@@ -1,0 +1,1889 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>Momixapon</title>
+<style>
+  :root {
+    --ink: #1a1a1d;
+    --muted: #6c6b66;
+    --accent: #c9202a;
+    --gold: rgba(255, 196, 46, 0.98);
+    --panel: rgba(255, 255, 255, 0.92);
+    /* Proporzioni reali della foto ritagliata macchinetta_2.png (565x1000) */
+    --stage-h: min(75dvh, 720px);
+    --stage-w: min(74vw, calc(var(--stage-h) * 0.565));
+  }
+
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+    color: var(--ink);
+    background-color: #d8d8d6;
+    background-image: url("public/background.jpg");
+    background-position: center center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    user-select: none;
+  }
+
+  /* --- Top Bar con Logo Extra-Large --- */
+  .topbar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 40;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 6px 14px;
+    pointer-events: none;
+  }
+
+  .brand-logo-wrap {
+    display: flex;
+    align-items: flex-start;
+    height: clamp(110px, 18vh, 175px);
+    width: min(64vw, 480px);
+    pointer-events: none;
+  }
+
+  .brand-logo {
+    height: 100%;
+    width: 100%;
+    object-fit: contain;
+    object-position: left top;
+    display: block;
+    filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.28));
+  }
+
+  .top-actions {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding-top: 0;
+    pointer-events: auto;
+  }
+
+  .btn-pill {
+    border: 1px solid rgba(0,0,0,0.08);
+    background: var(--panel);
+    color: var(--ink);
+    padding: 8px 13px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .btn-pill:active { transform: scale(0.94); }
+
+  .inv-badge {
+    background: var(--ink);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 800;
+    min-width: 22px;
+    height: 22px;
+    padding: 0 6px;
+    border-radius: 999px;
+    display: inline-grid;
+    place-items: center;
+  }
+
+  .inv-icon-btn {
+    position: relative;
+    border: none;
+    background: transparent;
+    padding: 0;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: flex-start;
+    justify-content: center;
+    height: clamp(110px, 18vh, 175px);
+    width: auto;
+    max-width: min(32vw, 260px);
+    transition: transform 0.15s ease;
+  }
+  .inv-icon-btn:active { transform: scale(0.94); }
+  .inv-icon-btn img {
+    height: 100%;
+    width: auto;
+    max-width: 100%;
+    object-fit: contain;
+    display: block;
+    filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.28));
+  }
+  .inv-icon-btn .inv-badge {
+    position: absolute;
+    top: 8px;
+    right: 6px;
+    min-width: 28px;
+    height: 28px;
+    font-size: 13px;
+    border: 2px solid #fff;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.28);
+  }
+
+  /* --- Corridoio Sala Gashapon --- */
+  .corridor-wrap {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+  }
+
+  .corridor {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    height: 100%;
+    padding-inline: calc(50% - var(--stage-w) / 2);
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    cursor: grab;
+  }
+  .corridor::-webkit-scrollbar { display: none; }
+  .corridor.is-dragging {
+    cursor: grabbing;
+    scroll-snap-type: none;
+  }
+  .corridor.locked {
+    overflow-x: hidden;
+    touch-action: none;
+    cursor: default;
+  }
+
+  .slide {
+    flex: 0 0 var(--stage-w);
+    scroll-snap-align: center;
+    scroll-snap-stop: always;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 52px 0 112px;
+    transition: transform 0.28s cubic-bezier(0.22, 0.85, 0.35, 1), opacity 0.25s ease;
+    opacity: 0.78;
+    transform: scale(0.91);
+    position: relative;
+    z-index: 1;
+    will-change: transform, opacity;
+  }
+  .slide.is-active {
+    opacity: 1;
+    transform: scale(1.04);
+    z-index: 5;
+  }
+
+  /* --- Macchinetta PNG trasparente senza bordi --- */
+  .machine-stage {
+    position: relative;
+    width: var(--stage-w);
+    aspect-ratio: 565 / 1000;
+    background: transparent;
+    overflow: visible;
+    transform: translateZ(0);
+  }
+
+  .machine-stage.has-photo {
+    filter: drop-shadow(0 16px 26px rgba(0, 0, 0, 0.34));
+  }
+  .slide.is-active .machine-stage.has-photo {
+    filter: drop-shadow(0 22px 34px rgba(0, 0, 0, 0.42));
+  }
+
+  .machine-photo {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: fill;
+    display: block;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  .machine-fallback {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background: linear-gradient(180deg, #faf9f6 0%, #e9e7e0 100%);
+    border: 2px solid #d6d3cb;
+    border-radius: 10px;
+    display: grid;
+    place-items: center;
+    font-size: 11px;
+    color: #666;
+    text-align: center;
+    padding: 14px;
+  }
+  .machine-stage.has-photo .machine-fallback { display: none; }
+
+  /* Vetrina Locandina */
+  .poster-window {
+    position: absolute;
+    top: 10.4%;
+    left: 4.0%;
+    width: 90.0%;
+    height: 43.8%;
+    z-index: 5;
+    border-radius: 4px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 250, 240, 0.08);
+    cursor: zoom-in;
+  }
+
+  .poster-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+    pointer-events: none;
+  }
+  .poster-img.cover { object-fit: cover; }
+
+  .poster-placeholder {
+    text-align: center;
+    padding: 10px 14px;
+    color: rgba(40, 38, 35, 0.78);
+    background: rgba(255, 255, 255, 0.78);
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 700;
+    pointer-events: none;
+  }
+
+  .poster-glass {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      125deg,
+      rgba(255,255,255,0.22) 0%,
+      rgba(255,255,255,0.04) 35%,
+      rgba(255,255,255,0) 55%,
+      rgba(255,255,255,0.1) 100%
+    );
+    box-shadow: inset 0 0 14px rgba(0,0,0,0.1);
+    pointer-events: none;
+  }
+
+  .poster-zoom-badge {
+    position: absolute;
+    right: 6px;
+    bottom: 6px;
+    background: rgba(0, 0, 0, 0.56);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 7px;
+    border-radius: 999px;
+    pointer-events: none;
+  }
+
+  /* Gettoniera (zona drop per la moneta) */
+  .coin-hotspot {
+    position: absolute;
+    top: 56.0%;
+    left: 10.0%;
+    width: 20.0%;
+    height: 18.5%;
+    z-index: 6;
+    border-radius: 8px;
+    transition: box-shadow 0.2s ease, background 0.2s ease;
+  }
+  .coin-hotspot.highlight {
+    box-shadow: 0 0 0 2px rgba(255, 210, 60, 0.95), 0 0 20px rgba(255, 200, 40, 0.75);
+    background: rgba(255, 215, 70, 0.22);
+  }
+
+  /* Manopola interna centrata */
+  .knob-hotspot {
+    position: absolute;
+    top: 64.3%;
+    left: 38.2%;
+    width: 20.8%;
+    height: 11.75%;
+    z-index: 6;
+    border-radius: 50%;
+    overflow: hidden;
+    cursor: grab;
+    touch-action: none;
+    transform-origin: center center;
+    will-change: transform;
+  }
+  .knob-hotspot:active { cursor: grabbing; }
+  .knob-hotspot.ready {
+    box-shadow: 0 0 0 3px rgba(255, 230, 120, 0.95), 0 0 20px rgba(201, 32, 42, 0.6);
+  }
+
+  .knob-photo-crop {
+    position: absolute;
+    width: 480.77%;
+    height: 851.06%;
+    left: -183.65%;
+    top: -547.23%;
+    object-fit: fill;
+    pointer-events: none;
+    display: none;
+  }
+  .machine-stage.has-photo .knob-photo-crop { display: block; }
+
+  .knob-fallback {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 4px solid var(--accent);
+    background: radial-gradient(circle at 35% 30%, #fff, #cfcdc7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .knob-fallback::after {
+    content: "";
+    width: 72%;
+    height: 18%;
+    border-radius: 99px;
+    background: linear-gradient(180deg, #fff, #b8b6b0);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.25);
+  }
+  .machine-stage.has-photo .knob-fallback { display: none; }
+
+  .chute-origin {
+    position: absolute;
+    top: 79.5%;
+    left: 62.5%;
+    width: 26.0%;
+    height: 18.5%;
+    z-index: 5;
+    pointer-events: none;
+  }
+
+  .machine-meta {
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--panel);
+    padding: 5px 12px;
+    border-radius: 999px;
+    border: 1px solid rgba(0,0,0,0.06);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .price-tag {
+    background: var(--ink);
+    color: #fff;
+    padding: 2px 9px;
+    border-radius: 999px;
+    font-size: 11px;
+  }
+
+  .count-tag {
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 600;
+  }
+
+  /* Dock inferiore + Moneta extra-grande (public/coin.png) */
+  .coin-dock {
+    position: fixed;
+    bottom: 18px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 35;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--panel);
+    padding: 8px 16px 8px 10px;
+    border-radius: 999px;
+    border: 1px solid rgba(0,0,0,0.08);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+    max-width: 96vw;
+  }
+
+  .coin-visual {
+    position: relative;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid #c9a23f;
+    background: conic-gradient(from 40deg, #f9e396, #cfa03b, #fff2bf, #b78524, #f9e396);
+    color: #4d3500;
+    font-weight: 900;
+    font-size: 24px;
+    display: grid;
+    place-items: center;
+    box-shadow: inset 0 0 0 3px rgba(255,255,255,0.4), 0 6px 14px rgba(0,0,0,0.24);
+  }
+  .coin-visual.has-coin-img {
+    border: none;
+    background: transparent;
+    box-shadow: none;
+    overflow: visible;
+  }
+  .coin-visual img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    pointer-events: none;
+  }
+  .coin-visual.has-coin-img img {
+    filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.35));
+  }
+  .coin-visual.has-coin-img .coin-text { display: none; }
+
+  .coin-btn {
+    flex-shrink: 0;
+    width: 116px;
+    height: 116px;
+    margin: -34px 0 -22px -6px;
+    cursor: grab;
+    touch-action: none;
+    transition: transform 0.15s ease;
+  }
+  .coin-btn:hover { transform: scale(1.06); }
+  .coin-btn:active { cursor: grabbing; }
+
+  @media (max-width: 480px) {
+    .coin-btn {
+      width: 96px;
+      height: 96px;
+      margin: -26px 0 -16px -4px;
+    }
+  }
+
+  .dock-hint {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--muted);
+    max-width: 145px;
+    line-height: 1.25;
+  }
+
+  .dots { display: flex; gap: 5px; }
+  .dot {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 1px solid rgba(0,0,0,0.12);
+    background: #fff;
+    font-size: 11px;
+    font-weight: 800;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+  }
+  .dot.active {
+    background: var(--ink);
+    color: #fff;
+    border-color: var(--ink);
+  }
+
+  .nav-arrow {
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 30;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 1px solid rgba(0,0,0,0.08);
+    background: var(--panel);
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.14);
+    transition: opacity 0.2s ease;
+  }
+  .nav-arrow.prev { left: 8px; }
+  .nav-arrow.next { right: 8px; }
+  .nav-arrow.hidden { opacity: 0; pointer-events: none; }
+
+  .floating-coin {
+    position: fixed;
+    top: 0; left: 0;
+    z-index: 90;
+    width: 124px;
+    height: 124px;
+    display: none;
+    pointer-events: none;
+    will-change: transform;
+  }
+
+  /* --- Lightbox Locandina / Anteprima Premio --- */
+  .poster-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 95;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(12, 13, 16, 0.88);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.22s ease;
+  }
+  .poster-modal.open { opacity: 1; pointer-events: auto; }
+
+  .poster-modal-box {
+    max-width: 94vw;
+    max-height: 86dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    transform: scale(0.94);
+    transition: transform 0.24s cubic-bezier(0.2, 0.9, 0.3, 1);
+  }
+  .poster-modal.open .poster-modal-box { transform: scale(1); }
+
+  .poster-modal-box img {
+    max-width: 92vw;
+    max-height: 80dvh;
+    object-fit: contain;
+    border-radius: 12px;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.6);
+    background: #1b1c20;
+  }
+
+  .poster-modal-close {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.22);
+    background: rgba(255,255,255,0.14);
+    color: #fff;
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+  }
+
+  /* --- Drawer Inventario (Solo Immagini a Griglia) --- */
+  .inv-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 92;
+    background: rgba(15, 16, 20, 0.52);
+    display: flex;
+    justify-content: flex-end;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.24s ease;
+  }
+  .inv-backdrop.open { opacity: 1; pointer-events: auto; }
+
+  .inv-drawer {
+    width: min(92vw, 400px);
+    height: 100%;
+    background: #f7f6f2;
+    display: flex;
+    flex-direction: column;
+    box-shadow: -14px 0 40px rgba(0, 0, 0, 0.28);
+    transform: translateX(100%);
+    transition: transform 0.28s cubic-bezier(0.22, 0.85, 0.35, 1);
+  }
+  .inv-backdrop.open .inv-drawer { transform: translateX(0); }
+
+  .inv-header {
+    padding: 16px 18px;
+    background: #fff;
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .inv-header h2 { margin: 0; font-size: 16px; font-weight: 800; }
+  .inv-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+  .inv-grid {
+    flex: 1;
+    overflow-y: auto;
+    padding: 14px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    align-content: start;
+  }
+
+  .inv-empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.5;
+    padding: 48px 16px;
+  }
+  .inv-empty-icon { font-size: 42px; margin-bottom: 8px; }
+
+  .inv-tile {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    background: #fff;
+    border: 1px solid rgba(0,0,0,0.08);
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    cursor: pointer;
+    transition: transform 0.14s ease;
+  }
+  .inv-tile:active { transform: scale(0.95); }
+  .inv-tile img {
+    width: 86%;
+    height: 86%;
+    object-fit: contain;
+  }
+  .inv-tile-emoji { font-size: 36px; }
+
+  .inv-qty {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    background: #1a1a1d;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 800;
+    padding: 2px 7px;
+    border-radius: 999px;
+  }
+
+  .inv-footer {
+    padding: 12px 16px;
+    background: #fff;
+    border-top: 1px solid rgba(0,0,0,0.08);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .btn-clear {
+    border: 1px solid rgba(201, 32, 42, 0.25);
+    background: rgba(201, 32, 42, 0.08);
+    color: var(--accent);
+    padding: 7px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  /* --- Overlay Capsula PNG & Apertura Dorata --- */
+  .capsule-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(circle at 50% 45%, rgba(255,255,255,0.86), rgba(210,206,198,0.94));
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.28s ease;
+  }
+  .capsule-overlay.active { opacity: 1; pointer-events: auto; }
+
+  .capsule-wrap {
+    position: relative;
+    width: 260px;
+    height: 260px;
+    cursor: pointer;
+    touch-action: none;
+    transform-origin: center center;
+    will-change: transform, opacity;
+  }
+
+  .gold-glow {
+    position: absolute;
+    inset: -80px;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--gold) 0%, rgba(255,215,90,0.38) 42%, rgba(255,255,255,0) 70%);
+    opacity: 0;
+    pointer-events: none;
+    will-change: opacity, transform;
+  }
+
+  .capsule-shadow {
+    position: absolute;
+    bottom: -14px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 170px;
+    height: 28px;
+    border-radius: 50%;
+    background: radial-gradient(ellipse at center, rgba(0,0,0,0.3), rgba(0,0,0,0) 70%);
+  }
+
+  .cap-top, .cap-bottom {
+    position: absolute;
+    inset: 0;
+    will-change: transform, opacity;
+    transition: transform 0.32s cubic-bezier(0.2, 0.9, 0.3, 1), opacity 0.26s ease;
+  }
+
+  .cap-photo-layer {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    pointer-events: none;
+    filter: drop-shadow(0 12px 22px rgba(0,0,0,0.28));
+  }
+  .cap-top .cap-photo-layer {
+    clip-path: inset(0 0 47% 0);
+  }
+  .cap-bottom .cap-photo-layer {
+    clip-path: inset(53% 0 0 0);
+  }
+
+  .capsule-wrap.has-cap-photo .cap-css-fallback { display: none; }
+  .capsule-wrap:not(.has-cap-photo) .cap-photo-layer { display: none; }
+
+  .cap-css-top {
+    position: absolute;
+    top: 20px; left: 20px;
+    width: 220px; height: 112px;
+    border-radius: 110px 110px 6px 6px;
+    background: radial-gradient(circle at 32% 26%, rgba(255,255,255,0.94) 0%, rgba(255,255,255,0.34) 32%, rgba(220,232,240,0.24) 70%, rgba(160,180,195,0.38) 100%);
+    border: 2px solid rgba(255,255,255,0.88);
+    border-bottom: 3px solid rgba(255,255,255,0.92);
+    box-shadow: inset 0 12px 24px rgba(255,255,255,0.75);
+  }
+  .cap-css-bottom {
+    position: absolute;
+    bottom: 20px; left: 20px;
+    width: 220px; height: 112px;
+    border-radius: 6px 6px 110px 110px;
+    background: var(--cap-color, #e8a825);
+    border: 2px solid rgba(255,255,255,0.45);
+    box-shadow: inset 0 14px 18px rgba(255,255,255,0.32), inset 0 -22px 30px rgba(0,0,0,0.26);
+  }
+
+  .seam-stress {
+    position: absolute;
+    top: 52%;
+    left: 10%;
+    right: 10%;
+    height: 12px;
+    transform: translateY(-50%);
+    border-radius: 99px;
+    background: radial-gradient(ellipse at center, #fffbe0 25%, rgba(255, 210, 60, 0.85) 55%, rgba(255,255,255,0) 85%);
+    opacity: 0;
+    z-index: 6;
+    pointer-events: none;
+    will-change: opacity;
+  }
+
+  .squeeze-ui {
+    margin-top: 32px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    transition: opacity 0.25s ease;
+  }
+
+  .squeeze-bar-bg {
+    width: 210px;
+    height: 8px;
+    border-radius: 99px;
+    background: rgba(0,0,0,0.12);
+    overflow: hidden;
+  }
+  .squeeze-bar-fill {
+    width: 100%;
+    height: 100%;
+    transform-origin: left center;
+    transform: scaleX(0);
+    background: linear-gradient(90deg, #b8860b, #ffd54f);
+    will-change: transform;
+  }
+
+  .btn-primary {
+    border: none;
+    background: var(--ink);
+    color: #fff;
+    padding: 12px 24px;
+    border-radius: 999px;
+    font-size: 14px;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 10px 22px rgba(0,0,0,0.18);
+  }
+  .btn-primary:active { transform: scale(0.96); }
+
+  #fxCanvas {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 80;
+    pointer-events: none;
+  }
+
+  .flash-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 85;
+    background: #fff9e6;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.28s ease;
+    will-change: opacity;
+  }
+
+  /* --- Reveal Screen (Chiaro, abbinato a background.jpg) --- */
+  .reveal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 75;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background:
+      radial-gradient(circle at 50% 35%, rgba(255, 255, 255, 0.72) 0%, rgba(222, 237, 248, 0.88) 100%),
+      url("public/background.jpg") center / cover no-repeat;
+    backdrop-filter: blur(6px);
+    color: var(--ink);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+  .reveal-overlay.active { opacity: 1; pointer-events: auto; }
+
+  .reveal-card {
+    width: min(86vw, 340px);
+    background: rgba(255, 255, 255, 0.88);
+    border: 2px solid rgba(168, 200, 224, 0.55);
+    border-radius: 26px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 24px 55px rgba(86, 126, 158, 0.22);
+    transform-style: preserve-3d;
+    will-change: transform;
+  }
+  .reveal-card.resetting {
+    transition: transform 0.35s cubic-bezier(0.2, 0.9, 0.3, 1);
+  }
+
+  .prize-stage {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    border-radius: 18px;
+    background: radial-gradient(circle at 50% 42%, #ffffff 20%, #e4eff7 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    margin-bottom: 14px;
+    border: 1px solid rgba(168, 200, 224, 0.4);
+    box-shadow: inset 0 2px 10px rgba(120, 155, 185, 0.12);
+  }
+  .prize-stage img {
+    width: 88%;
+    height: 88%;
+    object-fit: contain;
+    filter: drop-shadow(0 12px 18px rgba(45, 75, 105, 0.22));
+  }
+  .prize-fallback-emoji { font-size: 76px; }
+
+  .reveal-sub {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+    margin: 0 0 14px;
+  }
+
+  .reveal-actions {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    justify-content: center;
+  }
+
+  .btn-inv-reveal {
+    border: none;
+    background: transparent;
+    padding: 0;
+    height: 54px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.15s ease;
+  }
+  .btn-inv-reveal:active { transform: scale(0.93); }
+  .btn-inv-reveal img {
+    height: 100%;
+    width: auto;
+    object-fit: contain;
+    display: block;
+    filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.18));
+  }
+</style>
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="brand-logo-wrap">
+      <img
+        id="brandLogo"
+        src="public/logo.png"
+        alt="Logo"
+        class="brand-logo"
+        onerror="if(!this.dataset.triedJpg){this.dataset.triedJpg='1';this.src='public/logo.jpg';}else{this.style.display='none';}"
+      />
+    </div>
+    <div class="top-actions">
+      <button class="inv-icon-btn" id="invBtn" title="Apri Inventario">
+        <img
+          src="public/inventario.png"
+          alt="Inventario"
+          onerror="this.style.display='none';this.nextElementSibling.style.display='inline';"
+        />
+        <span style="display:none;font-size:28px;">🎒</span>
+        <span class="inv-badge" id="invBadge">0</span>
+      </button>
+      <button class="btn-pill" id="muteBtn" title="Audio">🔊</button>
+    </div>
+  </header>
+
+  <button class="nav-arrow prev" id="prevBtn" aria-label="Macchina precedente">‹</button>
+  <button class="nav-arrow next" id="nextBtn" aria-label="Macchina successiva">›</button>
+
+  <main class="corridor-wrap">
+    <div class="corridor" id="corridor"></div>
+  </main>
+
+  <div class="coin-dock" id="coinDock">
+    <div class="coin-visual coin-btn" id="coinBtn" title="Trascina nella fessura della macchinetta">
+      <img id="coinImgDock" alt="€3" />
+      <span class="coin-text">€3</span>
+    </div>
+    <div class="dock-hint" id="dockHint">Trascina il gettone nella fessura</div>
+    <div class="dots" id="dots"></div>
+  </div>
+
+  <div class="coin-visual floating-coin" id="floatingCoin">
+    <img id="coinImgFloat" alt="€3" />
+    <span class="coin-text">€3</span>
+  </div>
+
+  <!-- Lightbox Locandina / Anteprima Premio -->
+  <div class="poster-modal" id="posterModal" role="dialog" aria-modal="true">
+    <button class="poster-modal-close" id="closePosterModal" aria-label="Chiudi">✕</button>
+    <div class="poster-modal-box">
+      <img id="posterModalImg" alt="Anteprima ingrandita" />
+    </div>
+  </div>
+
+  <!-- Drawer Inventario -->
+  <div class="inv-backdrop" id="invBackdrop">
+    <aside class="inv-drawer" aria-label="Inventario premi vinti">
+      <div class="inv-header">
+        <div>
+          <h2>🎒 Inventario</h2>
+          <div class="inv-sub" id="invSummary">0 gadget vinti</div>
+        </div>
+        <button class="btn-pill" id="closeInvBtn">✕</button>
+      </div>
+      <div class="inv-grid" id="invGrid"></div>
+      <div class="inv-footer">
+        <span class="inv-sub">Salvato automaticamente</span>
+        <button class="btn-clear" id="clearInvBtn">Svuota</button>
+      </div>
+    </aside>
+  </div>
+
+  <!-- Overlay Capsula Macro (4 PNG casuali divisi lungo la giuntura) -->
+  <section class="capsule-overlay" id="capsuleOverlay">
+    <div class="capsule-wrap" id="capsuleWrap">
+      <div class="gold-glow" id="goldGlow"></div>
+      <div class="capsule-shadow"></div>
+      <div class="cap-top" id="capTop">
+        <img class="cap-photo-layer" id="capImgTop" alt="" />
+        <div class="cap-css-fallback cap-css-top"></div>
+      </div>
+      <div class="seam-stress" id="seamStress"></div>
+      <div class="cap-bottom" id="capBottom">
+        <img class="cap-photo-layer" id="capImgBottom" alt="" />
+        <div class="cap-css-fallback cap-css-bottom"></div>
+      </div>
+    </div>
+
+    <div class="squeeze-ui" id="squeezeUI">
+      <div class="squeeze-bar-bg"><div class="squeeze-bar-fill" id="squeezeFill"></div></div>
+      <button class="btn-primary" id="openCapBtn">Tieni premuto o Tocca per Aprire</button>
+    </div>
+  </section>
+
+  <canvas id="fxCanvas"></canvas>
+  <div class="flash-screen" id="flashScreen"></div>
+
+  <!-- Reveal Finale -->
+  <section class="reveal-overlay" id="revealOverlay">
+    <div class="reveal-card" id="revealCard">
+      <div class="prize-stage" id="prizeStage"></div>
+      <p class="reveal-sub">Aggiunto al tuo inventario</p>
+      <div class="reveal-actions">
+        <button class="btn-inv-reveal" id="openInvFromReveal" title="Apri Inventario">
+          <img
+            src="public/inventario.png"
+            alt="Inventario"
+            onerror="this.style.display='none';this.nextElementSibling.style.display='inline';"
+          />
+          <span style="display:none;font-size:28px;">🎒</span>
+        </button>
+        <button class="btn-primary" id="againBtn">Continua</button>
+      </div>
+    </div>
+  </section>
+
+<script>
+/* =========================================================================
+   1. CONFIGURAZIONE 5 MACCHINETTE & 4 PALLINE PNG CASUALI
+   ========================================================================= */
+const MAX_PRIZES_PROBE = 15;
+const CAPSULE_COLORS = ["#18a5d8", "#e85d75", "#e8a825", "#2eb872", "#8c4ce8", "#2d7ff9"];
+const GOLD_TINT = "rgba(255, 196, 46, 0.98)";
+
+const CAPSULE_IMAGES = [
+  "public/pallina1.png",
+  "public/pallina2.png",
+  "public/pallina3.png",
+  "public/pallina.png"
+];
+let availableCapsules = [];
+
+const MACHINES = [
+  { id: 0, prefix: "m1", price: 3, machinePhoto: "public/macchinetta_2.png", posterPhoto: "public/locandina-1.jpg", posterCover: false, activePrizes: [] },
+  { id: 1, prefix: "m2", price: 3, machinePhoto: "public/macchinetta_2.png", posterPhoto: "public/locandina-2.jpg", posterCover: false, activePrizes: [] },
+  { id: 2, prefix: "m3", price: 3, machinePhoto: "public/macchinetta_2.png", posterPhoto: "public/locandina-3.jpg", posterCover: false, activePrizes: [] },
+  { id: 3, prefix: "m4", price: 3, machinePhoto: "public/macchinetta_2.png", posterPhoto: "public/locandina-4.jpg", posterCover: false, activePrizes: [] },
+  { id: 4, prefix: "m5", price: 3, machinePhoto: "public/macchinetta_2.png", posterPhoto: "public/locandina-5.jpg", posterCover: false, activePrizes: [] }
+];
+
+function checkImageExists(url) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => resolve(true);
+    img.onerror = () => resolve(false);
+    img.src = url;
+  });
+}
+
+async function detectCapsules() {
+  const checks = await Promise.all(
+    CAPSULE_IMAGES.map((url) => checkImageExists(url).then((ok) => ({ url, ok })))
+  );
+  availableCapsules = checks.filter((c) => c.ok).map((c) => c.url);
+}
+
+function initCoinImage() {
+  const dockEl = document.getElementById("coinBtn");
+  const floatEl = document.getElementById("floatingCoin");
+  const imgDock = document.getElementById("coinImgDock");
+  const imgFloat = document.getElementById("coinImgFloat");
+
+  checkImageExists("public/coin.png").then((ok) => {
+    if (ok) {
+      imgDock.src = "public/coin.png";
+      imgFloat.src = "public/coin.png";
+      dockEl.classList.add("has-coin-img");
+      floatEl.classList.add("has-coin-img");
+    } else {
+      imgDock.style.display = "none";
+      imgFloat.style.display = "none";
+    }
+  });
+}
+
+async function detectAllPrizes() {
+  for (let mIdx = 0; mIdx < MACHINES.length; mIdx++) {
+    const m = MACHINES[mIdx];
+    const checks = [];
+    for (let n = 1; n <= MAX_PRIZES_PROBE; n++) {
+      const url = `public/${m.prefix}-premio-${n}.jpg`;
+      checks.push(checkImageExists(url).then((ok) => ({ n, url, ok })));
+    }
+    const results = await Promise.all(checks);
+    const found = results.filter((r) => r.ok);
+
+    if (found.length > 0) {
+      m.activePrizes = found.map((item) => ({
+        key: `${m.prefix}-${item.n}`,
+        color: CAPSULE_COLORS[(item.n - 1) % CAPSULE_COLORS.length],
+        photo: item.url
+      }));
+    } else {
+      m.activePrizes = Array.from({ length: 5 }, (_, i) => ({
+        key: `${m.prefix}-${i + 1}`,
+        color: CAPSULE_COLORS[i % CAPSULE_COLORS.length],
+        photo: `public/${m.prefix}-premio-${i + 1}.jpg`
+      }));
+    }
+
+    const badge = document.getElementById(`count-${mIdx}`);
+    if (badge) badge.textContent = `${m.activePrizes.length} sorprese`;
+  }
+}
+
+/* =========================================================================
+   2. INVENTARIO A GRIGLIA (Solo immagini, salvato in localStorage)
+   ========================================================================= */
+const INV_STORAGE_KEY = "gashapon_inventory_v1";
+let inventory = [];
+
+function loadInventory() {
+  try {
+    const raw = localStorage.getItem(INV_STORAGE_KEY);
+    inventory = raw ? JSON.parse(raw) : [];
+  } catch {
+    inventory = [];
+  }
+  updateInventoryUI();
+}
+
+function saveInventory() {
+  try { localStorage.setItem(INV_STORAGE_KEY, JSON.stringify(inventory)); } catch {}
+}
+
+function addToInventory(prize) {
+  const existing = inventory.find((item) => item.key === prize.key);
+  if (existing) {
+    existing.qty += 1;
+    existing.lastWon = Date.now();
+  } else {
+    inventory.unshift({
+      key: prize.key,
+      photo: prize.photo,
+      qty: 1,
+      lastWon: Date.now()
+    });
+  }
+  inventory.sort((a, b) => b.lastWon - a.lastWon);
+  saveInventory();
+  updateInventoryUI();
+}
+
+const invBadge = document.getElementById("invBadge");
+const invBackdrop = document.getElementById("invBackdrop");
+const invGrid = document.getElementById("invGrid");
+const invSummary = document.getElementById("invSummary");
+
+function updateInventoryUI() {
+  const totalCount = inventory.reduce((sum, item) => sum + item.qty, 0);
+  invBadge.textContent = totalCount;
+  invSummary.textContent = `${totalCount} ${totalCount === 1 ? "gadget vinto" : "gadget vinti"}`;
+
+  invGrid.innerHTML = "";
+  if (inventory.length === 0) {
+    invGrid.innerHTML = `
+      <div class="inv-empty">
+        <div class="inv-empty-icon">🎁</div>
+        Nessun gadget ancora.<br>Gira una macchinetta per iniziare!
+      </div>
+    `;
+    return;
+  }
+
+  inventory.forEach((item) => {
+    const tile = document.createElement("div");
+    tile.className = "inv-tile";
+    tile.innerHTML = `
+      <img src="${item.photo}" alt="Premio" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" />
+      <span class="inv-tile-emoji" style="display:none;">🎁</span>
+      <span class="inv-qty">x${item.qty}</span>
+    `;
+    tile.onclick = () => openImageModal(item.photo);
+    invGrid.appendChild(tile);
+  });
+}
+
+function openInventory() { invBackdrop.classList.add("open"); }
+function closeInventory() { invBackdrop.classList.remove("open"); }
+
+document.getElementById("invBtn").onclick = openInventory;
+document.getElementById("closeInvBtn").onclick = closeInventory;
+invBackdrop.addEventListener("click", (e) => { if (e.target === invBackdrop) closeInventory(); });
+document.getElementById("clearInvBtn").onclick = () => {
+  if (inventory.length === 0) return;
+  if (confirm("Vuoi svuotare tutto l'inventario?")) {
+    inventory = [];
+    saveInventory();
+    updateInventoryUI();
+  }
+};
+
+/* =========================================================================
+   3. STATO & AUDIO
+   ========================================================================= */
+let activeIndex = Math.floor(MACHINES.length / 2); // Parte sulla #3 (centrale)
+let phase = "idle";
+let currentPrize = null;
+let lastPrizeByMachine = {};
+let muted = false;
+let audioCtx = null;
+
+function ensureAudio() {
+  if (muted) return null;
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (audioCtx.state === "suspended") audioCtx.resume();
+  return audioCtx;
+}
+
+function playTone(freq, dur, type = "sine", vol = 0.12, endFreq = null) {
+  const ctx = ensureAudio();
+  if (!ctx) return;
+  const o = ctx.createOscillator();
+  const g = ctx.createGain();
+  o.type = type;
+  o.frequency.setValueAtTime(freq, ctx.currentTime);
+  if (endFreq) o.frequency.exponentialRampToValueAtTime(endFreq, ctx.currentTime + dur);
+  g.gain.setValueAtTime(vol, ctx.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
+  o.connect(g); g.connect(ctx.destination);
+  o.start(); o.stop(ctx.currentTime + dur);
+}
+
+function sfxCoin() {
+  playTone(1580, 0.12, "sine", 0.14, 2100);
+  setTimeout(() => playTone(2350, 0.18, "triangle", 0.1, 1900), 75);
+}
+function sfxClick() { playTone(320, 0.04, "square", 0.055, 120); }
+function sfxBounce() { playTone(180, 0.09, "triangle", 0.12, 70); }
+function sfxCrack() { playTone(520, 0.09, "sawtooth", 0.1, 140); }
+function sfxBoom() {
+  playTone(130, 0.55, "sine", 0.25, 34);
+  playTone(540, 0.45, "triangle", 0.12, 1180);
+  setTimeout(() => playTone(880, 0.5, "sine", 0.1, 1320), 90);
+}
+
+document.getElementById("muteBtn").onclick = (e) => {
+  muted = !muted;
+  e.target.textContent = muted ? "🔇" : "🔊";
+};
+
+/* =========================================================================
+   4. CORRIDOIO CENTRATO + MOUSE DRAG-TO-SCROLL
+   ========================================================================= */
+const corridor = document.getElementById("corridor");
+const dotsEl = document.getElementById("dots");
+const coinBtn = document.getElementById("coinBtn");
+const dockHint = document.getElementById("dockHint");
+const floatingCoin = document.getElementById("floatingCoin");
+const prevBtn = document.getElementById("prevBtn");
+const nextBtn = document.getElementById("nextBtn");
+
+const posterModal = document.getElementById("posterModal");
+const posterModalImg = document.getElementById("posterModalImg");
+
+function openImageModal(src) {
+  posterModalImg.src = src;
+  posterModal.classList.add("open");
+}
+
+function closePosterModal() { posterModal.classList.remove("open"); }
+document.getElementById("closePosterModal").onclick = closePosterModal;
+posterModal.addEventListener("click", (e) => { if (e.target === posterModal) closePosterModal(); });
+
+function renderCorridor() {
+  corridor.innerHTML = "";
+  dotsEl.innerHTML = "";
+
+  MACHINES.forEach((m, idx) => {
+    const slide = document.createElement("div");
+    slide.className = "slide" + (idx === activeIndex ? " is-active" : "");
+    slide.id = `slide-${idx}`;
+    slide.innerHTML = `
+      <div class="machine-stage" id="stage-${idx}">
+        <div class="machine-fallback">Inserisci <b>${m.machinePhoto}</b></div>
+        <img class="machine-photo" id="mPhoto-${idx}" alt="Macchinetta" />
+        <div class="poster-window" id="posterWin-${idx}" title="Tocca per ingrandire">
+          <img class="poster-img ${m.posterCover ? "cover" : ""}" id="pPhoto-${idx}" alt="Locandina" />
+          <div class="poster-placeholder" id="pFallback-${idx}">${m.posterPhoto}</div>
+          <div class="poster-glass"></div>
+          <span class="poster-zoom-badge">🔍</span>
+        </div>
+        <div class="coin-hotspot" id="coinSlot-${idx}" title="Trascina qui il gettone"></div>
+        <div class="knob-hotspot" id="knob-${idx}" title="Gira la manopola">
+          <img class="knob-photo-crop" id="knobCrop-${idx}" alt="" />
+          <div class="knob-fallback"></div>
+        </div>
+        <div class="chute-origin" id="chute-${idx}"></div>
+      </div>
+      <div class="machine-meta">
+        <span class="price-tag">€${m.price}</span>
+        <span class="count-tag" id="count-${idx}">...</span>
+      </div>
+    `;
+    corridor.appendChild(slide);
+
+    const dot = document.createElement("button");
+    dot.className = "dot" + (idx === activeIndex ? " active" : "");
+    dot.textContent = idx + 1;
+    dot.onclick = () => scrollToMachine(idx);
+    dotsEl.appendChild(dot);
+
+    bindMachineImages(idx);
+    bindMachineEvents(idx);
+  });
+
+  updateActiveUI();
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => centerMachine(activeIndex, false));
+  });
+}
+
+function bindMachineImages(idx) {
+  const m = MACHINES[idx];
+  const stage = document.getElementById(`stage-${idx}`);
+  const mImg = document.getElementById(`mPhoto-${idx}`);
+  const knobCrop = document.getElementById(`knobCrop-${idx}`);
+  const pImg = document.getElementById(`pPhoto-${idx}`);
+  const pFallback = document.getElementById(`pFallback-${idx}`);
+
+  mImg.onload = () => {
+    stage.classList.add("has-photo");
+    knobCrop.src = mImg.src;
+  };
+  mImg.onerror = () => stage.classList.remove("has-photo");
+  mImg.src = m.machinePhoto;
+
+  pImg.onload = () => {
+    pImg.style.display = "block";
+    pFallback.style.display = "none";
+  };
+  pImg.onerror = () => {
+    pImg.style.display = "none";
+    pFallback.style.display = "block";
+  };
+  pImg.src = m.posterPhoto;
+}
+
+function centerMachine(idx, smooth = true) {
+  const slide = document.getElementById(`slide-${idx}`);
+  if (!slide) return;
+  const targetLeft = slide.offsetLeft - (corridor.clientWidth - slide.offsetWidth) / 2;
+  if (!smooth) {
+    corridor.style.scrollSnapType = "none";
+    corridor.scrollLeft = targetLeft;
+    requestAnimationFrame(() => {
+      corridor.style.scrollSnapType = "";
+    });
+  } else {
+    corridor.scrollTo({ left: targetLeft, behavior: "smooth" });
+  }
+}
+
+function scrollToMachine(idx) {
+  if (phase !== "idle") return;
+  activeIndex = Math.max(0, Math.min(MACHINES.length - 1, idx));
+  centerMachine(activeIndex, true);
+  updateActiveUI();
+}
+
+function findClosestMachine() {
+  const center = corridor.scrollLeft + corridor.clientWidth / 2;
+  let closest = activeIndex;
+  let bestDist = Infinity;
+  for (let i = 0; i < MACHINES.length; i++) {
+    const s = document.getElementById(`slide-${i}`);
+    const d = Math.abs(s.offsetLeft + s.offsetWidth / 2 - center);
+    if (d < bestDist) { bestDist = d; closest = i; }
+  }
+  return closest;
+}
+
+let scrollTicking = false;
+corridor.addEventListener("scroll", () => {
+  if (phase !== "idle" || scrollTicking) return;
+  scrollTicking = true;
+  requestAnimationFrame(() => {
+    scrollTicking = false;
+    const closest = findClosestMachine();
+    if (closest !== activeIndex) {
+      activeIndex = closest;
+      updateActiveUI();
+    }
+  });
+}, { passive: true });
+
+/* Drag-to-scroll con il mouse */
+let mouseDragging = false;
+let mouseDragMoved = false;
+let dragStartX = 0;
+let dragStartScroll = 0;
+let suppressNextClick = false;
+
+corridor.addEventListener("mousedown", (e) => {
+  if (e.button !== 0 || phase !== "idle") return;
+  mouseDragging = true;
+  mouseDragMoved = false;
+  dragStartX = e.clientX;
+  dragStartScroll = corridor.scrollLeft;
+  corridor.classList.add("is-dragging");
+});
+
+window.addEventListener("mousemove", (e) => {
+  if (!mouseDragging) return;
+  const dx = e.clientX - dragStartX;
+  if (Math.abs(dx) > 5) mouseDragMoved = true;
+  corridor.scrollLeft = dragStartScroll - dx;
+});
+
+window.addEventListener("mouseup", () => {
+  if (!mouseDragging) return;
+  mouseDragging = false;
+  corridor.classList.remove("is-dragging");
+  if (mouseDragMoved) {
+    suppressNextClick = true;
+    setTimeout(() => { suppressNextClick = false; }, 60);
+    activeIndex = findClosestMachine();
+    centerMachine(activeIndex, true);
+    updateActiveUI();
+  }
+});
+
+window.addEventListener("load", () => centerMachine(activeIndex, false));
+window.addEventListener("resize", () => centerMachine(activeIndex, false));
+
+prevBtn.onclick = () => scrollToMachine(activeIndex - 1);
+nextBtn.onclick = () => scrollToMachine(activeIndex + 1);
+
+function updateActiveUI() {
+  document.querySelectorAll(".slide").forEach((s, i) => s.classList.toggle("is-active", i === activeIndex));
+  document.querySelectorAll(".dot").forEach((d, i) => d.classList.toggle("active", i === activeIndex));
+  prevBtn.classList.toggle("hidden", activeIndex === 0 || phase !== "idle");
+  nextBtn.classList.toggle("hidden", activeIndex === MACHINES.length - 1 || phase !== "idle");
+}
+
+/* =========================================================================
+   5. GETTONE (Solo Drag & Drop nella fessura) & ROTAZIONE MANOPOLA
+   ========================================================================= */
+function insertCoin(idx) {
+  if (phase !== "idle" || idx !== activeIndex) return;
+  phase = "coinInserted";
+  corridor.classList.add("locked");
+  sfxCoin();
+  dockHint.textContent = "Gira la manopola centrale di 360°!";
+  document.getElementById(`knob-${idx}`).classList.add("ready");
+  updateActiveUI();
+}
+
+let draggingCoin = false;
+coinBtn.addEventListener("pointerdown", (e) => {
+  if (phase !== "idle") return;
+  draggingCoin = true;
+  coinBtn.setPointerCapture(e.pointerId);
+  floatingCoin.style.display = "grid";
+  floatingCoin.style.transform = `translate3d(calc(${e.clientX}px - 50%), calc(${e.clientY}px - 50%), 0) scale(1.06)`;
+  document.getElementById(`coinSlot-${activeIndex}`).classList.add("highlight");
+});
+
+window.addEventListener("pointermove", (e) => {
+  if (!draggingCoin) return;
+  floatingCoin.style.transform = `translate3d(calc(${e.clientX}px - 50%), calc(${e.clientY}px - 50%), 0) scale(1.06)`;
+});
+
+window.addEventListener("pointerup", (e) => {
+  if (!draggingCoin) return;
+  draggingCoin = false;
+  floatingCoin.style.display = "none";
+  const slot = document.getElementById(`coinSlot-${activeIndex}`);
+  slot.classList.remove("highlight");
+  const r = slot.getBoundingClientRect();
+  const hitSlot = e.clientX >= r.left - 24 && e.clientX <= r.right + 24 && e.clientY >= r.top - 24 && e.clientY <= r.bottom + 24;
+  if (hitSlot) insertCoin(activeIndex);
+});
+
+function bindMachineEvents(idx) {
+  document.getElementById(`posterWin-${idx}`).addEventListener("click", () => {
+    if (suppressNextClick) return;
+    if (idx !== activeIndex && phase === "idle") { scrollToMachine(idx); return; }
+    if (phase === "idle" || phase === "coinInserted") {
+      openImageModal(MACHINES[idx].posterPhoto);
+    }
+  });
+
+  const knob = document.getElementById(`knob-${idx}`);
+  let turning = false, startAngle = 0, currentDeg = 0, lastDetent = 0, knobCx = 0, knobCy = 0;
+
+  knob.addEventListener("pointerdown", (e) => {
+    if (phase !== "coinInserted" || idx !== activeIndex) return;
+    e.stopPropagation();
+    turning = true;
+    knob.setPointerCapture(e.pointerId);
+    const r = knob.getBoundingClientRect();
+    knobCx = r.left + r.width / 2;
+    knobCy = r.top + r.height / 2;
+    startAngle = Math.atan2(e.clientY - knobCy, e.clientX - knobCx) * (180 / Math.PI) - currentDeg;
+  });
+
+  knob.addEventListener("pointermove", (e) => {
+    if (!turning) return;
+    let deg = Math.atan2(e.clientY - knobCy, e.clientX - knobCx) * (180 / Math.PI) - startAngle;
+    while (deg < currentDeg - 180) deg += 360;
+    if (deg > currentDeg) {
+      currentDeg = deg;
+      knob.style.transform = `rotate3d(0,0,1,${currentDeg}deg)`;
+      if (currentDeg - lastDetent >= 45) { lastDetent = currentDeg; sfxClick(); }
+      if (currentDeg >= 330) {
+        turning = false; currentDeg = 0; lastDetent = 0;
+        finishKnobTurn(idx, knob);
+      }
+    }
+  });
+
+  knob.addEventListener("pointerup", () => {
+    if (!turning) return;
+    turning = false;
+    if (currentDeg < 35) { currentDeg = 0; lastDetent = 0; autoTurnKnob(idx, knob); }
+  });
+}
+
+function autoTurnKnob(idx, knob) {
+  const duration = 720, start = performance.now();
+  let lastClickStep = 0;
+  function frame(now) {
+    const t = Math.min(1, (now - start) / duration);
+    const eased = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    const deg = eased * 360;
+    knob.style.transform = `rotate3d(0,0,1,${deg}deg)`;
+    const step = Math.floor(deg / 60);
+    if (step > lastClickStep) { lastClickStep = step; sfxClick(); }
+    if (t < 1) requestAnimationFrame(frame);
+    else finishKnobTurn(idx, knob);
+  }
+  requestAnimationFrame(frame);
+}
+
+function finishKnobTurn(idx, knob) {
+  knob.classList.remove("ready");
+  knob.style.transform = "rotate3d(0,0,1,0deg)";
+  startCapsuleDrop(idx);
+}
+
+/* =========================================================================
+   6. ESTRAZIONE CASUALE, DISCESA PALLINA PNG & ESPLOSIONE DORATA
+   ========================================================================= */
+const capsuleOverlay = document.getElementById("capsuleOverlay");
+const capsuleWrap = document.getElementById("capsuleWrap");
+const capTop = document.getElementById("capTop");
+const capBottom = document.getElementById("capBottom");
+const capImgTop = document.getElementById("capImgTop");
+const capImgBottom = document.getElementById("capImgBottom");
+const seamStress = document.getElementById("seamStress");
+const goldGlow = document.getElementById("goldGlow");
+const squeezeFill = document.getElementById("squeezeFill");
+const squeezeUI = document.getElementById("squeezeUI");
+const openCapBtn = document.getElementById("openCapBtn");
+
+function pickRandomPrize(machineIdx) {
+  const pool = MACHINES[machineIdx].activePrizes;
+  const last = lastPrizeByMachine[machineIdx];
+  const candidates = pool.filter((_, i) => pool.length < 2 || i !== last);
+  const chosen = candidates[Math.floor(Math.random() * candidates.length)];
+  lastPrizeByMachine[machineIdx] = pool.indexOf(chosen);
+  return chosen;
+}
+
+function startCapsuleDrop(idx) {
+  phase = "dropping";
+  currentPrize = pickRandomPrize(idx);
+
+  if (availableCapsules.length > 0) {
+    const capUrl = availableCapsules[Math.floor(Math.random() * availableCapsules.length)];
+    capImgTop.src = capUrl;
+    capImgBottom.src = capUrl;
+    capsuleWrap.classList.add("has-cap-photo");
+  } else {
+    capsuleWrap.classList.remove("has-cap-photo");
+    capBottom.style.setProperty("--cap-color", currentPrize.color);
+  }
+
+  const chute = document.getElementById(`chute-${idx}`).getBoundingClientRect();
+
+  capTop.style.transform = "translate3d(0,0,0) rotate(0deg)";
+  capTop.style.opacity = "1";
+  capBottom.style.transform = "translate3d(0,0,0) rotate(0deg)";
+  capBottom.style.opacity = "1";
+  seamStress.style.opacity = "0";
+  goldGlow.style.opacity = "0";
+  squeezeFill.style.transform = "scaleX(0)";
+  squeezeUI.style.opacity = "0";
+
+  capsuleOverlay.classList.add("active");
+
+  const startX = chute.left + chute.width / 2 - window.innerWidth / 2;
+  const startY = chute.top + chute.height / 2 - window.innerHeight / 2;
+
+  const anim = capsuleWrap.animate([
+    { transform: `translate3d(${startX}px, ${startY}px, 0) scale(0.22) rotate(-25deg)`, opacity: 0.35 },
+    { transform: `translate3d(${startX * 0.52}px, ${startY + 34}px, 0) scale(0.56) rotate(170deg)`, opacity: 1, offset: 0.36 },
+    { transform: `translate3d(0px, 24px, 0) scale(1.06, 0.93) rotate(350deg)`, offset: 0.72 },
+    { transform: `translate3d(0px, -10px, 0) scale(0.97, 1.03) rotate(360deg)`, offset: 0.87 },
+    { transform: `translate3d(0px, 0px, 0) scale(1, 1) rotate(360deg)` }
+  ], {
+    duration: 1950,
+    easing: "cubic-bezier(0.22, 0.85, 0.35, 1)",
+    fill: "forwards"
+  });
+
+  setTimeout(() => sfxBounce(), 710);
+  setTimeout(() => sfxBounce(), 1410);
+
+  anim.onfinish = () => {
+    anim.cancel();
+    capsuleWrap.style.transform = "translate3d(0,0,0) scale(1,1)";
+    phase = "squeeze";
+    squeezeUI.style.opacity = "1";
+  };
+}
+
+let squeezeProgress = 0, holding = false, autoSqueeze = false, squeezeRaf = null, lastTime = 0, lastCreakStep = 0;
+
+capsuleWrap.addEventListener("pointerdown", () => {
+  if (phase !== "squeeze") return;
+  holding = true;
+  if (!squeezeRaf) { lastTime = performance.now(); squeezeRaf = requestAnimationFrame(tickSqueeze); }
+});
+window.addEventListener("pointerup", () => { holding = false; });
+openCapBtn.addEventListener("click", () => {
+  if (phase !== "squeeze") return;
+  autoSqueeze = true;
+  if (!squeezeRaf) { lastTime = performance.now(); squeezeRaf = requestAnimationFrame(tickSqueeze); }
+});
+
+function tickSqueeze(now) {
+  if (phase !== "squeeze") { squeezeRaf = null; return; }
+  const dt = Math.min(0.05, (now - lastTime) / 1000);
+  lastTime = now;
+
+  if (holding || autoSqueeze) {
+    squeezeProgress = Math.min(100, squeezeProgress + (autoSqueeze ? 46 : 62) * dt);
+    const creakStep = Math.floor(squeezeProgress / 16);
+    if (creakStep > lastCreakStep) {
+      lastCreakStep = creakStep;
+      playTone(190 + squeezeProgress * 3.5, 0.055, "sawtooth", 0.04);
+    }
+  } else {
+    squeezeProgress = Math.max(0, squeezeProgress - 85 * dt);
+    lastCreakStep = Math.floor(squeezeProgress / 16);
+  }
+
+  const p = squeezeProgress / 100;
+  squeezeFill.style.transform = `scaleX(${p})`;
+
+  const amp = p > 0.38 ? (p - 0.38) * 11 : 0;
+  const shakeX = amp ? Math.sin(now * 0.075) * amp : 0;
+  const shakeY = amp ? Math.cos(now * 0.092) * amp * 0.7 : 0;
+  capsuleWrap.style.transform = `translate3d(${shakeX}px, ${shakeY}px, 0) scale(${1 + p * 0.12}, ${1 - p * 0.1})`;
+
+  seamStress.style.opacity = Math.min(1, p * 1.15);
+  goldGlow.style.opacity = p > 0.3 ? (p - 0.3) * 1.45 : 0;
+  goldGlow.style.transform = `scale(${0.85 + p * 0.5})`;
+
+  if (squeezeProgress >= 100) {
+    squeezeRaf = null; autoSqueeze = false; holding = false; lastCreakStep = 0;
+    triggerExplosionAndReveal();
+    return;
+  }
+
+  if (holding || autoSqueeze || squeezeProgress > 0) squeezeRaf = requestAnimationFrame(tickSqueeze);
+  else squeezeRaf = null;
+}
+
+function triggerExplosionAndReveal() {
+  phase = "exploding";
+  squeezeUI.style.opacity = "0";
+  sfxCrack();
+
+  capTop.style.transform = "translate3d(-4px, -16px, 0) rotate(-5deg)";
+  capBottom.style.transform = "translate3d(0, 6px, 0)";
+  seamStress.style.opacity = "1";
+  goldGlow.style.opacity = "1";
+
+  setTimeout(() => {
+    sfxBoom();
+    capTop.style.transform = "translate3d(-34px, -250px, 0) rotate(-38deg)";
+    capTop.style.opacity = "0";
+    capBottom.style.transform = "translate3d(0, 88px, 0) rotate(8deg)";
+    capBottom.style.opacity = "0.2";
+    launchGoldExplosion();
+
+    const flash = document.getElementById("flashScreen");
+    flash.style.opacity = "1";
+    setTimeout(() => {
+      capsuleOverlay.classList.remove("active");
+      addToInventory(currentPrize);
+      showRevealScreen();
+      flash.style.opacity = "0";
+    }, 420);
+  }, 440);
+}
+
+const fxCanvas = document.getElementById("fxCanvas");
+const fxCtx = fxCanvas.getContext("2d");
+
+function launchGoldExplosion() {
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  fxCanvas.width = window.innerWidth * dpr;
+  fxCanvas.height = window.innerHeight * dpr;
+  fxCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+  const cx = window.innerWidth / 2, cy = window.innerHeight / 2;
+  const particles = Array.from({ length: 130 }, () => {
+    const angle = Math.random() * Math.PI * 2;
+    const speed = 180 + Math.random() * 680;
+    return {
+      x: cx, y: cy,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed,
+      r: 2 + Math.random() * 6.5,
+      alpha: 1,
+      decay: 0.85 + Math.random() * 1.1,
+      color: Math.random() > 0.4 ? GOLD_TINT : "#fff7d6"
+    };
+  });
+
+  let ringR = 20, ringAlpha = 0.95, prev = performance.now();
+
+  function step(now) {
+    const dt = Math.min(0.05, (now - prev) / 1000);
+    prev = now;
+    fxCtx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+    let alive = false;
+
+    if (ringAlpha > 0.01) {
+      alive = true;
+      ringR += 1500 * dt;
+      ringAlpha *= Math.pow(0.08, dt);
+      fxCtx.beginPath();
+      fxCtx.arc(cx, cy, ringR, 0, Math.PI * 2);
+      fxCtx.strokeStyle = `rgba(255, 215, 90, ${ringAlpha})`;
+      fxCtx.lineWidth = 6;
+      fxCtx.stroke();
+    }
+
+    const drag = Math.pow(0.09, dt);
+    particles.forEach((pt) => {
+      if (pt.alpha <= 0.01) return;
+      alive = true;
+      pt.x += pt.vx * dt; pt.y += pt.vy * dt;
+      pt.vx *= drag; pt.vy *= drag;
+      pt.alpha -= pt.decay * dt;
+      fxCtx.globalAlpha = Math.max(0, pt.alpha);
+      fxCtx.fillStyle = pt.color;
+      fxCtx.beginPath();
+      fxCtx.arc(pt.x, pt.y, pt.r, 0, Math.PI * 2);
+      fxCtx.fill();
+    });
+
+    fxCtx.globalAlpha = 1;
+    if (alive) requestAnimationFrame(step);
+    else fxCtx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+  }
+  requestAnimationFrame(step);
+}
+
+/* =========================================================================
+   7. REVEAL CON 3D TILT (Solo immagine)
+   ========================================================================= */
+const revealOverlay = document.getElementById("revealOverlay");
+const revealCard = document.getElementById("revealCard");
+const prizeStage = document.getElementById("prizeStage");
+
+function showRevealScreen() {
+  phase = "reveal";
+
+  prizeStage.innerHTML = "";
+  const img = document.createElement("img");
+  img.alt = "Premio";
+  img.onerror = () => {
+    prizeStage.innerHTML = `<div class="prize-fallback-emoji">🎁</div>`;
+  };
+  img.src = currentPrize.photo;
+  prizeStage.appendChild(img);
+
+  revealCard.style.transform = "perspective(700px) rotateY(0deg) rotateX(0deg)";
+  revealOverlay.classList.add("active");
+}
+
+let tiltRaf = null, tiltX = 0, tiltY = 0;
+revealCard.addEventListener("pointermove", (e) => {
+  revealCard.classList.remove("resetting");
+  const r = revealCard.getBoundingClientRect();
+  tiltX = ((e.clientX - r.left) / r.width - 0.5) * 22;
+  tiltY = -((e.clientY - r.top) / r.height - 0.5) * 22;
+  if (!tiltRaf) {
+    tiltRaf = requestAnimationFrame(() => {
+      tiltRaf = null;
+      revealCard.style.transform = `perspective(700px) rotateY(${tiltX}deg) rotateX(${tiltY}deg)`;
+    });
+  }
+});
+
+revealCard.addEventListener("pointerleave", () => {
+  revealCard.classList.add("resetting");
+  revealCard.style.transform = "perspective(700px) rotateY(0deg) rotateX(0deg)";
+});
+
+function closeReveal() {
+  revealOverlay.classList.remove("active");
+  corridor.classList.remove("locked");
+  squeezeProgress = 0;
+  phase = "idle";
+  dockHint.textContent = "Trascina il gettone nella fessura";
+  updateActiveUI();
+}
+
+document.getElementById("againBtn").addEventListener("click", closeReveal);
+document.getElementById("openInvFromReveal").addEventListener("click", () => {
+  closeReveal();
+  openInventory();
+});
+
+initCoinImage();
+detectCapsules();
+loadInventory();
+renderCorridor();
+detectAllPrizes();
+</script>
+</body>
+</html>
