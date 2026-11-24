@@ -11,7 +11,6 @@
     --accent: #c9202a;
     --gold: rgba(255, 196, 46, 0.98);
     --panel: rgba(255, 255, 255, 0.92);
-    /* Proporzioni reali della foto ritagliata macchinetta_2.png (565x1000) */
     --stage-h: min(75dvh, 720px);
     --stage-w: min(74vw, calc(var(--stage-h) * 0.565));
   }
@@ -34,7 +33,7 @@
     user-select: none;
   }
 
-/* --- Top Bar: Logo a sinistra, Inventario bloccato in alto a destra --- */
+  /* --- Top Bar: Logo a sinistra, Inventario bloccato in alto a destra --- */
   .topbar {
     position: fixed;
     top: 0; left: 0; right: 0;
@@ -161,15 +160,8 @@
     cursor: grab;
   }
   .corridor::-webkit-scrollbar { display: none; }
-  .corridor.is-dragging {
-    cursor: grabbing;
-    scroll-snap-type: none;
-  }
-  .corridor.locked {
-    overflow-x: hidden;
-    touch-action: none;
-    cursor: default;
-  }
+  .corridor.is-dragging { cursor: grabbing; scroll-snap-type: none; }
+  .corridor.locked { overflow-x: hidden; touch-action: none; cursor: default; }
 
   .slide {
     flex: 0 0 var(--stage-w);
@@ -187,13 +179,9 @@
     z-index: 1;
     will-change: transform, opacity;
   }
-  .slide.is-active {
-    opacity: 1;
-    transform: scale(1.04);
-    z-index: 5;
-  }
+  .slide.is-active { opacity: 1; transform: scale(1.04); z-index: 5; }
 
-  /* --- Macchinetta PNG trasparente senza bordi --- */
+  /* --- Macchinetta PNG trasparente --- */
   .machine-stage {
     position: relative;
     width: var(--stage-w);
@@ -202,13 +190,8 @@
     overflow: visible;
     transform: translateZ(0);
   }
-
-  .machine-stage.has-photo {
-    filter: drop-shadow(0 16px 26px rgba(0, 0, 0, 0.34));
-  }
-  .slide.is-active .machine-stage.has-photo {
-    filter: drop-shadow(0 22px 34px rgba(0, 0, 0, 0.42));
-  }
+  .machine-stage.has-photo { filter: drop-shadow(0 16px 26px rgba(0, 0, 0, 0.34)); }
+  .slide.is-active .machine-stage.has-photo { filter: drop-shadow(0 22px 34px rgba(0, 0, 0, 0.42)); }
 
   .machine-photo {
     position: absolute;
@@ -237,13 +220,9 @@
   }
   .machine-stage.has-photo .machine-fallback { display: none; }
 
-  /* Vetrina Locandina */
   .poster-window {
     position: absolute;
-    top: 10.4%;
-    left: 4.0%;
-    width: 90.0%;
-    height: 43.8%;
+    top: 10.4%; left: 4.0%; width: 90.0%; height: 43.8%;
     z-index: 5;
     border-radius: 4px;
     overflow: hidden;
@@ -253,14 +232,7 @@
     background: rgba(255, 250, 240, 0.08);
     cursor: zoom-in;
   }
-
-  .poster-img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    display: block;
-    pointer-events: none;
-  }
+  .poster-img { width: 100%; height: 100%; object-fit: contain; display: block; pointer-events: none; }
   .poster-img.cover { object-fit: cover; }
 
   .poster-placeholder {
@@ -277,21 +249,14 @@
   .poster-glass {
     position: absolute;
     inset: 0;
-    background: linear-gradient(
-      125deg,
-      rgba(255,255,255,0.22) 0%,
-      rgba(255,255,255,0.04) 35%,
-      rgba(255,255,255,0) 55%,
-      rgba(255,255,255,0.1) 100%
-    );
+    background: linear-gradient(125deg, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.04) 35%, rgba(255,255,255,0) 55%, rgba(255,255,255,0.1) 100%);
     box-shadow: inset 0 0 14px rgba(0,0,0,0.1);
     pointer-events: none;
   }
 
   .poster-zoom-badge {
     position: absolute;
-    right: 6px;
-    bottom: 6px;
+    right: 6px; bottom: 6px;
     background: rgba(0, 0, 0, 0.56);
     color: #fff;
     font-size: 10px;
@@ -301,13 +266,9 @@
     pointer-events: none;
   }
 
-  /* Gettoniera (zona drop per la moneta) */
   .coin-hotspot {
     position: absolute;
-    top: 56.0%;
-    left: 10.0%;
-    width: 20.0%;
-    height: 18.5%;
+    top: 56.0%; left: 10.0%; width: 20.0%; height: 18.5%;
     z-index: 6;
     border-radius: 8px;
     transition: box-shadow 0.2s ease, background 0.2s ease;
@@ -317,13 +278,9 @@
     background: rgba(255, 215, 70, 0.22);
   }
 
-  /* Manopola interna centrata */
   .knob-hotspot {
     position: absolute;
-    top: 64.3%;
-    left: 38.2%;
-    width: 20.8%;
-    height: 11.75%;
+    top: 64.3%; left: 38.2%; width: 20.8%; height: 11.75%;
     z-index: 6;
     border-radius: 50%;
     overflow: hidden;
@@ -333,16 +290,11 @@
     will-change: transform;
   }
   .knob-hotspot:active { cursor: grabbing; }
-  .knob-hotspot.ready {
-    box-shadow: 0 0 0 3px rgba(255, 230, 120, 0.95), 0 0 20px rgba(201, 32, 42, 0.6);
-  }
+  .knob-hotspot.ready { box-shadow: 0 0 0 3px rgba(255, 230, 120, 0.95), 0 0 20px rgba(201, 32, 42, 0.6); }
 
   .knob-photo-crop {
     position: absolute;
-    width: 480.77%;
-    height: 851.06%;
-    left: -183.65%;
-    top: -547.23%;
+    width: 480.77%; height: 851.06%; left: -183.65%; top: -547.23%;
     object-fit: fill;
     pointer-events: none;
     display: none;
@@ -350,19 +302,15 @@
   .machine-stage.has-photo .knob-photo-crop { display: block; }
 
   .knob-fallback {
-    width: 100%;
-    height: 100%;
+    width: 100%; height: 100%;
     border-radius: 50%;
     border: 4px solid var(--accent);
     background: radial-gradient(circle at 35% 30%, #fff, #cfcdc7);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: flex; align-items: center; justify-content: center;
   }
   .knob-fallback::after {
     content: "";
-    width: 72%;
-    height: 18%;
+    width: 72%; height: 18%;
     border-radius: 99px;
     background: linear-gradient(180deg, #fff, #b8b6b0);
     box-shadow: 0 2px 5px rgba(0,0,0,0.25);
@@ -371,10 +319,7 @@
 
   .chute-origin {
     position: absolute;
-    top: 79.5%;
-    left: 62.5%;
-    width: 26.0%;
-    height: 18.5%;
+    top: 79.5%; left: 62.5%; width: 26.0%; height: 18.5%;
     z-index: 5;
     pointer-events: none;
   }
@@ -402,12 +347,24 @@
   }
 
   .count-tag {
-    color: var(--muted);
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 9px;
+    border-radius: 999px;
+    background: rgba(26, 26, 29, 0.08);
+    color: var(--ink);
     font-size: 11px;
-    font-weight: 600;
+    font-weight: 800;
+    transition: background 0.25s ease, color 0.25s ease;
+  }
+  .count-tag.is-complete {
+    background: linear-gradient(135deg, #ffd54f, #f4a900);
+    color: #3d2600;
+    box-shadow: 0 2px 8px rgba(244, 169, 0, 0.35);
   }
 
-  /* Dock inferiore + Moneta extra-grande (public/coin.png) */
+  /* Dock inferiore + Moneta extra-grande */
   .coin-dock {
     position: fixed;
     bottom: 18px;
@@ -438,23 +395,9 @@
     place-items: center;
     box-shadow: inset 0 0 0 3px rgba(255,255,255,0.4), 0 6px 14px rgba(0,0,0,0.24);
   }
-  .coin-visual.has-coin-img {
-    border: none;
-    background: transparent;
-    box-shadow: none;
-    overflow: visible;
-  }
-  .coin-visual img {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    pointer-events: none;
-  }
-  .coin-visual.has-coin-img img {
-    filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.35));
-  }
+  .coin-visual.has-coin-img { border: none; background: transparent; box-shadow: none; overflow: visible; }
+  .coin-visual img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; pointer-events: none; }
+  .coin-visual.has-coin-img img { filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.35)); }
   .coin-visual.has-coin-img .coin-text { display: none; }
 
   .coin-btn {
@@ -470,55 +413,37 @@
   .coin-btn:active { cursor: grabbing; }
 
   @media (max-width: 480px) {
-    .coin-btn {
-      width: 96px;
-      height: 96px;
-      margin: -26px 0 -16px -4px;
-    }
+    .coin-btn { width: 96px; height: 96px; margin: -26px 0 -16px -4px; }
   }
 
-  .dock-hint {
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--muted);
-    max-width: 145px;
-    line-height: 1.25;
-  }
+  .dock-hint { font-size: 11px; font-weight: 600; color: var(--muted); max-width: 145px; line-height: 1.25; }
 
-  .dots { display: flex; gap: 5px; }
+  .dots { display: flex; gap: 5px; flex-wrap: nowrap; overflow-x: auto; max-width: 38vw; scrollbar-width: none; }
+  .dots::-webkit-scrollbar { display: none; }
   .dot {
-    width: 24px;
-    height: 24px;
+    flex-shrink: 0;
+    width: 24px; height: 24px;
     border-radius: 50%;
     border: 1px solid rgba(0,0,0,0.12);
     background: #fff;
-    font-size: 11px;
-    font-weight: 800;
+    font-size: 11px; font-weight: 800;
     cursor: pointer;
-    display: grid;
-    place-items: center;
+    display: grid; place-items: center;
   }
-  .dot.active {
-    background: var(--ink);
-    color: #fff;
-    border-color: var(--ink);
-  }
+  .dot.active { background: var(--ink); color: #fff; border-color: var(--ink); }
 
   .nav-arrow {
     position: fixed;
     top: 50%;
     transform: translateY(-50%);
     z-index: 30;
-    width: 38px;
-    height: 38px;
+    width: 38px; height: 38px;
     border-radius: 50%;
     border: 1px solid rgba(0,0,0,0.08);
     background: var(--panel);
-    font-size: 22px;
-    line-height: 1;
+    font-size: 22px; line-height: 1;
     cursor: pointer;
-    display: grid;
-    place-items: center;
+    display: grid; place-items: center;
     box-shadow: 0 6px 18px rgba(0,0,0,0.14);
     transition: opacity 0.2s ease;
   }
@@ -530,8 +455,7 @@
     position: fixed;
     top: 0; left: 0;
     z-index: 90;
-    width: 124px;
-    height: 124px;
+    width: 124px; height: 124px;
     display: none;
     pointer-events: none;
     will-change: transform;
@@ -555,20 +479,14 @@
   .poster-modal.open { opacity: 1; pointer-events: auto; }
 
   .poster-modal-box {
-    max-width: 94vw;
-    max-height: 86dvh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 12px;
+    max-width: 94vw; max-height: 86dvh;
+    display: flex; flex-direction: column; align-items: center; gap: 12px;
     transform: scale(0.94);
     transition: transform 0.24s cubic-bezier(0.2, 0.9, 0.3, 1);
   }
   .poster-modal.open .poster-modal-box { transform: scale(1); }
-
   .poster-modal-box img {
-    max-width: 92vw;
-    max-height: 80dvh;
+    max-width: 92vw; max-height: 80dvh;
     object-fit: contain;
     border-radius: 12px;
     box-shadow: 0 24px 60px rgba(0,0,0,0.6);
@@ -577,22 +495,18 @@
 
   .poster-modal-close {
     position: fixed;
-    top: 16px;
-    right: 16px;
-    width: 40px;
-    height: 40px;
+    top: 16px; right: 16px;
+    width: 40px; height: 40px;
     border-radius: 50%;
     border: 1px solid rgba(255,255,255,0.22);
     background: rgba(255,255,255,0.14);
     color: #fff;
-    font-size: 18px;
-    font-weight: 700;
+    font-size: 18px; font-weight: 700;
     cursor: pointer;
-    display: grid;
-    place-items: center;
+    display: grid; place-items: center;
   }
 
-  /* --- Drawer Inventario (Solo Immagini a Griglia) --- */
+  /* --- Drawer Inventario (Banner PNG + Griglia) --- */
   .inv-backdrop {
     position: fixed;
     inset: 0;
@@ -619,14 +533,27 @@
   .inv-backdrop.open .inv-drawer { transform: translateX(0); }
 
   .inv-header {
-    padding: 16px 18px;
+    padding: 12px 16px;
     background: #fff;
     border-bottom: 1px solid rgba(0,0,0,0.08);
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 12px;
   }
-  .inv-header h2 { margin: 0; font-size: 16px; font-weight: 800; }
+  .inv-header-left {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+  }
+  .inv-banner-img {
+    height: 52px;
+    width: auto;
+    max-width: 220px;
+    object-fit: contain;
+    display: block;
+  }
   .inv-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
 
   .inv-grid {
@@ -664,21 +591,15 @@
     transition: transform 0.14s ease;
   }
   .inv-tile:active { transform: scale(0.95); }
-  .inv-tile img {
-    width: 86%;
-    height: 86%;
-    object-fit: contain;
-  }
+  .inv-tile img { width: 86%; height: 86%; object-fit: contain; }
   .inv-tile-emoji { font-size: 36px; }
 
   .inv-qty {
     position: absolute;
-    top: 6px;
-    right: 6px;
+    top: 6px; right: 6px;
     background: #1a1a1d;
     color: #fff;
-    font-size: 11px;
-    font-weight: 800;
+    font-size: 11px; font-weight: 800;
     padding: 2px 7px;
     border-radius: 999px;
   }
@@ -697,8 +618,7 @@
     color: var(--accent);
     padding: 7px 12px;
     border-radius: 999px;
-    font-size: 12px;
-    font-weight: 700;
+    font-size: 12px; font-weight: 700;
     cursor: pointer;
   }
 
@@ -720,8 +640,7 @@
 
   .capsule-wrap {
     position: relative;
-    width: 260px;
-    height: 260px;
+    width: 260px; height: 260px;
     cursor: pointer;
     touch-action: none;
     transform-origin: center center;
@@ -740,11 +659,9 @@
 
   .capsule-shadow {
     position: absolute;
-    bottom: -14px;
-    left: 50%;
+    bottom: -14px; left: 50%;
     transform: translateX(-50%);
-    width: 170px;
-    height: 28px;
+    width: 170px; height: 28px;
     border-radius: 50%;
     background: radial-gradient(ellipse at center, rgba(0,0,0,0.3), rgba(0,0,0,0) 70%);
   }
@@ -759,26 +676,20 @@
   .cap-photo-layer {
     position: absolute;
     inset: 0;
-    width: 100%;
-    height: 100%;
+    width: 100%; height: 100%;
     object-fit: contain;
     pointer-events: none;
     filter: drop-shadow(0 12px 22px rgba(0,0,0,0.28));
   }
-  .cap-top .cap-photo-layer {
-    clip-path: inset(0 0 47% 0);
-  }
-  .cap-bottom .cap-photo-layer {
-    clip-path: inset(53% 0 0 0);
-  }
+  .cap-top .cap-photo-layer { clip-path: inset(0 0 47% 0); }
+  .cap-bottom .cap-photo-layer { clip-path: inset(53% 0 0 0); }
 
   .capsule-wrap.has-cap-photo .cap-css-fallback { display: none; }
   .capsule-wrap:not(.has-cap-photo) .cap-photo-layer { display: none; }
 
   .cap-css-top {
     position: absolute;
-    top: 20px; left: 20px;
-    width: 220px; height: 112px;
+    top: 20px; left: 20px; width: 220px; height: 112px;
     border-radius: 110px 110px 6px 6px;
     background: radial-gradient(circle at 32% 26%, rgba(255,255,255,0.94) 0%, rgba(255,255,255,0.34) 32%, rgba(220,232,240,0.24) 70%, rgba(160,180,195,0.38) 100%);
     border: 2px solid rgba(255,255,255,0.88);
@@ -787,8 +698,7 @@
   }
   .cap-css-bottom {
     position: absolute;
-    bottom: 20px; left: 20px;
-    width: 220px; height: 112px;
+    bottom: 20px; left: 20px; width: 220px; height: 112px;
     border-radius: 6px 6px 110px 110px;
     background: var(--cap-color, #e8a825);
     border: 2px solid rgba(255,255,255,0.45);
@@ -797,10 +707,7 @@
 
   .seam-stress {
     position: absolute;
-    top: 52%;
-    left: 10%;
-    right: 10%;
-    height: 12px;
+    top: 52%; left: 10%; right: 10%; height: 12px;
     transform: translateY(-50%);
     border-radius: 99px;
     background: radial-gradient(ellipse at center, #fffbe0 25%, rgba(255, 210, 60, 0.85) 55%, rgba(255,255,255,0) 85%);
@@ -810,30 +717,9 @@
     will-change: opacity;
   }
 
-  .squeeze-ui {
-    margin-top: 32px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-    transition: opacity 0.25s ease;
-  }
-
-  .squeeze-bar-bg {
-    width: 210px;
-    height: 8px;
-    border-radius: 99px;
-    background: rgba(0,0,0,0.12);
-    overflow: hidden;
-  }
-  .squeeze-bar-fill {
-    width: 100%;
-    height: 100%;
-    transform-origin: left center;
-    transform: scaleX(0);
-    background: linear-gradient(90deg, #b8860b, #ffd54f);
-    will-change: transform;
-  }
+  .squeeze-ui { margin-top: 32px; display: flex; flex-direction: column; align-items: center; gap: 10px; transition: opacity 0.25s ease; }
+  .squeeze-bar-bg { width: 210px; height: 8px; border-radius: 99px; background: rgba(0,0,0,0.12); overflow: hidden; }
+  .squeeze-bar-fill { width: 100%; height: 100%; transform-origin: left center; transform: scaleX(0); background: linear-gradient(90deg, #b8860b, #ffd54f); will-change: transform; }
 
   .btn-primary {
     border: none;
@@ -841,32 +727,14 @@
     color: #fff;
     padding: 12px 24px;
     border-radius: 999px;
-    font-size: 14px;
-    font-weight: 800;
+    font-size: 14px; font-weight: 800;
     cursor: pointer;
     box-shadow: 0 10px 22px rgba(0,0,0,0.18);
   }
   .btn-primary:active { transform: scale(0.96); }
 
-  #fxCanvas {
-    position: fixed;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 80;
-    pointer-events: none;
-  }
-
-  .flash-screen {
-    position: fixed;
-    inset: 0;
-    z-index: 85;
-    background: #fff9e6;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.28s ease;
-    will-change: opacity;
-  }
+  #fxCanvas { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 80; pointer-events: none; }
+  .flash-screen { position: fixed; inset: 0; z-index: 85; background: #fff9e6; opacity: 0; pointer-events: none; transition: opacity 0.28s ease; will-change: opacity; }
 
   /* --- Reveal Screen (Chiaro, abbinato a background.jpg) --- */
   .reveal-overlay {
@@ -900,9 +768,7 @@
     transform-style: preserve-3d;
     will-change: transform;
   }
-  .reveal-card.resetting {
-    transition: transform 0.35s cubic-bezier(0.2, 0.9, 0.3, 1);
-  }
+  .reveal-card.resetting { transition: transform 0.35s cubic-bezier(0.2, 0.9, 0.3, 1); }
 
   .prize-stage {
     width: 100%;
@@ -917,27 +783,11 @@
     border: 1px solid rgba(168, 200, 224, 0.4);
     box-shadow: inset 0 2px 10px rgba(120, 155, 185, 0.12);
   }
-  .prize-stage img {
-    width: 88%;
-    height: 88%;
-    object-fit: contain;
-    filter: drop-shadow(0 12px 18px rgba(45, 75, 105, 0.22));
-  }
+  .prize-stage img { width: 88%; height: 88%; object-fit: contain; filter: drop-shadow(0 12px 18px rgba(45, 75, 105, 0.22)); }
   .prize-fallback-emoji { font-size: 76px; }
 
-  .reveal-sub {
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--muted);
-    margin: 0 0 14px;
-  }
-
-  .reveal-actions {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    justify-content: center;
-  }
+  .reveal-sub { font-size: 12px; font-weight: 600; color: var(--muted); margin: 0 0 14px; }
+  .reveal-actions { display: flex; align-items: center; gap: 14px; justify-content: center; }
 
   .btn-inv-reveal {
     border: none;
@@ -951,13 +801,7 @@
     transition: transform 0.15s ease;
   }
   .btn-inv-reveal:active { transform: scale(0.93); }
-  .btn-inv-reveal img {
-    height: 100%;
-    width: auto;
-    object-fit: contain;
-    display: block;
-    filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.18));
-  }
+  .btn-inv-reveal img { height: 100%; width: auto; object-fit: contain; display: block; filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.18)); }
 </style>
 </head>
 <body>
@@ -1007,7 +851,6 @@
     <span class="coin-text">€3</span>
   </div>
 
-  <!-- Lightbox Locandina / Anteprima Premio -->
   <div class="poster-modal" id="posterModal" role="dialog" aria-modal="true">
     <button class="poster-modal-close" id="closePosterModal" aria-label="Chiudi">✕</button>
     <div class="poster-modal-box">
@@ -1015,12 +858,17 @@
     </div>
   </div>
 
-  <!-- Drawer Inventario -->
+  <!-- Drawer Inventario con Banner inventario.png -->
   <div class="inv-backdrop" id="invBackdrop">
     <aside class="inv-drawer" aria-label="Inventario premi vinti">
       <div class="inv-header">
-        <div>
-          <h2>🎒 Inventario</h2>
+        <div class="inv-header-left">
+          <img
+            src="public/inventario.png"
+            alt="Inventario"
+            class="inv-banner-img"
+            onerror="this.style.display='none';"
+          />
           <div class="inv-sub" id="invSummary">0 gadget vinti</div>
         </div>
         <button class="btn-pill" id="closeInvBtn">✕</button>
@@ -1033,7 +881,6 @@
     </aside>
   </div>
 
-  <!-- Overlay Capsula Macro (4 PNG casuali divisi lungo la giuntura) -->
   <section class="capsule-overlay" id="capsuleOverlay">
     <div class="capsule-wrap" id="capsuleWrap">
       <div class="gold-glow" id="goldGlow"></div>
@@ -1058,7 +905,6 @@
   <canvas id="fxCanvas"></canvas>
   <div class="flash-screen" id="flashScreen"></div>
 
-  <!-- Reveal Finale -->
   <section class="reveal-overlay" id="revealOverlay">
     <div class="reveal-card" id="revealCard">
       <div class="prize-stage" id="prizeStage"></div>
@@ -1078,9 +924,6 @@
   </section>
 
 <script>
-/* =========================================================================
-   1. CONFIGURAZIONE 5 MACCHINETTE & 4 PALLINE PNG CASUALI
-   ========================================================================= */
 const MAX_PRIZES_PROBE = 15;
 const CAPSULE_COLORS = ["#18a5d8", "#e85d75", "#e8a825", "#2eb872", "#8c4ce8", "#2d7ff9"];
 const GOLD_TINT = "rgba(255, 196, 46, 0.98)";
@@ -1099,7 +942,10 @@ const MACHINES = [
   { id: 2, prefix: "m3", price: 3, machinePhoto: "public/macchinetta_2.png", posterPhoto: "public/locandina-3.jpg", posterCover: false, activePrizes: [] },
   { id: 3, prefix: "m4", price: 3, machinePhoto: "public/macchinetta_2.png", posterPhoto: "public/locandina-4.jpg", posterCover: false, activePrizes: [] },
   { id: 4, prefix: "m5", price: 3, machinePhoto: "public/macchinetta_2.png", posterPhoto: "public/locandina-5.jpg", posterCover: false, activePrizes: [] },
-  { id: 5, prefix: "m6", price: 3, machinePhoto: "public/macchinetta_2.png", posterPhoto: "public/locandina-6.jpg", posterCover: false, activePrizes: [] }
+  { id: 5, prefix: "m6", price: 3, machinePhoto: "public/macchinetta_2.png", posterPhoto: "public/locandina-6.jpg", posterCover: false, activePrizes: [] },
+  { id: 6, prefix: "m7", price: 3, machinePhoto: "public/macchinetta_2.png", posterPhoto: "public/locandina-7.jpg", posterCover: false, activePrizes: [] },
+  { id: 7, prefix: "m8", price: 3, machinePhoto: "public/macchinetta_2.png", posterPhoto: "public/locandina-8.jpg", posterCover: false, activePrizes: [] },
+  { id: 8, prefix: "m9", price: 3, machinePhoto: "public/macchinetta_2.png", posterPhoto: "public/locandina-9.jpg", posterCover: false, activePrizes: [] }
 ];
 
 function checkImageExists(url) {
@@ -1162,14 +1008,11 @@ async function detectAllPrizes() {
       }));
     }
 
-    const badge = document.getElementById(`count-${mIdx}`);
-    if (badge) badge.textContent = `${m.activePrizes.length} sorprese`;
+    updateMachineProgress();
   }
 }
 
-/* =========================================================================
-   2. INVENTARIO A GRIGLIA (Solo immagini, salvato in localStorage)
-   ========================================================================= */
+/* --- Inventario & Progresso Collezione --- */
 const INV_STORAGE_KEY = "gashapon_inventory_v1";
 let inventory = [];
 
@@ -1193,12 +1036,7 @@ function addToInventory(prize) {
     existing.qty += 1;
     existing.lastWon = Date.now();
   } else {
-    inventory.unshift({
-      key: prize.key,
-      photo: prize.photo,
-      qty: 1,
-      lastWon: Date.now()
-    });
+    inventory.unshift({ key: prize.key, photo: prize.photo, qty: 1, lastWon: Date.now() });
   }
   inventory.sort((a, b) => b.lastWon - a.lastWon);
   saveInventory();
@@ -1210,7 +1048,26 @@ const invBackdrop = document.getElementById("invBackdrop");
 const invGrid = document.getElementById("invGrid");
 const invSummary = document.getElementById("invSummary");
 
+function updateMachineProgress() {
+  const ownedKeys = new Set(inventory.map((item) => item.key));
+  MACHINES.forEach((m, idx) => {
+    const badge = document.getElementById(`count-${idx}`);
+    if (!badge) return;
+    const total = m.activePrizes.length;
+    if (total === 0) {
+      badge.textContent = "...";
+      badge.classList.remove("is-complete");
+      return;
+    }
+    const owned = m.activePrizes.filter((p) => ownedKeys.has(p.key)).length;
+    const isComplete = owned >= total;
+    badge.textContent = isComplete ? `🏆 ${owned}/${total}` : `⭐ ${owned}/${total}`;
+    badge.classList.toggle("is-complete", isComplete);
+  });
+}
+
 function updateInventoryUI() {
+  updateMachineProgress();
   const totalCount = inventory.reduce((sum, item) => sum + item.qty, 0);
   invBadge.textContent = totalCount;
   invSummary.textContent = `${totalCount} ${totalCount === 1 ? "gadget vinto" : "gadget vinti"}`;
@@ -1254,10 +1111,8 @@ document.getElementById("clearInvBtn").onclick = () => {
   }
 };
 
-/* =========================================================================
-   3. STATO & AUDIO
-   ========================================================================= */
-let activeIndex = Math.floor(MACHINES.length / 2); // Parte sulla #3 (centrale)
+/* --- Stato & Audio --- */
+let activeIndex = Math.floor(MACHINES.length / 2);
 let phase = "idle";
 let currentPrize = null;
 let lastPrizeByMachine = {};
@@ -1303,9 +1158,7 @@ document.getElementById("muteBtn").onclick = (e) => {
   e.target.textContent = muted ? "🔇" : "🔊";
 };
 
-/* =========================================================================
-   4. CORRIDOIO CENTRATO + MOUSE DRAG-TO-SCROLL
-   ========================================================================= */
+/* --- Corridoio & Navigazione --- */
 const corridor = document.getElementById("corridor");
 const dotsEl = document.getElementById("dots");
 const coinBtn = document.getElementById("coinBtn");
@@ -1313,15 +1166,10 @@ const dockHint = document.getElementById("dockHint");
 const floatingCoin = document.getElementById("floatingCoin");
 const prevBtn = document.getElementById("prevBtn");
 const nextBtn = document.getElementById("nextBtn");
-
 const posterModal = document.getElementById("posterModal");
 const posterModalImg = document.getElementById("posterModalImg");
 
-function openImageModal(src) {
-  posterModalImg.src = src;
-  posterModal.classList.add("open");
-}
-
+function openImageModal(src) { posterModalImg.src = src; posterModal.classList.add("open"); }
 function closePosterModal() { posterModal.classList.remove("open"); }
 document.getElementById("closePosterModal").onclick = closePosterModal;
 posterModal.addEventListener("click", (e) => { if (e.target === posterModal) closePosterModal(); });
@@ -1369,9 +1217,8 @@ function renderCorridor() {
   });
 
   updateActiveUI();
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => centerMachine(activeIndex, false));
-  });
+  updateMachineProgress();
+  requestAnimationFrame(() => requestAnimationFrame(() => centerMachine(activeIndex, false)));
 }
 
 function bindMachineImages(idx) {
@@ -1382,21 +1229,12 @@ function bindMachineImages(idx) {
   const pImg = document.getElementById(`pPhoto-${idx}`);
   const pFallback = document.getElementById(`pFallback-${idx}`);
 
-  mImg.onload = () => {
-    stage.classList.add("has-photo");
-    knobCrop.src = mImg.src;
-  };
+  mImg.onload = () => { stage.classList.add("has-photo"); knobCrop.src = mImg.src; };
   mImg.onerror = () => stage.classList.remove("has-photo");
   mImg.src = m.machinePhoto;
 
-  pImg.onload = () => {
-    pImg.style.display = "block";
-    pFallback.style.display = "none";
-  };
-  pImg.onerror = () => {
-    pImg.style.display = "none";
-    pFallback.style.display = "block";
-  };
+  pImg.onload = () => { pImg.style.display = "block"; pFallback.style.display = "none"; };
+  pImg.onerror = () => { pImg.style.display = "none"; pFallback.style.display = "block"; };
   pImg.src = m.posterPhoto;
 }
 
@@ -1407,9 +1245,7 @@ function centerMachine(idx, smooth = true) {
   if (!smooth) {
     corridor.style.scrollSnapType = "none";
     corridor.scrollLeft = targetLeft;
-    requestAnimationFrame(() => {
-      corridor.style.scrollSnapType = "";
-    });
+    requestAnimationFrame(() => { corridor.style.scrollSnapType = ""; });
   } else {
     corridor.scrollTo({ left: targetLeft, behavior: "smooth" });
   }
@@ -1424,8 +1260,7 @@ function scrollToMachine(idx) {
 
 function findClosestMachine() {
   const center = corridor.scrollLeft + corridor.clientWidth / 2;
-  let closest = activeIndex;
-  let bestDist = Infinity;
+  let closest = activeIndex, bestDist = Infinity;
   for (let i = 0; i < MACHINES.length; i++) {
     const s = document.getElementById(`slide-${i}`);
     const d = Math.abs(s.offsetLeft + s.offsetWidth / 2 - center);
@@ -1441,36 +1276,22 @@ corridor.addEventListener("scroll", () => {
   requestAnimationFrame(() => {
     scrollTicking = false;
     const closest = findClosestMachine();
-    if (closest !== activeIndex) {
-      activeIndex = closest;
-      updateActiveUI();
-    }
+    if (closest !== activeIndex) { activeIndex = closest; updateActiveUI(); }
   });
 }, { passive: true });
 
-/* Drag-to-scroll con il mouse */
-let mouseDragging = false;
-let mouseDragMoved = false;
-let dragStartX = 0;
-let dragStartScroll = 0;
-let suppressNextClick = false;
-
+let mouseDragging = false, mouseDragMoved = false, dragStartX = 0, dragStartScroll = 0, suppressNextClick = false;
 corridor.addEventListener("mousedown", (e) => {
   if (e.button !== 0 || phase !== "idle") return;
-  mouseDragging = true;
-  mouseDragMoved = false;
-  dragStartX = e.clientX;
-  dragStartScroll = corridor.scrollLeft;
+  mouseDragging = true; mouseDragMoved = false; dragStartX = e.clientX; dragStartScroll = corridor.scrollLeft;
   corridor.classList.add("is-dragging");
 });
-
 window.addEventListener("mousemove", (e) => {
   if (!mouseDragging) return;
   const dx = e.clientX - dragStartX;
   if (Math.abs(dx) > 5) mouseDragMoved = true;
   corridor.scrollLeft = dragStartScroll - dx;
 });
-
 window.addEventListener("mouseup", () => {
   if (!mouseDragging) return;
   mouseDragging = false;
@@ -1486,7 +1307,6 @@ window.addEventListener("mouseup", () => {
 
 window.addEventListener("load", () => centerMachine(activeIndex, false));
 window.addEventListener("resize", () => centerMachine(activeIndex, false));
-
 prevBtn.onclick = () => scrollToMachine(activeIndex - 1);
 nextBtn.onclick = () => scrollToMachine(activeIndex + 1);
 
@@ -1497,9 +1317,7 @@ function updateActiveUI() {
   nextBtn.classList.toggle("hidden", activeIndex === MACHINES.length - 1 || phase !== "idle");
 }
 
-/* =========================================================================
-   5. GETTONE (Solo Drag & Drop nella fessura) & ROTAZIONE MANOPOLA
-   ========================================================================= */
+/* --- Gettone (Solo Drag & Drop) & Manopola --- */
 function insertCoin(idx) {
   if (phase !== "idle" || idx !== activeIndex) return;
   phase = "coinInserted";
@@ -1519,12 +1337,10 @@ coinBtn.addEventListener("pointerdown", (e) => {
   floatingCoin.style.transform = `translate3d(calc(${e.clientX}px - 50%), calc(${e.clientY}px - 50%), 0) scale(1.06)`;
   document.getElementById(`coinSlot-${activeIndex}`).classList.add("highlight");
 });
-
 window.addEventListener("pointermove", (e) => {
   if (!draggingCoin) return;
   floatingCoin.style.transform = `translate3d(calc(${e.clientX}px - 50%), calc(${e.clientY}px - 50%), 0) scale(1.06)`;
 });
-
 window.addEventListener("pointerup", (e) => {
   if (!draggingCoin) return;
   draggingCoin = false;
@@ -1540,9 +1356,7 @@ function bindMachineEvents(idx) {
   document.getElementById(`posterWin-${idx}`).addEventListener("click", () => {
     if (suppressNextClick) return;
     if (idx !== activeIndex && phase === "idle") { scrollToMachine(idx); return; }
-    if (phase === "idle" || phase === "coinInserted") {
-      openImageModal(MACHINES[idx].posterPhoto);
-    }
+    if (phase === "idle" || phase === "coinInserted") openImageModal(MACHINES[idx].posterPhoto);
   });
 
   const knob = document.getElementById(`knob-${idx}`);
@@ -1554,8 +1368,7 @@ function bindMachineEvents(idx) {
     turning = true;
     knob.setPointerCapture(e.pointerId);
     const r = knob.getBoundingClientRect();
-    knobCx = r.left + r.width / 2;
-    knobCy = r.top + r.height / 2;
+    knobCx = r.left + r.width / 2; knobCy = r.top + r.height / 2;
     startAngle = Math.atan2(e.clientY - knobCy, e.clientX - knobCx) * (180 / Math.PI) - currentDeg;
   });
 
@@ -1567,10 +1380,7 @@ function bindMachineEvents(idx) {
       currentDeg = deg;
       knob.style.transform = `rotate3d(0,0,1,${currentDeg}deg)`;
       if (currentDeg - lastDetent >= 45) { lastDetent = currentDeg; sfxClick(); }
-      if (currentDeg >= 330) {
-        turning = false; currentDeg = 0; lastDetent = 0;
-        finishKnobTurn(idx, knob);
-      }
+      if (currentDeg >= 330) { turning = false; currentDeg = 0; lastDetent = 0; finishKnobTurn(idx, knob); }
     }
   });
 
@@ -1603,9 +1413,7 @@ function finishKnobTurn(idx, knob) {
   startCapsuleDrop(idx);
 }
 
-/* =========================================================================
-   6. ESTRAZIONE CASUALE, DISCESA PALLINA PNG & ESPLOSIONE DORATA
-   ========================================================================= */
+/* --- Discesa Capsula & Esplosione Dorata --- */
 const capsuleOverlay = document.getElementById("capsuleOverlay");
 const capsuleWrap = document.getElementById("capsuleWrap");
 const capTop = document.getElementById("capTop");
@@ -1642,7 +1450,6 @@ function startCapsuleDrop(idx) {
   }
 
   const chute = document.getElementById(`chute-${idx}`).getBoundingClientRect();
-
   capTop.style.transform = "translate3d(0,0,0) rotate(0deg)";
   capTop.style.opacity = "1";
   capBottom.style.transform = "translate3d(0,0,0) rotate(0deg)";
@@ -1663,11 +1470,7 @@ function startCapsuleDrop(idx) {
     { transform: `translate3d(0px, 24px, 0) scale(1.06, 0.93) rotate(350deg)`, offset: 0.72 },
     { transform: `translate3d(0px, -10px, 0) scale(0.97, 1.03) rotate(360deg)`, offset: 0.87 },
     { transform: `translate3d(0px, 0px, 0) scale(1, 1) rotate(360deg)` }
-  ], {
-    duration: 1950,
-    easing: "cubic-bezier(0.22, 0.85, 0.35, 1)",
-    fill: "forwards"
-  });
+  ], { duration: 1950, easing: "cubic-bezier(0.22, 0.85, 0.35, 1)", fill: "forwards" });
 
   setTimeout(() => sfxBounce(), 710);
   setTimeout(() => sfxBounce(), 1410);
@@ -1702,10 +1505,7 @@ function tickSqueeze(now) {
   if (holding || autoSqueeze) {
     squeezeProgress = Math.min(100, squeezeProgress + (autoSqueeze ? 46 : 62) * dt);
     const creakStep = Math.floor(squeezeProgress / 16);
-    if (creakStep > lastCreakStep) {
-      lastCreakStep = creakStep;
-      playTone(190 + squeezeProgress * 3.5, 0.055, "sawtooth", 0.04);
-    }
+    if (creakStep > lastCreakStep) { lastCreakStep = creakStep; playTone(190 + squeezeProgress * 3.5, 0.055, "sawtooth", 0.04); }
   } else {
     squeezeProgress = Math.max(0, squeezeProgress - 85 * dt);
     lastCreakStep = Math.floor(squeezeProgress / 16);
@@ -1713,12 +1513,10 @@ function tickSqueeze(now) {
 
   const p = squeezeProgress / 100;
   squeezeFill.style.transform = `scaleX(${p})`;
-
   const amp = p > 0.38 ? (p - 0.38) * 11 : 0;
   const shakeX = amp ? Math.sin(now * 0.075) * amp : 0;
   const shakeY = amp ? Math.cos(now * 0.092) * amp * 0.7 : 0;
   capsuleWrap.style.transform = `translate3d(${shakeX}px, ${shakeY}px, 0) scale(${1 + p * 0.12}, ${1 - p * 0.1})`;
-
   seamStress.style.opacity = Math.min(1, p * 1.15);
   goldGlow.style.opacity = p > 0.3 ? (p - 0.3) * 1.45 : 0;
   goldGlow.style.transform = `scale(${0.85 + p * 0.5})`;
@@ -1776,12 +1574,8 @@ function launchGoldExplosion() {
     const angle = Math.random() * Math.PI * 2;
     const speed = 180 + Math.random() * 680;
     return {
-      x: cx, y: cy,
-      vx: Math.cos(angle) * speed,
-      vy: Math.sin(angle) * speed,
-      r: 2 + Math.random() * 6.5,
-      alpha: 1,
-      decay: 0.85 + Math.random() * 1.1,
+      x: cx, y: cy, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed,
+      r: 2 + Math.random() * 6.5, alpha: 1, decay: 0.85 + Math.random() * 1.1,
       color: Math.random() > 0.4 ? GOLD_TINT : "#fff7d6"
     };
   });
@@ -1826,22 +1620,17 @@ function launchGoldExplosion() {
   requestAnimationFrame(step);
 }
 
-/* =========================================================================
-   7. REVEAL CON 3D TILT (Solo immagine)
-   ========================================================================= */
+/* --- Reveal con 3D Tilt --- */
 const revealOverlay = document.getElementById("revealOverlay");
 const revealCard = document.getElementById("revealCard");
 const prizeStage = document.getElementById("prizeStage");
 
 function showRevealScreen() {
   phase = "reveal";
-
   prizeStage.innerHTML = "";
   const img = document.createElement("img");
   img.alt = "Premio";
-  img.onerror = () => {
-    prizeStage.innerHTML = `<div class="prize-fallback-emoji">🎁</div>`;
-  };
+  img.onerror = () => { prizeStage.innerHTML = `<div class="prize-fallback-emoji">🎁</div>`; };
   img.src = currentPrize.photo;
   prizeStage.appendChild(img);
 
