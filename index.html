@@ -4,6 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 <title>Momixapon</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root {
     --ink: #1a1a1d;
@@ -21,6 +22,11 @@
     -webkit-user-select: none;
     user-select: none;
     -webkit-touch-callout: none;
+  }
+
+  input {
+    -webkit-user-select: text;
+    user-select: text;
   }
 
   img {
@@ -106,7 +112,7 @@
     letter-spacing: 0.3px;
   }
 
-  /* --- Top Bar: Logo a sinistra, Inventario bloccato in alto a destra --- */
+  /* --- Top Bar --- */
   .topbar {
     position: fixed;
     top: 0; left: 0; right: 0;
@@ -159,6 +165,33 @@
     gap: 6px;
   }
   .btn-pill:active { transform: scale(0.94); }
+
+  .auth-btn {
+    border: 2px solid rgba(255, 255, 255, 0.92);
+    background: rgba(255, 255, 255, 0.9);
+    color: #1e364a;
+    padding: 7px 13px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 5px 14px rgba(45, 75, 105, 0.2);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    max-width: 150px;
+    transition: transform 0.14s ease, background 0.2s ease;
+  }
+  .auth-btn:active { transform: scale(0.94); }
+  .auth-btn.is-logged {
+    background: linear-gradient(135deg, #e8f6ff, #ffffff);
+    border-color: #7cc4f5;
+  }
+  .auth-btn-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
 
   .inv-badge {
     background: var(--ink);
@@ -396,7 +429,6 @@
     background: rgba(255, 215, 70, 0.22);
   }
 
-  /* Tasto sgancio moneta (cerchietto in alto a destra della rotella rossa) */
   .eject-hotspot {
     position: absolute;
     top: 55.8%;
@@ -415,12 +447,8 @@
     box-shadow: 0 0 0 2px rgba(255, 230, 120, 0.92), 0 0 14px rgba(255, 200, 40, 0.65);
     background: rgba(255, 225, 110, 0.16);
   }
-  .eject-hotspot.ready:hover {
-    background: rgba(255, 225, 110, 0.3);
-  }
-  .eject-hotspot.ready:active {
-    transform: scale(0.9);
-  }
+  .eject-hotspot.ready:hover { background: rgba(255, 225, 110, 0.3); }
+  .eject-hotspot.ready:active { transform: scale(0.9); }
 
   .knob-hotspot {
     position: absolute;
@@ -468,7 +496,6 @@
     pointer-events: none;
   }
 
-  /* --- Prezzo (badge3.png) + Progresso Collezione SULLA scocca in basso a sinistra --- */
   .machine-meta {
     position: absolute;
     top: 81.5%;
@@ -538,7 +565,7 @@
     box-shadow: 0 3px 10px rgba(244, 169, 0, 0.4);
   }
 
-  /* --- Dock inferiore con sfondo public/nuvola.png, borsellino e nuvoletta credito --- */
+  /* --- Dock inferiore --- */
   .coin-dock {
     position: fixed;
     bottom: 18px;
@@ -574,7 +601,6 @@
   }
   .coin-dock.no-cloud-img .dock-cloud-bg { display: none; }
 
-  /* Nuvoletta Credito Residuo */
   .wallet-cloud {
     position: absolute;
     right: calc(100% + 34px);
@@ -618,25 +644,9 @@
   }
   .wallet-cloud.no-cloud-img .wallet-cloud-bg { display: none; }
 
-  .wallet-info {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    line-height: 1.1;
-  }
-  .wallet-label {
-    font-size: 9px;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 0.4px;
-    color: #4b677f;
-  }
-  .wallet-amount {
-    font-size: 18px;
-    font-weight: 900;
-    color: #1a3347;
-    transition: transform 0.18s ease, color 0.18s ease;
-  }
+  .wallet-info { display: flex; flex-direction: column; align-items: flex-start; line-height: 1.1; }
+  .wallet-label { font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.4px; color: #4b677f; }
+  .wallet-amount { font-size: 18px; font-weight: 900; color: #1a3347; transition: transform 0.18s ease, color 0.18s ease; }
   .wallet-amount.is-low { color: var(--accent); }
   .wallet-amount.is-bump { transform: scale(1.22); }
 
@@ -659,7 +669,6 @@
   }
   .wallet-add-btn:active { transform: scale(0.88); }
 
-  /* Su mobile/touch: sempre visibile, centrata sopra il dock */
   @media (max-width: 640px), (hover: none) {
     .wallet-cloud {
       right: auto;
@@ -671,12 +680,8 @@
       padding: 8px 16px;
       min-width: 122px;
     }
-    .wallet-cloud.open {
-      transform: translateX(-50%) scale(1);
-    }
-    .slide {
-      padding: 46px 0 148px;
-    }
+    .wallet-cloud.open { transform: translateX(-50%) scale(1); }
+    .slide { padding: 46px 0 148px; }
   }
 
   .coin-visual {
@@ -694,13 +699,9 @@
   }
   .coin-visual.has-coin-img { border: none; background: transparent; box-shadow: none; overflow: visible; }
   .coin-visual img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; pointer-events: none; }
-  .coin-visual.has-coin-img img {
-    transform: scale(2.1);
-    filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.32));
-  }
+  .coin-visual.has-coin-img img { transform: scale(2.1); filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.32)); }
   .coin-visual.has-coin-img .coin-text { display: none; }
 
-  /* Borsellino nel dock */
   .coin-btn {
     flex-shrink: 0;
     width: 112px;
@@ -714,21 +715,11 @@
   .coin-btn:active { cursor: grabbing; }
   .coin-btn.is-empty { filter: grayscale(65%); opacity: 0.78; cursor: pointer; }
 
-  .coin-btn.has-purse-img {
-    border: none;
-    background: transparent;
-    box-shadow: none;
-    overflow: visible;
-  }
-  .coin-btn.has-purse-img img {
-    transform: scale(1.75);
-    filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.32));
-  }
+  .coin-btn.has-purse-img { border: none; background: transparent; box-shadow: none; overflow: visible; }
+  .coin-btn.has-purse-img img { transform: scale(1.75); filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.32)); }
   .coin-btn.has-purse-img .coin-text { display: none; }
 
-  .coin-btn.is-popping {
-    animation: purseSquish 0.38s cubic-bezier(0.22, 1.2, 0.36, 1);
-  }
+  .coin-btn.is-popping { animation: purseSquish 0.38s cubic-bezier(0.22, 1.2, 0.36, 1); }
   @keyframes purseSquish {
     0% { transform: scale(1, 1); }
     28% { transform: scale(1.18, 0.82) translateY(5px); }
@@ -782,19 +773,11 @@
     transition: opacity 0.2s ease, transform 0.15s ease;
   }
   .nav-arrow:active { transform: translateY(-50%) scale(0.9); }
-  .nav-arrow img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    transform: scale(1.6);
-    display: block;
-    filter: drop-shadow(0 5px 12px rgba(0, 0, 0, 0.28));
-  }
+  .nav-arrow img { width: 100%; height: 100%; object-fit: contain; transform: scale(1.6); display: block; filter: drop-shadow(0 5px 12px rgba(0, 0, 0, 0.28)); }
   .nav-arrow.prev { left: 6px; }
   .nav-arrow.next { right: 6px; }
   .nav-arrow.hidden { opacity: 0; pointer-events: none; }
 
-  /* Moneta che esce dal borsellino */
   .floating-coin {
     position: fixed;
     top: 0; left: 0;
@@ -804,22 +787,160 @@
     pointer-events: none;
     will-change: transform;
   }
-
-  .floating-coin-inner {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    display: grid;
-    place-items: center;
-  }
-
-  .floating-coin.is-emerging .floating-coin-inner {
-    animation: coinPopOut 0.26s cubic-bezier(0.22, 1.35, 0.36, 1);
-  }
+  .floating-coin-inner { position: relative; width: 100%; height: 100%; display: grid; place-items: center; }
+  .floating-coin.is-emerging .floating-coin-inner { animation: coinPopOut 0.26s cubic-bezier(0.22, 1.35, 0.36, 1); }
   @keyframes coinPopOut {
     0% { transform: translateY(34px) scale(0.25) rotate(-25deg); opacity: 0.2; }
     65% { transform: translateY(-8px) scale(1.12) rotate(8deg); opacity: 1; }
     100% { transform: translateY(0) scale(1) rotate(0deg); opacity: 1; }
+  }
+
+  /* --- Modale Login / Profilo Supabase --- */
+  .auth-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 110;
+    background: rgba(15, 22, 32, 0.56);
+    backdrop-filter: blur(5px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 18px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.22s ease;
+  }
+  .auth-modal.open { opacity: 1; pointer-events: auto; }
+
+  .auth-card {
+    position: relative;
+    width: min(92vw, 370px);
+    background: linear-gradient(180deg, #ffffff 0%, #eef7fd 100%);
+    border: 3px solid rgba(255, 255, 255, 0.95);
+    border-radius: 26px;
+    padding: 22px 20px 20px;
+    box-shadow: 0 22px 50px rgba(20, 42, 66, 0.28);
+    transform: scale(0.94);
+    transition: transform 0.22s cubic-bezier(0.22, 1.15, 0.36, 1);
+  }
+  .auth-modal.open .auth-card { transform: scale(1); }
+
+  .auth-close {
+    position: absolute;
+    top: 12px; right: 12px;
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    background: #fff;
+    color: #365066;
+    font-size: 15px;
+    font-weight: 800;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+  }
+
+  .auth-title {
+    margin: 0 0 4px;
+    font-size: 19px;
+    font-weight: 900;
+    color: #1a3347;
+  }
+  .auth-desc {
+    margin: 0 0 16px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #546e85;
+    line-height: 1.4;
+  }
+
+  .auth-tabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    background: rgba(120, 165, 200, 0.16);
+    padding: 4px;
+    border-radius: 14px;
+    margin-bottom: 14px;
+  }
+  .auth-tab {
+    border: none;
+    background: transparent;
+    color: #4b677f;
+    padding: 8px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: background 0.18s ease, color 0.18s ease;
+  }
+  .auth-tab.active {
+    background: #fff;
+    color: #1a3347;
+    box-shadow: 0 2px 8px rgba(45, 75, 105, 0.12);
+  }
+
+  .auth-form { display: flex; flex-direction: column; gap: 10px; }
+  .auth-input {
+    width: 100%;
+    padding: 11px 14px;
+    border-radius: 14px;
+    border: 1.5px solid rgba(110, 150, 185, 0.35);
+    background: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink);
+    outline: none;
+  }
+  .auth-input:focus { border-color: #5eaee6; }
+
+  .auth-submit {
+    border: none;
+    background: linear-gradient(135deg, #4da3e0, #2c7ec2);
+    color: #fff;
+    padding: 12px;
+    border-radius: 14px;
+    font-size: 14px;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 8px 18px rgba(44, 126, 194, 0.28);
+    margin-top: 4px;
+  }
+  .auth-submit:disabled { opacity: 0.6; cursor: wait; }
+
+  .auth-msg {
+    font-size: 12px;
+    font-weight: 700;
+    min-height: 16px;
+    margin-top: 4px;
+    color: var(--accent);
+  }
+  .auth-msg.ok { color: #1b8a4e; }
+
+  .auth-profile-box {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .auth-user-pill {
+    background: #fff;
+    border: 1.5px solid rgba(110, 150, 185, 0.28);
+    border-radius: 14px;
+    padding: 12px 14px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #1a3347;
+    word-break: break-all;
+  }
+  .auth-logout-btn {
+    border: 1.5px solid rgba(201, 32, 42, 0.28);
+    background: rgba(201, 32, 42, 0.08);
+    color: var(--accent);
+    padding: 11px;
+    border-radius: 14px;
+    font-size: 13px;
+    font-weight: 800;
+    cursor: pointer;
   }
 
   /* --- Lightbox Locandina / Anteprima Premio --- */
@@ -838,7 +959,6 @@
     transition: opacity 0.22s ease;
   }
   .poster-modal.open { opacity: 1; pointer-events: auto; }
-
   .poster-modal-box {
     max-width: 94vw; max-height: 86dvh;
     display: flex; flex-direction: column; align-items: center; gap: 12px;
@@ -846,14 +966,7 @@
     transition: transform 0.24s cubic-bezier(0.2, 0.9, 0.3, 1);
   }
   .poster-modal.open .poster-modal-box { transform: scale(1); }
-  .poster-modal-box img {
-    max-width: 92vw; max-height: 80dvh;
-    object-fit: contain;
-    border-radius: 12px;
-    box-shadow: 0 24px 60px rgba(0,0,0,0.6);
-    background: #1b1c20;
-  }
-
+  .poster-modal-box img { max-width: 92vw; max-height: 80dvh; object-fit: contain; border-radius: 12px; box-shadow: 0 24px 60px rgba(0,0,0,0.6); background: #1b1c20; }
   .poster-modal-close {
     position: fixed;
     top: 16px; right: 16px;
@@ -867,7 +980,7 @@
     display: grid; place-items: center;
   }
 
-  /* --- Sidebar Inventario con sfondo a nuvole (public/sidebar.png) --- */
+  /* --- Sidebar Inventario --- */
   .inv-backdrop {
     position: fixed;
     inset: 0;
@@ -896,53 +1009,27 @@
 
   .inv-sidebar-bg {
     position: absolute;
-    top: -3%;
-    right: 2%;
-    width: 122%;
-    height: 106%;
+    top: -3%; right: 2%;
+    width: 122%; height: 106%;
     object-fit: fill;
     z-index: -1;
     pointer-events: none;
     filter: drop-shadow(-12px 0 26px rgba(32, 54, 78, 0.32));
   }
-
-  .inv-drawer.no-sidebar-img {
-    background: #eaf4fc;
-    box-shadow: -14px 0 40px rgba(0, 0, 0, 0.28);
-  }
+  .inv-drawer.no-sidebar-img { background: #eaf4fc; box-shadow: -14px 0 40px rgba(0, 0, 0, 0.28); }
   .inv-drawer.no-sidebar-img .inv-sidebar-bg { display: none; }
 
   .inv-header {
     padding: 18px 24px 8px 34px;
     background: transparent;
-    border-bottom: none;
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
     gap: 8px;
   }
-  .inv-header-left {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    gap: 2px;
-  }
-  .inv-banner-img {
-    height: 76px;
-    width: auto;
-    max-width: 280px;
-    object-fit: contain;
-    display: block;
-    filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.18));
-  }
-  .inv-sub {
-    font-size: 12px;
-    font-weight: 800;
-    color: #2b475e;
-    margin-top: 2px;
-  }
+  .inv-header-left { flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 2px; }
+  .inv-banner-img { height: 76px; width: auto; max-width: 280px; object-fit: contain; display: block; filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.18)); }
+  .inv-sub { font-size: 12px; font-weight: 800; color: #2b475e; margin-top: 2px; }
 
   .inv-grid {
     flex: 1;
@@ -953,16 +1040,7 @@
     gap: 9px;
     align-content: start;
   }
-
-  .inv-empty {
-    grid-column: 1 / -1;
-    text-align: center;
-    color: #2b475e;
-    font-size: 13px;
-    font-weight: 700;
-    line-height: 1.5;
-    padding: 48px 16px;
-  }
+  .inv-empty { grid-column: 1 / -1; text-align: center; color: #2b475e; font-size: 13px; font-weight: 700; line-height: 1.5; padding: 48px 16px; }
   .inv-empty-icon { font-size: 42px; margin-bottom: 8px; }
 
   .inv-tile {
@@ -982,21 +1060,11 @@
   .inv-tile:active { transform: scale(0.95); }
   .inv-tile img { width: 86%; height: 86%; object-fit: contain; }
   .inv-tile-emoji { font-size: 36px; }
-
-  .inv-qty {
-    position: absolute;
-    top: 5px; right: 5px;
-    background: #1a1a1d;
-    color: #fff;
-    font-size: 11px; font-weight: 800;
-    padding: 2px 7px;
-    border-radius: 999px;
-  }
+  .inv-qty { position: absolute; top: 5px; right: 5px; background: #1a1a1d; color: #fff; font-size: 11px; font-weight: 800; padding: 2px 7px; border-radius: 999px; }
 
   .inv-footer {
     padding: 12px 26px 18px 36px;
     background: transparent;
-    border-top: none;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -1028,58 +1096,19 @@
   }
   .capsule-overlay.active { opacity: 1; pointer-events: auto; }
 
-  .capsule-wrap {
-    position: relative;
-    width: 260px; height: 260px;
-    cursor: pointer;
-    touch-action: none;
-    transform-origin: center center;
-    will-change: transform, opacity;
-  }
+  .capsule-wrap { position: relative; width: 260px; height: 260px; cursor: pointer; touch-action: none; transform-origin: center center; will-change: transform, opacity; }
+  .gold-glow { position: absolute; inset: -80px; border-radius: 50%; background: radial-gradient(circle, var(--gold) 0%, rgba(255,215,90,0.38) 42%, rgba(255,255,255,0) 70%); opacity: 0; pointer-events: none; will-change: opacity, transform; }
+  .capsule-shadow { position: absolute; bottom: -14px; left: 50%; transform: translateX(-50%); width: 170px; height: 28px; border-radius: 50%; background: radial-gradient(ellipse at center, rgba(0,0,0,0.3), rgba(0,0,0,0) 70%); }
+  .cap-top, .cap-bottom { position: absolute; inset: 0; will-change: transform, opacity; transition: transform 0.32s cubic-bezier(0.2, 0.9, 0.3, 1), opacity 0.26s ease; }
 
-  .gold-glow {
-    position: absolute;
-    inset: -80px;
-    border-radius: 50%;
-    background: radial-gradient(circle, var(--gold) 0%, rgba(255,215,90,0.38) 42%, rgba(255,255,255,0) 70%);
-    opacity: 0;
-    pointer-events: none;
-    will-change: opacity, transform;
-  }
-
-  .capsule-shadow {
-    position: absolute;
-    bottom: -14px; left: 50%;
-    transform: translateX(-50%);
-    width: 170px; height: 28px;
-    border-radius: 50%;
-    background: radial-gradient(ellipse at center, rgba(0,0,0,0.3), rgba(0,0,0,0) 70%);
-  }
-
-  .cap-top, .cap-bottom {
-    position: absolute;
-    inset: 0;
-    will-change: transform, opacity;
-    transition: transform 0.32s cubic-bezier(0.2, 0.9, 0.3, 1), opacity 0.26s ease;
-  }
-
-  .cap-photo-layer {
-    position: absolute;
-    inset: 0;
-    width: 100%; height: 100%;
-    object-fit: contain;
-    pointer-events: none;
-    filter: drop-shadow(0 12px 22px rgba(0,0,0,0.28));
-  }
+  .cap-photo-layer { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; pointer-events: none; filter: drop-shadow(0 12px 22px rgba(0,0,0,0.28)); }
   .cap-top .cap-photo-layer { clip-path: url(#capTopClip); }
   .cap-bottom .cap-photo-layer { clip-path: url(#capBottomClip); }
-
   .capsule-wrap.has-cap-photo .cap-css-fallback { display: none; }
   .capsule-wrap:not(.has-cap-photo) .cap-photo-layer { display: none; }
 
   .cap-css-top {
-    position: absolute;
-    top: 20px; left: 20px; width: 220px; height: 112px;
+    position: absolute; top: 20px; left: 20px; width: 220px; height: 112px;
     border-radius: 110px 110px 6px 6px;
     background: radial-gradient(circle at 32% 26%, rgba(255,255,255,0.94) 0%, rgba(255,255,255,0.34) 32%, rgba(220,232,240,0.24) 70%, rgba(160,180,195,0.38) 100%);
     border: 2px solid rgba(255,255,255,0.88);
@@ -1087,62 +1116,32 @@
     box-shadow: inset 0 12px 24px rgba(255,255,255,0.75);
   }
   .cap-css-bottom {
-    position: absolute;
-    bottom: 20px; left: 20px; width: 220px; height: 112px;
+    position: absolute; bottom: 20px; left: 20px; width: 220px; height: 112px;
     border-radius: 6px 6px 110px 110px;
     background: var(--cap-color, #e8a825);
     border: 2px solid rgba(255,255,255,0.45);
     box-shadow: inset 0 14px 18px rgba(255,255,255,0.32), inset 0 -22px 30px rgba(0,0,0,0.26);
   }
 
-  /* Bagliore dorato curvo lungo la linea di chiusura */
-  .seam-stress {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    opacity: 0;
-    z-index: 6;
-    pointer-events: none;
-    will-change: opacity;
-  }
+  .seam-stress { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; z-index: 6; pointer-events: none; will-change: opacity; }
 
   .squeeze-ui { margin-top: 32px; display: flex; flex-direction: column; align-items: center; gap: 14px; transition: opacity 0.25s ease; }
   .squeeze-bar-bg { width: 210px; height: 8px; border-radius: 99px; background: rgba(0,0,0,0.12); overflow: hidden; }
   .squeeze-bar-fill { width: 100%; height: 100%; transform-origin: left center; transform: scaleX(0); background: linear-gradient(90deg, #b8860b, #ffd54f); will-change: transform; }
 
   .btn-open-cap {
-    border: none;
-    background: transparent;
-    padding: 0;
-    cursor: pointer;
-    width: min(74vw, 270px);
-    height: 86px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    overflow: visible;
+    border: none; background: transparent; padding: 0; cursor: pointer;
+    width: min(74vw, 270px); height: 86px;
+    display: inline-flex; align-items: center; justify-content: center; overflow: visible;
     transition: transform 0.15s ease;
   }
   .btn-open-cap:active { transform: scale(0.94); }
-  .btn-open-cap img {
-    width: 132%;
-    max-height: 220%;
-    height: auto;
-    object-fit: contain;
-    display: block;
-    pointer-events: none;
-    filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.22));
-  }
+  .btn-open-cap img { width: 132%; max-height: 220%; height: auto; object-fit: contain; display: block; pointer-events: none; filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.22)); }
 
   .btn-primary {
-    border: none;
-    background: var(--ink);
-    color: #fff;
-    padding: 12px 24px;
-    border-radius: 999px;
-    font-size: 14px; font-weight: 800;
-    cursor: pointer;
+    border: none; background: var(--ink); color: #fff;
+    padding: 12px 24px; border-radius: 999px;
+    font-size: 14px; font-weight: 800; cursor: pointer;
     box-shadow: 0 10px 22px rgba(0,0,0,0.18);
   }
   .btn-primary:active { transform: scale(0.96); }
@@ -1150,7 +1149,7 @@
   #fxCanvas { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 80; pointer-events: none; }
   .flash-screen { position: fixed; inset: 0; z-index: 85; background: #fff9e6; opacity: 0; pointer-events: none; transition: opacity 0.28s ease; will-change: opacity; }
 
-  /* --- Reveal Screen con Nuvoletta grande e proporzionata (public/nuvola.png) --- */
+  /* --- Reveal Screen --- */
   .reveal-overlay {
     position: fixed;
     inset: 0;
@@ -1190,24 +1189,16 @@
 
   .reveal-cloud-bg {
     position: absolute;
-    top: 50%;
-    left: 50%;
+    top: 50%; left: 50%;
     transform: translate(-50%, -50%);
     width: min(215vw, 1180px);
-    max-width: none;
-    height: auto;
+    max-width: none; height: auto;
     object-fit: contain;
     z-index: -1;
     pointer-events: none;
     filter: drop-shadow(0 18px 34px rgba(68, 92, 118, 0.28));
   }
-
-  .reveal-card.no-cloud-img {
-    background: rgba(255, 255, 255, 0.88);
-    border: 2px solid rgba(168, 200, 224, 0.55);
-    border-radius: 26px;
-    box-shadow: 0 24px 55px rgba(86, 126, 158, 0.22);
-  }
+  .reveal-card.no-cloud-img { background: rgba(255, 255, 255, 0.88); border: 2px solid rgba(168, 200, 224, 0.55); border-radius: 26px; box-shadow: 0 24px 55px rgba(86, 126, 158, 0.22); }
   .reveal-card.no-cloud-img .reveal-cloud-bg { display: none; }
 
   .prize-stage {
@@ -1223,48 +1214,20 @@
     justify-content: center;
     overflow: hidden;
   }
-  .prize-stage img {
-    width: 90%;
-    height: 90%;
-    object-fit: contain;
-    border-radius: 20px;
-  }
+  .prize-stage img { width: 90%; height: 90%; object-fit: contain; border-radius: 20px; }
   .prize-fallback-emoji { font-size: 68px; }
 
-  .reveal-sub {
-    font-size: clamp(11px, 3.2vw, 13px);
-    font-weight: 800;
-    color: #1e364a;
-    margin: 0 0 10px;
-  }
-  .reveal-actions {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-  }
+  .reveal-sub { font-size: clamp(11px, 3.2vw, 13px); font-weight: 800; color: #1e364a; margin: 0 0 10px; }
+  .reveal-actions { display: flex; align-items: center; justify-content: center; gap: 12px; }
 
   .btn-reveal-img {
-    border: none;
-    background: transparent;
-    padding: 0;
-    height: clamp(50px, 13vw, 72px);
-    max-width: 46%;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+    border: none; background: transparent; padding: 0;
+    height: clamp(50px, 13vw, 72px); max-width: 46%;
+    cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
     transition: transform 0.15s ease;
   }
   .btn-reveal-img:active { transform: scale(0.93); }
-  .btn-reveal-img img {
-    height: 100%;
-    width: auto;
-    max-width: 100%;
-    object-fit: contain;
-    display: block;
-    filter: drop-shadow(0 5px 12px rgba(0, 0, 0, 0.2));
-  }
+  .btn-reveal-img img { height: 100%; width: auto; max-width: 100%; object-fit: contain; display: block; filter: drop-shadow(0 5px 12px rgba(0, 0, 0, 0.2)); }
 </style>
 </head>
 <body>
@@ -1306,6 +1269,10 @@
       />
     </div>
     <div class="top-actions">
+      <button class="auth-btn" id="authBtn" title="Accedi o gestisci profilo">
+        <span>👤</span>
+        <span class="auth-btn-text" id="authBtnText">Accedi</span>
+      </button>
       <button class="inv-icon-btn" id="invBtn" title="Apri Inventario">
         <img
           src="public/inventario.png"
@@ -1335,19 +1302,11 @@
   </header>
 
   <button class="nav-arrow prev" id="prevBtn" aria-label="Macchina precedente">
-    <img
-      src="public/muovisx.png"
-      alt="Precedente"
-      onerror="this.style.display='none';this.nextElementSibling.style.display='inline';"
-    />
+    <img src="public/muovisx.png" alt="Precedente" onerror="this.style.display='none';this.nextElementSibling.style.display='inline';" />
     <span style="display:none;">‹</span>
   </button>
   <button class="nav-arrow next" id="nextBtn" aria-label="Macchina successiva">
-    <img
-      src="public/muovidx.png"
-      alt="Successiva"
-      onerror="this.style.display='none';this.nextElementSibling.style.display='inline';"
-    />
+    <img src="public/muovidx.png" alt="Successiva" onerror="this.style.display='none';this.nextElementSibling.style.display='inline';" />
     <span style="display:none;">›</span>
   </button>
 
@@ -1364,7 +1323,6 @@
       onerror="this.parentElement.classList.add('no-cloud-img');"
     />
 
-    <!-- Nuvoletta Credito Residuo -->
     <div class="wallet-cloud" id="walletCloud" aria-live="polite">
       <img
         src="public/nuvola.png"
@@ -1397,6 +1355,37 @@
     </div>
   </div>
 
+  <!-- Modale Login / Profilo -->
+  <div class="auth-modal" id="authModal" role="dialog" aria-modal="true">
+    <div class="auth-card">
+      <button class="auth-close" id="closeAuthModal" aria-label="Chiudi">✕</button>
+
+      <!-- Vista non loggato -->
+      <div id="authGuestView">
+        <h2 class="auth-title">Account Momixapon</h2>
+        <p class="auth-desc">Salva nel cloud il tuo credito e tutti i gadget vinti su qualsiasi dispositivo.</p>
+        <div class="auth-tabs">
+          <button type="button" class="auth-tab active" id="tabLogin">Accedi</button>
+          <button type="button" class="auth-tab" id="tabSignup">Registrati</button>
+        </div>
+        <form class="auth-form" id="authForm">
+          <input class="auth-input" id="authEmail" type="email" placeholder="Email" required autocomplete="email" />
+          <input class="auth-input" id="authPassword" type="password" placeholder="Password (min. 6 caratteri)" required minlength="6" autocomplete="current-password" />
+          <button class="auth-submit" id="authSubmitBtn" type="submit">Accedi</button>
+          <div class="auth-msg" id="authMsg"></div>
+        </form>
+      </div>
+
+      <!-- Vista loggato -->
+      <div id="authUserView" class="auth-profile-box" style="display:none;">
+        <h2 class="auth-title">Profilo attivo</h2>
+        <p class="auth-desc">Il tuo inventario e il tuo credito sono sincronizzati automaticamente nel cloud.</p>
+        <div class="auth-user-pill" id="authUserEmail"></div>
+        <button type="button" class="auth-logout-btn" id="logoutBtn">Esci dall'account</button>
+      </div>
+    </div>
+  </div>
+
   <div class="poster-modal" id="posterModal" role="dialog" aria-modal="true">
     <button class="poster-modal-close" id="closePosterModal" aria-label="Chiudi">✕</button>
     <div class="poster-modal-box">
@@ -1404,7 +1393,7 @@
     </div>
   </div>
 
-  <!-- Sidebar Inventario con sfondo nuvole (public/sidebar.png) -->
+  <!-- Sidebar Inventario -->
   <div class="inv-backdrop" id="invBackdrop">
     <aside class="inv-drawer" aria-label="Inventario premi vinti">
       <img
@@ -1416,19 +1405,14 @@
       />
       <div class="inv-header">
         <div class="inv-header-left">
-          <img
-            src="public/inventario.png"
-            alt="Inventario"
-            class="inv-banner-img"
-            onerror="this.style.display='none';"
-          />
+          <img src="public/inventario.png" alt="Inventario" class="inv-banner-img" onerror="this.style.display='none';" />
           <div class="inv-sub" id="invSummary">0 gadget vinti</div>
         </div>
         <button class="btn-pill" id="closeInvBtn">✕</button>
       </div>
       <div class="inv-grid" id="invGrid"></div>
       <div class="inv-footer">
-        <span class="inv-sub">Salvato automaticamente</span>
+        <span class="inv-sub" id="invSyncLabel">Salvato in locale (ospite)</span>
         <button class="btn-clear" id="clearInvBtn">Svuota</button>
       </div>
     </aside>
@@ -1490,19 +1474,11 @@
       <p class="reveal-sub">Aggiunto al tuo inventario</p>
       <div class="reveal-actions">
         <button class="btn-reveal-img" id="openInvFromReveal" title="Apri Inventario">
-          <img
-            src="public/inventario.png"
-            alt="Inventario"
-            onerror="this.style.display='none';this.nextElementSibling.style.display='inline-flex';"
-          />
+          <img src="public/inventario.png" alt="Inventario" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-flex';" />
           <span class="btn-primary" style="display:none;">🎒 Inventario</span>
         </button>
         <button class="btn-reveal-img" id="againBtn" title="Continua">
-          <img
-            src="public/continua.png"
-            alt="Continua"
-            onerror="this.style.display='none';this.nextElementSibling.style.display='inline-flex';"
-          />
+          <img src="public/continua.png" alt="Continua" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-flex';" />
           <span class="btn-primary" style="display:none;">Continua</span>
         </button>
       </div>
@@ -1510,6 +1486,14 @@
   </section>
 
 <script>
+/* --- Configurazione Supabase --- */
+const SUPABASE_URL = "https://wsppmilxgbyrtojaiten.supabase.co";
+const SUPABASE_KEY = "sb_publishable_fh0uYqBqDFn4urQ-k6EtHQ_LAC3ZCaA";
+const sb = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
+
+let currentUser = null;
+let authMode = "login";
+
 const MAX_PRIZES_PROBE = 15;
 const CAPSULE_COLORS = ["#18a5d8", "#e85d75", "#e8a825", "#2eb872", "#8c4ce8", "#2d7ff9"];
 const GOLD_TINT = "rgba(255, 196, 46, 0.98)";
@@ -1615,16 +1599,31 @@ const walletCloud = document.getElementById("walletCloud");
 const walletAmount = document.getElementById("walletAmount");
 const addCreditBtn = document.getElementById("addCreditBtn");
 
-function loadCredit() {
+function loadLocalCredit() {
   try {
     const raw = localStorage.getItem(CREDIT_STORAGE_KEY);
     if (raw !== null && !isNaN(Number(raw))) credit = Math.max(0, Number(raw));
-  } catch {}
+    else credit = 15;
+  } catch {
+    credit = 15;
+  }
   updateCreditUI(false);
 }
 
-function saveCredit() {
-  try { localStorage.setItem(CREDIT_STORAGE_KEY, String(credit)); } catch {}
+async function saveCredit() {
+  if (currentUser && sb) {
+    try {
+      await sb.from("profiles").upsert({
+        id: currentUser.id,
+        credit,
+        updated_at: new Date().toISOString()
+      });
+    } catch (err) {
+      console.error("Errore salvataggio credito cloud:", err);
+    }
+  } else {
+    try { localStorage.setItem(CREDIT_STORAGE_KEY, String(credit)); } catch {}
+  }
 }
 
 function updateCreditUI(animate = true) {
@@ -1667,11 +1666,17 @@ addCreditBtn.addEventListener("click", (e) => {
   showWalletCloud();
 });
 
-/* --- Inventario & Progresso Collezione --- */
+/* --- Inventario & Sync Cloud --- */
 const INV_STORAGE_KEY = "gashapon_inventory_v1";
 let inventory = [];
 
-function loadInventory() {
+const invBadge = document.getElementById("invBadge");
+const invBackdrop = document.getElementById("invBackdrop");
+const invGrid = document.getElementById("invGrid");
+const invSummary = document.getElementById("invSummary");
+const invSyncLabel = document.getElementById("invSyncLabel");
+
+function loadLocalInventory() {
   try {
     const raw = localStorage.getItem(INV_STORAGE_KEY);
     inventory = raw ? JSON.parse(raw) : [];
@@ -1681,27 +1686,96 @@ function loadInventory() {
   updateInventoryUI();
 }
 
-function saveInventory() {
+function saveLocalInventory() {
   try { localStorage.setItem(INV_STORAGE_KEY, JSON.stringify(inventory)); } catch {}
 }
 
-function addToInventory(prize) {
-  const existing = inventory.find((item) => item.key === prize.key);
-  if (existing) {
-    existing.qty += 1;
-    existing.lastWon = Date.now();
-  } else {
-    inventory.unshift({ key: prize.key, photo: prize.photo, qty: 1, lastWon: Date.now() });
+async function syncItemToCloud(item) {
+  if (!currentUser || !sb) return;
+  try {
+    await sb.from("inventory").upsert({
+      user_id: currentUser.id,
+      prize_key: item.key,
+      photo: item.photo,
+      qty: item.qty,
+      last_won: item.lastWon
+    }, { onConflict: "user_id,prize_key" });
+  } catch (err) {
+    console.error("Errore salvataggio item cloud:", err);
   }
-  inventory.sort((a, b) => b.lastWon - a.lastWon);
-  saveInventory();
-  updateInventoryUI();
 }
 
-const invBadge = document.getElementById("invBadge");
-const invBackdrop = document.getElementById("invBackdrop");
-const invGrid = document.getElementById("invGrid");
-const invSummary = document.getElementById("invSummary");
+async function loadCloudData(user) {
+  if (!sb || !user) return;
+  try {
+    // 1. Carica profilo (credito)
+    const { data: profile } = await sb
+      .from("profiles")
+      .select("credit")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    if (profile && typeof profile.credit === "number") {
+      credit = profile.credit;
+    } else {
+      credit = 15;
+      await sb.from("profiles").upsert({ id: user.id, credit: 15 });
+    }
+    updateCreditUI(false);
+
+    // 2. Carica inventario dal cloud
+    const { data: rows } = await sb
+      .from("inventory")
+      .select("prize_key, photo, qty, last_won")
+      .eq("user_id", user.id)
+      .order("last_won", { ascending: false });
+
+    const cloudItems = (rows || []).map((r) => ({
+      key: r.prize_key,
+      photo: r.photo,
+      qty: r.qty,
+      lastWon: Number(r.last_won) || Date.now()
+    }));
+
+    // Se l'account cloud è nuovo e c'erano gadget vinti da ospite, li migra nel cloud
+    if (cloudItems.length === 0 && inventory.length > 0) {
+      const toUpload = inventory.map((item) => ({
+        user_id: user.id,
+        prize_key: item.key,
+        photo: item.photo,
+        qty: item.qty,
+        last_won: item.lastWon
+      }));
+      await sb.from("inventory").upsert(toUpload, { onConflict: "user_id,prize_key" });
+      try { localStorage.removeItem(INV_STORAGE_KEY); } catch {}
+    } else {
+      inventory = cloudItems;
+    }
+    updateInventoryUI();
+  } catch (err) {
+    console.error("Errore caricamento dati cloud:", err);
+  }
+}
+
+function addToInventory(prize) {
+  const now = Date.now();
+  let target = inventory.find((item) => item.key === prize.key);
+  if (target) {
+    target.qty += 1;
+    target.lastWon = now;
+  } else {
+    target = { key: prize.key, photo: prize.photo, qty: 1, lastWon: now };
+    inventory.unshift(target);
+  }
+  inventory.sort((a, b) => b.lastWon - a.lastWon);
+
+  if (currentUser && sb) {
+    syncItemToCloud(target);
+  } else {
+    saveLocalInventory();
+  }
+  updateInventoryUI();
+}
 
 function updateMachineProgress() {
   const ownedKeys = new Set(inventory.map((item) => item.key));
@@ -1757,14 +1831,151 @@ function closeInventory() { invBackdrop.classList.remove("open"); }
 document.getElementById("invBtn").onclick = openInventory;
 document.getElementById("closeInvBtn").onclick = closeInventory;
 invBackdrop.addEventListener("click", (e) => { if (e.target === invBackdrop) closeInventory(); });
-document.getElementById("clearInvBtn").onclick = () => {
+document.getElementById("clearInvBtn").onclick = async () => {
   if (inventory.length === 0) return;
   if (confirm("Vuoi svuotare tutto l'inventario?")) {
     inventory = [];
-    saveInventory();
+    if (currentUser && sb) {
+      await sb.from("inventory").delete().eq("user_id", currentUser.id);
+    } else {
+      saveLocalInventory();
+    }
     updateInventoryUI();
   }
 };
+
+/* --- Autenticazione UI & Logica --- */
+const authBtn = document.getElementById("authBtn");
+const authBtnText = document.getElementById("authBtnText");
+const authModal = document.getElementById("authModal");
+const authGuestView = document.getElementById("authGuestView");
+const authUserView = document.getElementById("authUserView");
+const authUserEmail = document.getElementById("authUserEmail");
+const authForm = document.getElementById("authForm");
+const authEmail = document.getElementById("authEmail");
+const authPassword = document.getElementById("authPassword");
+const authSubmitBtn = document.getElementById("authSubmitBtn");
+const authMsg = document.getElementById("authMsg");
+const tabLogin = document.getElementById("tabLogin");
+const tabSignup = document.getElementById("tabSignup");
+
+function updateAuthUI() {
+  if (currentUser) {
+    const shortName = (currentUser.email || "Profilo").split("@")[0];
+    authBtn.classList.add("is-logged");
+    authBtnText.textContent = shortName;
+    authGuestView.style.display = "none";
+    authUserView.style.display = "flex";
+    authUserEmail.textContent = currentUser.email || "";
+    invSyncLabel.textContent = "☁️ Salvato nel cloud";
+  } else {
+    authBtn.classList.remove("is-logged");
+    authBtnText.textContent = "Accedi";
+    authGuestView.style.display = "block";
+    authUserView.style.display = "none";
+    invSyncLabel.textContent = "Salvato in locale (ospite)";
+  }
+}
+
+function setAuthMode(mode) {
+  authMode = mode;
+  tabLogin.classList.toggle("active", mode === "login");
+  tabSignup.classList.toggle("active", mode === "signup");
+  authSubmitBtn.textContent = mode === "login" ? "Accedi" : "Crea account";
+  authMsg.textContent = "";
+  authMsg.classList.remove("ok");
+}
+
+tabLogin.onclick = () => setAuthMode("login");
+tabSignup.onclick = () => setAuthMode("signup");
+
+function openAuthModal() {
+  authMsg.textContent = "";
+  authMsg.classList.remove("ok");
+  updateAuthUI();
+  authModal.classList.add("open");
+}
+function closeAuthModal() { authModal.classList.remove("open"); }
+
+authBtn.onclick = openAuthModal;
+document.getElementById("closeAuthModal").onclick = closeAuthModal;
+authModal.addEventListener("click", (e) => { if (e.target === authModal) closeAuthModal(); });
+
+authForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  if (!sb) {
+    authMsg.textContent = "Errore di connessione a Supabase.";
+    return;
+  }
+
+  const email = authEmail.value.trim();
+  const password = authPassword.value;
+  authSubmitBtn.disabled = true;
+  authMsg.textContent = "";
+  authMsg.classList.remove("ok");
+
+  try {
+    let result;
+    if (authMode === "login") {
+      result = await sb.auth.signInWithPassword({ email, password });
+    } else {
+      result = await sb.auth.signUp({ email, password });
+    }
+
+    if (result.error) {
+      authMsg.textContent = result.error.message;
+    } else if (result.data && result.data.user) {
+      currentUser = result.data.user;
+      updateAuthUI();
+      await loadCloudData(currentUser);
+      authPassword.value = "";
+      closeAuthModal();
+    } else {
+      authMsg.classList.add("ok");
+      authMsg.textContent = "Account creato! Controlla l'email o accedi.";
+    }
+  } catch (err) {
+    authMsg.textContent = "Errore imprevisto. Riprova.";
+  } finally {
+    authSubmitBtn.disabled = false;
+  }
+});
+
+document.getElementById("logoutBtn").onclick = async () => {
+  if (!sb) return;
+  await sb.auth.signOut();
+  currentUser = null;
+  updateAuthUI();
+  loadLocalCredit();
+  loadLocalInventory();
+  closeAuthModal();
+};
+
+async function initAuth() {
+  if (!sb) {
+    updateAuthUI();
+    return;
+  }
+  const { data } = await sb.auth.getSession();
+  if (data && data.session && data.session.user) {
+    currentUser = data.session.user;
+    updateAuthUI();
+    await loadCloudData(currentUser);
+  } else {
+    updateAuthUI();
+  }
+
+  sb.auth.onAuthStateChange(async (event, session) => {
+    if (event === "SIGNED_IN" && session && session.user) {
+      currentUser = session.user;
+      updateAuthUI();
+      await loadCloudData(currentUser);
+    } else if (event === "SIGNED_OUT") {
+      currentUser = null;
+      updateAuthUI();
+    }
+  });
+}
 
 /* --- Stato & Audio --- */
 let activeIndex = Math.floor(MACHINES.length / 2);
@@ -1795,12 +2006,8 @@ function playTone(freq, dur, type = "sine", vol = 0.12, endFreq = null) {
   o.start(); o.stop(ctx.currentTime + dur);
 }
 
-function sfxAddCredit() {
-  playTone(980, 0.08, "sine", 0.1, 1480);
-}
-function sfxError() {
-  playTone(220, 0.12, "sawtooth", 0.08, 150);
-}
+function sfxAddCredit() { playTone(980, 0.08, "sine", 0.1, 1480); }
+function sfxError() { playTone(220, 0.12, "sawtooth", 0.08, 150); }
 function sfxPursePop() {
   playTone(420, 0.06, "triangle", 0.09, 760);
   setTimeout(() => playTone(1650, 0.09, "sine", 0.08, 2250), 45);
@@ -1843,7 +2050,6 @@ const randomBtn = document.getElementById("randomBtn");
 const posterModal = document.getElementById("posterModal");
 const posterModalImg = document.getElementById("posterModalImg");
 
-/* Hover borsellino <-> nuvoletta credito */
 coinBtn.addEventListener("mouseenter", () => showWalletCloud());
 coinBtn.addEventListener("mouseleave", () => scheduleHideWalletCloud());
 walletCloud.addEventListener("mouseenter", () => showWalletCloud());
@@ -1884,12 +2090,7 @@ function renderCorridor() {
         <div class="chute-origin" id="chute-${idx}"></div>
         <div class="machine-meta">
           <div class="machine-badge" id="badgeWrap-${idx}">
-            <img
-              src="public/badge3.png"
-              alt="3€"
-              class="machine-badge-img"
-              onerror="this.parentElement.classList.add('no-badge-img');"
-            />
+            <img src="public/badge3.png" alt="3€" class="machine-badge-img" onerror="this.parentElement.classList.add('no-badge-img');" />
             <span class="badge-fallback-price">€${m.price}</span>
           </div>
           <span class="count-tag" id="count-${idx}">...</span>
@@ -2010,9 +2211,7 @@ function shuffleRandomMachine() {
   updateActiveUI();
 
   let finalIdx = activeIndex;
-  while (finalIdx === activeIndex) {
-    finalIdx = Math.floor(Math.random() * MACHINES.length);
-  }
+  while (finalIdx === activeIndex) finalIdx = Math.floor(Math.random() * MACHINES.length);
 
   const steps = 6;
   let step = 0;
@@ -2021,13 +2220,10 @@ function shuffleRandomMachine() {
     step++;
     const isLast = step >= steps;
     let nextIdx;
-
     if (isLast) {
       nextIdx = finalIdx;
     } else {
-      do {
-        nextIdx = Math.floor(Math.random() * MACHINES.length);
-      } while (nextIdx === activeIndex);
+      do { nextIdx = Math.floor(Math.random() * MACHINES.length); } while (nextIdx === activeIndex);
     }
 
     activeIndex = nextIdx;
@@ -2047,10 +2243,8 @@ function shuffleRandomMachine() {
       setTimeout(nextJump, 110 + step * 35);
     }
   }
-
   nextJump();
 }
-
 randomBtn.onclick = shuffleRandomMachine;
 
 function updateActiveUI() {
@@ -2294,10 +2488,7 @@ function startCapsuleDrop(idx) {
 
 let squeezeProgress = 0, holding = false, autoSqueeze = false, squeezeRaf = null, lastTime = 0, lastCreakStep = 0;
 
-capsuleWrap.addEventListener("touchstart", (e) => {
-  if (phase === "squeeze") e.preventDefault();
-}, { passive: false });
-
+capsuleWrap.addEventListener("touchstart", (e) => { if (phase === "squeeze") e.preventDefault(); }, { passive: false });
 capsuleOverlay.addEventListener("contextmenu", (e) => e.preventDefault());
 
 capsuleWrap.addEventListener("pointerdown", (e) => {
@@ -2490,8 +2681,8 @@ document.getElementById("openInvFromReveal").addEventListener("click", () => {
 
 /* --- Avvio & Precaricamento --- */
 async function bootApp() {
-  loadCredit();
-  loadInventory();
+  loadLocalCredit();
+  loadLocalInventory();
   renderCorridor();
 
   const coreAssets = [
@@ -2512,6 +2703,7 @@ async function bootApp() {
   ];
 
   const loadTasks = Promise.all([
+    initAuth(),
     initCoinImage(),
     detectCapsules(),
     detectAllPrizes(),
