@@ -1485,6 +1485,52 @@
   }
   .btn-reveal-img:active { transform: scale(0.93); }
   .btn-reveal-img img { height: 100%; width: auto; max-width: 100%; object-fit: contain; display: block; filter: drop-shadow(0 5px 12px rgba(0, 0, 0, 0.2)); }
+/* --- Fix Topbar su Mobile (evita sovrapposizione Logo / Inventario) --- */
+  @media (max-width: 640px) {
+    .brand-logo-wrap {
+      top: 6px;
+      left: 8px;
+      height: clamp(58px, 9.5vh, 84px);
+      max-width: 38vw;
+    }
+
+    .top-actions {
+      top: 6px;
+      right: 8px;
+      gap: 4px;
+    }
+
+    .top-row {
+      gap: 6px;
+    }
+
+    .inv-icon-btn {
+      height: clamp(50px, 8vh, 66px);
+      max-width: 36vw;
+    }
+    .inv-icon-btn .inv-badge {
+      top: 2px;
+      right: 0;
+      min-width: 20px;
+      height: 20px;
+      font-size: 10px;
+    }
+
+    .auth-btn-img {
+      height: clamp(32px, 5vh, 40px);
+    }
+
+    /* Su schermi stretti nasconde la pillola col nome: resta l'icona profilo pulita */
+    .auth-btn.has-custom-img.is-logged .auth-img-user-tag {
+      display: none;
+    }
+
+    .mute-icon-btn, .random-icon-btn {
+      height: 50px;
+      width: 50px;
+    }
+  }
+
 </style>
 </head>
 <body>
