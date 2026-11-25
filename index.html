@@ -396,6 +396,32 @@
     background: rgba(255, 215, 70, 0.22);
   }
 
+  /* Tasto sgancio moneta (cerchietto in alto a destra della rotella rossa) */
+  .eject-hotspot {
+    position: absolute;
+    top: 55.8%;
+    left: 65.2%;
+    width: 15.2%;
+    height: 8.6%;
+    z-index: 7;
+    border-radius: 50%;
+    pointer-events: none;
+    cursor: default;
+    transition: box-shadow 0.2s ease, background 0.2s ease, transform 0.12s ease;
+  }
+  .eject-hotspot.ready {
+    pointer-events: auto;
+    cursor: pointer;
+    box-shadow: 0 0 0 2px rgba(255, 230, 120, 0.92), 0 0 14px rgba(255, 200, 40, 0.65);
+    background: rgba(255, 225, 110, 0.16);
+  }
+  .eject-hotspot.ready:hover {
+    background: rgba(255, 225, 110, 0.3);
+  }
+  .eject-hotspot.ready:active {
+    transform: scale(0.9);
+  }
+
   .knob-hotspot {
     position: absolute;
     top: 64.3%; left: 38.2%; width: 20.8%; height: 11.75%;
@@ -512,7 +538,7 @@
     box-shadow: 0 3px 10px rgba(244, 169, 0, 0.4);
   }
 
-  /* --- Dock inferiore con sfondo public/nuvola.png e pallini trasparenti --- */
+  /* --- Dock inferiore con sfondo public/nuvola.png, borsellino e nuvoletta credito --- */
   .coin-dock {
     position: fixed;
     bottom: 18px;
@@ -548,6 +574,99 @@
   }
   .coin-dock.no-cloud-img .dock-cloud-bg { display: none; }
 
+  /* Nuvoletta Credito Residuo */
+  .wallet-cloud {
+    position: absolute;
+    right: calc(100% + 26px);
+    bottom: 4px;
+    z-index: 5;
+    isolation: isolate;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 18px;
+    min-width: 136px;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(8px) scale(0.92);
+    transition: opacity 0.22s ease, transform 0.24s cubic-bezier(0.22, 1.15, 0.36, 1);
+  }
+  .wallet-cloud.open {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0) scale(1);
+  }
+
+  .wallet-cloud-bg {
+    position: absolute;
+    top: -54%;
+    left: -28%;
+    width: 156%;
+    height: 208%;
+    object-fit: fill;
+    z-index: -1;
+    pointer-events: none;
+    filter: drop-shadow(0 8px 16px rgba(68, 92, 118, 0.26));
+  }
+
+  .wallet-cloud.no-cloud-img {
+    background: var(--panel);
+    border-radius: 999px;
+    border: 1px solid rgba(0,0,0,0.08);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.16);
+  }
+  .wallet-cloud.no-cloud-img .wallet-cloud-bg { display: none; }
+
+  .wallet-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    line-height: 1.1;
+  }
+  .wallet-label {
+    font-size: 9px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: #4b677f;
+  }
+  .wallet-amount {
+    font-size: 19px;
+    font-weight: 900;
+    color: #1a3347;
+    transition: transform 0.18s ease, color 0.18s ease;
+  }
+  .wallet-amount.is-low { color: var(--accent); }
+  .wallet-amount.is-bump { transform: scale(1.22); }
+
+  .wallet-add-btn {
+    border: 2px solid #fff;
+    background: linear-gradient(135deg, #ffd54f, #f4a900);
+    color: #3d2600;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    font-size: 18px;
+    font-weight: 900;
+    line-height: 1;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    box-shadow: 0 4px 10px rgba(244, 169, 0, 0.38);
+    transition: transform 0.14s ease;
+  }
+  .wallet-add-btn:active { transform: scale(0.88); }
+
+  @media (max-width: 640px) {
+    .wallet-cloud {
+      right: auto;
+      left: -6px;
+      bottom: calc(100% + 26px);
+    }
+  }
+
   .coin-visual {
     position: relative;
     border-radius: 50%;
@@ -569,6 +688,7 @@
   }
   .coin-visual.has-coin-img .coin-text { display: none; }
 
+  /* Borsellino nel dock */
   .coin-btn {
     flex-shrink: 0;
     width: 112px;
@@ -576,10 +696,33 @@
     margin: -34px 0 -22px -6px;
     cursor: grab;
     touch-action: none;
-    transition: transform 0.15s ease;
+    transition: transform 0.15s ease, filter 0.2s ease, opacity 0.2s ease;
   }
   .coin-btn:hover { transform: scale(1.06); }
   .coin-btn:active { cursor: grabbing; }
+  .coin-btn.is-empty { filter: grayscale(65%); opacity: 0.78; cursor: pointer; }
+
+  .coin-btn.has-purse-img {
+    border: none;
+    background: transparent;
+    box-shadow: none;
+    overflow: visible;
+  }
+  .coin-btn.has-purse-img img {
+    transform: scale(1.75);
+    filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.32));
+  }
+  .coin-btn.has-purse-img .coin-text { display: none; }
+
+  .coin-btn.is-popping {
+    animation: purseSquish 0.38s cubic-bezier(0.22, 1.2, 0.36, 1);
+  }
+  @keyframes purseSquish {
+    0% { transform: scale(1, 1); }
+    28% { transform: scale(1.18, 0.82) translateY(5px); }
+    64% { transform: scale(0.92, 1.12) translateY(-6px); }
+    100% { transform: scale(1, 1); }
+  }
 
   @media (max-width: 480px) {
     .coin-dock { padding: 12px 20px 12px 14px; gap: 10px; }
@@ -639,6 +782,7 @@
   .nav-arrow.next { right: 6px; }
   .nav-arrow.hidden { opacity: 0; pointer-events: none; }
 
+  /* Moneta che esce dal borsellino */
   .floating-coin {
     position: fixed;
     top: 0; left: 0;
@@ -647,6 +791,23 @@
     display: none;
     pointer-events: none;
     will-change: transform;
+  }
+
+  .floating-coin-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: grid;
+    place-items: center;
+  }
+
+  .floating-coin.is-emerging .floating-coin-inner {
+    animation: coinPopOut 0.26s cubic-bezier(0.22, 1.35, 0.36, 1);
+  }
+  @keyframes coinPopOut {
+    0% { transform: translateY(34px) scale(0.25) rotate(-25deg); opacity: 0.2; }
+    65% { transform: translateY(-8px) scale(1.12) rotate(8deg); opacity: 1; }
+    100% { transform: translateY(0) scale(1) rotate(0deg); opacity: 1; }
   }
 
   /* --- Lightbox Locandina / Anteprima Premio --- */
@@ -721,7 +882,6 @@
   }
   .inv-backdrop.open .inv-drawer { transform: translateX(0); }
 
-  /* Spostato più a sinistra così la colonna di nuvole copre meglio la griglia */
   .inv-sidebar-bg {
     position: absolute;
     top: -3%;
@@ -734,7 +894,6 @@
     filter: drop-shadow(-12px 0 26px rgba(32, 54, 78, 0.32));
   }
 
-  /* Fallback se public/sidebar.png non carica */
   .inv-drawer.no-sidebar-img {
     background: #eaf4fc;
     box-shadow: -14px 0 40px rgba(0, 0, 0, 0.28);
@@ -841,7 +1000,7 @@
     box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
   }
 
-  /* --- Overlay Capsula PNG & Apertura Dorata --- */
+  /* --- Overlay Capsula PNG & Apertura Curva Dorata --- */
   .capsule-overlay {
     position: fixed;
     inset: 0;
@@ -900,8 +1059,8 @@
     pointer-events: none;
     filter: drop-shadow(0 12px 22px rgba(0,0,0,0.28));
   }
-  .cap-top .cap-photo-layer { clip-path: inset(0 0 47% 0); }
-  .cap-bottom .cap-photo-layer { clip-path: inset(53% 0 0 0); }
+  .cap-top .cap-photo-layer { clip-path: url(#capTopClip); }
+  .cap-bottom .cap-photo-layer { clip-path: url(#capBottomClip); }
 
   .capsule-wrap.has-cap-photo .cap-css-fallback { display: none; }
   .capsule-wrap:not(.has-cap-photo) .cap-photo-layer { display: none; }
@@ -924,12 +1083,12 @@
     box-shadow: inset 0 14px 18px rgba(255,255,255,0.32), inset 0 -22px 30px rgba(0,0,0,0.26);
   }
 
+  /* Bagliore dorato curvo lungo la linea di chiusura */
   .seam-stress {
     position: absolute;
-    top: 52%; left: 10%; right: 10%; height: 12px;
-    transform: translateY(-50%);
-    border-radius: 99px;
-    background: radial-gradient(ellipse at center, #fffbe0 25%, rgba(255, 210, 60, 0.85) 55%, rgba(255,255,255,0) 85%);
+    inset: 0;
+    width: 100%;
+    height: 100%;
     opacity: 0;
     z-index: 6;
     pointer-events: none;
@@ -1098,6 +1257,18 @@
 </head>
 <body>
 
+  <!-- Maschere SVG curve per il taglio della capsula -->
+  <svg width="0" height="0" style="position:absolute;pointer-events:none;" aria-hidden="true">
+    <defs>
+      <clipPath id="capTopClip" clipPathUnits="objectBoundingBox">
+        <path d="M 0 0 L 1 0 L 1 0.48 Q 0.5 0.635 0 0.45 Z" />
+      </clipPath>
+      <clipPath id="capBottomClip" clipPathUnits="objectBoundingBox">
+        <path d="M 0 0.445 Q 0.5 0.63 1 0.475 L 1 1 L 0 1 Z" />
+      </clipPath>
+    </defs>
+  </svg>
+
   <!-- Schermata di Caricamento -->
   <div class="loading-screen" id="loadingScreen">
     <img
@@ -1180,19 +1351,38 @@
       aria-hidden="true"
       onerror="this.parentElement.classList.add('no-cloud-img');"
     />
-    <div class="coin-visual coin-btn" id="coinBtn" title="Trascina nella fessura della macchinetta">
-      <img id="coinImgDock" alt="€3" />
+
+    <!-- Nuvoletta Credito Residuo -->
+    <div class="wallet-cloud" id="walletCloud" aria-live="polite">
+      <img
+        src="public/nuvoletta.png"
+        alt=""
+        class="wallet-cloud-bg"
+        aria-hidden="true"
+        onerror="if(!this.dataset.triedFallback){this.dataset.triedFallback='1';this.src='public/nuvola.png';}else{this.parentElement.classList.add('no-cloud-img');}"
+      />
+      <div class="wallet-info">
+        <span class="wallet-label">Credito</span>
+        <span class="wallet-amount" id="walletAmount">€15</span>
+      </div>
+      <button class="wallet-add-btn" id="addCreditBtn" type="button" title="Ricarica +1€">+</button>
+    </div>
+
+    <div class="coin-visual coin-btn" id="coinBtn" title="Estrai il gettone dal borsellino">
+      <img id="coinImgDock" alt="Borsellino" />
       <span class="coin-text">€3</span>
     </div>
     <div class="dock-info">
-      <div class="dock-hint" id="dockHint">Trascina il gettone nella fessura</div>
+      <div class="dock-hint" id="dockHint">Estrai il gettone dal borsellino</div>
       <div class="dots" id="dots"></div>
     </div>
   </div>
 
   <div class="coin-visual floating-coin" id="floatingCoin">
-    <img id="coinImgFloat" alt="€3" />
-    <span class="coin-text">€3</span>
+    <div class="floating-coin-inner">
+      <img id="coinImgFloat" alt="€3" />
+      <span class="coin-text">€3</span>
+    </div>
   </div>
 
   <div class="poster-modal" id="posterModal" role="dialog" aria-modal="true">
@@ -1240,7 +1430,19 @@
         <img class="cap-photo-layer" id="capImgTop" alt="" />
         <div class="cap-css-fallback cap-css-top"></div>
       </div>
-      <div class="seam-stress" id="seamStress"></div>
+      <svg class="seam-stress" id="seamStress" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+        <defs>
+          <filter id="seamGlowFilter" x="-20%" y="-40%" width="140%" height="180%">
+            <feGaussianBlur stdDeviation="2.4" result="blur" />
+            <feMerge>
+              <feMergeNode in="blur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+        </defs>
+        <path d="M 24 51.2 Q 50 59.5 76 52.8" fill="none" stroke="rgba(255, 210, 60, 0.92)" stroke-width="4.5" stroke-linecap="round" filter="url(#seamGlowFilter)" />
+        <path d="M 25 51.2 Q 50 59.5 75 52.8" fill="none" stroke="#fffbe6" stroke-width="1.8" stroke-linecap="round" />
+      </svg>
       <div class="cap-bottom" id="capBottom">
         <img class="cap-photo-layer" id="capImgBottom" alt="" />
         <div class="cap-css-fallback cap-css-bottom"></div>
@@ -1336,23 +1538,33 @@ async function detectCapsules() {
   availableCapsules = checks.filter((c) => c.ok).map((c) => c.url);
 }
 
-function initCoinImage() {
+async function initCoinImage() {
   const dockEl = document.getElementById("coinBtn");
   const floatEl = document.getElementById("floatingCoin");
   const imgDock = document.getElementById("coinImgDock");
   const imgFloat = document.getElementById("coinImgFloat");
 
-  return checkImageExists("public/coin.png").then((ok) => {
-    if (ok) {
-      imgDock.src = "public/coin.png";
-      imgFloat.src = "public/coin.png";
-      dockEl.classList.add("has-coin-img");
-      floatEl.classList.add("has-coin-img");
-    } else {
-      imgDock.style.display = "none";
-      imgFloat.style.display = "none";
-    }
-  });
+  const [hasCoin, hasPurse] = await Promise.all([
+    checkImageExists("public/coin.png"),
+    checkImageExists("public/borsellino.png")
+  ]);
+
+  if (hasCoin) {
+    imgFloat.src = "public/coin.png";
+    floatEl.classList.add("has-coin-img");
+  } else {
+    imgFloat.style.display = "none";
+  }
+
+  if (hasPurse) {
+    imgDock.src = "public/borsellino.png";
+    dockEl.classList.add("has-purse-img");
+  } else if (hasCoin) {
+    imgDock.src = "public/coin.png";
+    dockEl.classList.add("has-coin-img");
+  } else {
+    imgDock.style.display = "none";
+  }
 }
 
 async function detectAllPrizes() {
@@ -1381,6 +1593,67 @@ async function detectAllPrizes() {
   }));
   updateMachineProgress();
 }
+
+/* --- Credito / Borsellino --- */
+const CREDIT_STORAGE_KEY = "gashapon_credit_v1";
+let credit = 15;
+let walletHideTimer = null;
+
+const walletCloud = document.getElementById("walletCloud");
+const walletAmount = document.getElementById("walletAmount");
+const addCreditBtn = document.getElementById("addCreditBtn");
+
+function loadCredit() {
+  try {
+    const raw = localStorage.getItem(CREDIT_STORAGE_KEY);
+    if (raw !== null && !isNaN(Number(raw))) credit = Math.max(0, Number(raw));
+  } catch {}
+  updateCreditUI(false);
+}
+
+function saveCredit() {
+  try { localStorage.setItem(CREDIT_STORAGE_KEY, String(credit)); } catch {}
+}
+
+function updateCreditUI(animate = true) {
+  walletAmount.textContent = `€${credit}`;
+  const currentPrice = MACHINES[activeIndex] ? MACHINES[activeIndex].price : 3;
+  const low = credit < currentPrice;
+  walletAmount.classList.toggle("is-low", low);
+  coinBtn.classList.toggle("is-empty", low);
+
+  if (animate) {
+    walletAmount.classList.remove("is-bump");
+    void walletAmount.offsetWidth;
+    walletAmount.classList.add("is-bump");
+    setTimeout(() => walletAmount.classList.remove("is-bump"), 180);
+  }
+}
+
+function showWalletCloud(autoHideMs = 0) {
+  clearTimeout(walletHideTimer);
+  walletCloud.classList.add("open");
+  if (autoHideMs > 0) {
+    walletHideTimer = setTimeout(() => walletCloud.classList.remove("open"), autoHideMs);
+  }
+}
+
+function scheduleHideWalletCloud(delay = 240) {
+  clearTimeout(walletHideTimer);
+  walletHideTimer = setTimeout(() => walletCloud.classList.remove("open"), delay);
+}
+
+addCreditBtn.addEventListener("click", (e) => {
+  e.stopPropagation();
+  credit += 1;
+  saveCredit();
+  updateCreditUI(true);
+  sfxAddCredit();
+  if (phase === "idle" && credit >= MACHINES[activeIndex].price) {
+    dockHint.textContent = "Estrai il gettone dal borsellino";
+  }
+  showWalletCloud();
+});
 
 /* --- Inventario & Progresso Collezione --- */
 const INV_STORAGE_KEY = "gashapon_inventory_v1";
@@ -1510,6 +1783,21 @@ function playTone(freq, dur, type = "sine", vol = 0.12, endFreq = null) {
   o.start(); o.stop(ctx.currentTime + dur);
 }
 
+function sfxAddCredit() {
+  playTone(980, 0.08, "sine", 0.1, 1480);
+}
+function sfxError() {
+  playTone(220, 0.12, "sawtooth", 0.08, 150);
+}
+function sfxPursePop() {
+  playTone(420, 0.06, "triangle", 0.09, 760);
+  setTimeout(() => playTone(1650, 0.09, "sine", 0.08, 2250), 45);
+}
+function sfxEject() {
+  playTone(540, 0.06, "square", 0.06, 260);
+  setTimeout(() => playTone(1950, 0.14, "sine", 0.12, 1320), 65);
+  setTimeout(() => playTone(1480, 0.14, "triangle", 0.09, 1780), 140);
+}
 function sfxCoin() {
   playTone(1580, 0.12, "sine", 0.14, 2100);
   setTimeout(() => playTone(2350, 0.18, "triangle", 0.1, 1900), 75);
@@ -1543,6 +1831,12 @@ const randomBtn = document.getElementById("randomBtn");
 const posterModal = document.getElementById("posterModal");
 const posterModalImg = document.getElementById("posterModalImg");
 
+/* Hover borsellino <-> nuvoletta credito */
+coinBtn.addEventListener("mouseenter", () => showWalletCloud());
+coinBtn.addEventListener("mouseleave", () => scheduleHideWalletCloud());
+walletCloud.addEventListener("mouseenter", () => showWalletCloud());
+walletCloud.addEventListener("mouseleave", () => scheduleHideWalletCloud());
+
 function openImageModal(src) { posterModalImg.src = src; posterModal.classList.add("open"); }
 function closePosterModal() { posterModal.classList.remove("open"); }
 document.getElementById("closePosterModal").onclick = closePosterModal;
@@ -1570,6 +1864,7 @@ function renderCorridor() {
           </span>
         </div>
         <div class="coin-hotspot" id="coinSlot-${idx}" title="Trascina qui il gettone"></div>
+        <div class="eject-hotspot" id="eject-${idx}" title="Restituisci moneta"></div>
         <div class="knob-hotspot" id="knob-${idx}" title="Gira la manopola">
           <img class="knob-photo-crop" id="knobCrop-${idx}" alt="" />
           <div class="knob-fallback"></div>
@@ -1751,26 +2046,85 @@ function updateActiveUI() {
   document.querySelectorAll(".dot").forEach((d, i) => d.classList.toggle("active", i === activeIndex));
   prevBtn.classList.toggle("hidden", activeIndex === 0 || phase !== "idle");
   nextBtn.classList.toggle("hidden", activeIndex === MACHINES.length - 1 || phase !== "idle");
+  updateCreditUI(false);
 }
 
-/* --- Gettone (Solo Drag & Drop) & Manopola --- */
+/* --- Inserimento, Sgancio Moneta & Manopola --- */
 function insertCoin(idx) {
   if (phase !== "idle" || idx !== activeIndex) return;
+  const price = MACHINES[idx].price;
+  if (credit < price) {
+    sfxError();
+    dockHint.textContent = "Credito insufficiente! Ricarica con +";
+    showWalletCloud(2600);
+    return;
+  }
+
+  credit -= price;
+  saveCredit();
+  updateCreditUI(true);
+  showWalletCloud(1800);
+
   phase = "coinInserted";
   corridor.classList.add("locked");
   sfxCoin();
   dockHint.textContent = "Gira la manopola centrale di 360°!";
   document.getElementById(`knob-${idx}`).classList.add("ready");
+  document.getElementById(`eject-${idx}`).classList.add("ready");
+  updateActiveUI();
+}
+
+function ejectCoin(idx) {
+  if (phase !== "coinInserted" || idx !== activeIndex) return;
+
+  const price = MACHINES[idx].price;
+  credit += price;
+  saveCredit();
+  updateCreditUI(true);
+  showWalletCloud(2000);
+  sfxEject();
+
+  coinBtn.classList.remove("is-popping");
+  void coinBtn.offsetWidth;
+  coinBtn.classList.add("is-popping");
+
+  phase = "idle";
+  corridor.classList.remove("locked");
+  document.getElementById(`knob-${idx}`).classList.remove("ready");
+  document.getElementById(`eject-${idx}`).classList.remove("ready");
+  dockHint.textContent = "Moneta restituita nel borsellino!";
+  setTimeout(() => {
+    if (phase === "idle") dockHint.textContent = "Estrai il gettone dal borsellino";
+  }, 1800);
   updateActiveUI();
 }
 
 let draggingCoin = false;
 coinBtn.addEventListener("pointerdown", (e) => {
   if (phase !== "idle") return;
+  const price = MACHINES[activeIndex].price;
+
+  if (credit < price) {
+    sfxError();
+    dockHint.textContent = "Credito insufficiente! Ricarica con +";
+    showWalletCloud(2600);
+    return;
+  }
+
   draggingCoin = true;
   coinBtn.setPointerCapture(e.pointerId);
+
+  coinBtn.classList.remove("is-popping");
+  void coinBtn.offsetWidth;
+  coinBtn.classList.add("is-popping");
+  sfxPursePop();
+
+  floatingCoin.classList.remove("is-emerging");
   floatingCoin.style.display = "grid";
   floatingCoin.style.transform = `translate3d(calc(${e.clientX}px - 50%), calc(${e.clientY}px - 50%), 0) scale(1.06)`;
+  void floatingCoin.offsetWidth;
+  floatingCoin.classList.add("is-emerging");
+
   document.getElementById(`coinSlot-${activeIndex}`).classList.add("highlight");
 });
 window.addEventListener("pointermove", (e) => {
@@ -1781,6 +2135,7 @@ window.addEventListener("pointerup", (e) => {
   if (!draggingCoin) return;
   draggingCoin = false;
   floatingCoin.style.display = "none";
+  floatingCoin.classList.remove("is-emerging");
   const slot = document.getElementById(`coinSlot-${activeIndex}`);
   slot.classList.remove("highlight");
   const r = slot.getBoundingClientRect();
@@ -1793,6 +2148,11 @@ function bindMachineEvents(idx) {
     if (suppressNextClick) return;
     if (idx !== activeIndex && phase === "idle") { scrollToMachine(idx); return; }
     if (phase === "idle" || phase === "coinInserted") openImageModal(MACHINES[idx].posterPhoto);
+  });
+
+  document.getElementById(`eject-${idx}`).addEventListener("click", (e) => {
+    e.stopPropagation();
+    ejectCoin(idx);
   });
 
   const knob = document.getElementById(`knob-${idx}`);
@@ -1845,6 +2205,7 @@ function autoTurnKnob(idx, knob) {
 
 function finishKnobTurn(idx, knob) {
   knob.classList.remove("ready");
+  document.getElementById(`eject-${idx}`).classList.remove("ready");
   knob.style.transform = "rotate3d(0,0,1,0deg)";
   startCapsuleDrop(idx);
 }
@@ -2105,7 +2466,7 @@ function closeReveal() {
   corridor.classList.remove("locked");
   squeezeProgress = 0;
   phase = "idle";
-  dockHint.textContent = "Trascina il gettone nella fessura";
+  dockHint.textContent = "Estrai il gettone dal borsellino";
   updateActiveUI();
 }
 
@@ -2117,6 +2478,7 @@ document.getElementById("openInvFromReveal").addEventListener("click", () => {
 
 /* --- Avvio & Precaricamento --- */
 async function bootApp() {
+  loadCredit();
   loadInventory();
   renderCorridor();
 
@@ -2126,6 +2488,7 @@ async function bootApp() {
     "public/badge3.png",
     "public/nuvola.png",
     "public/sidebar.png",
+    "public/borsellino.png",
     "public/mute.png",
     "public/random.png",
     "public/muovisx.png",
