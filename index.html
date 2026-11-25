@@ -204,18 +204,20 @@
     background: transparent;
     padding: 0;
     cursor: pointer;
-    height: clamp(44px, 7.5vh, 72px);
-    width: auto;
+    height: clamp(64px, 11vh, 96px);
+    width: clamp(64px, 11vh, 96px);
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    overflow: visible;
     transition: transform 0.15s ease, opacity 0.2s ease, filter 0.2s ease;
   }
   .mute-icon-btn:active { transform: scale(0.92); }
   .mute-icon-btn img {
+    width: 100%;
     height: 100%;
-    width: auto;
     object-fit: contain;
+    transform: scale(1.5);
     display: block;
     filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.26));
   }
@@ -555,16 +557,17 @@
     top: 50%;
     transform: translateY(-50%);
     z-index: 30;
-    width: clamp(48px, 11vw, 76px);
-    height: clamp(48px, 11vw, 76px);
+    width: clamp(72px, 16vw, 110px);
+    height: clamp(72px, 16vw, 110px);
     border: none;
     background: transparent;
     padding: 0;
-    font-size: 28px;
+    font-size: 32px;
     line-height: 1;
     cursor: pointer;
     display: grid;
     place-items: center;
+    overflow: visible;
     transition: opacity 0.2s ease, transform 0.15s ease;
   }
   .nav-arrow:active { transform: translateY(-50%) scale(0.9); }
@@ -572,11 +575,12 @@
     width: 100%;
     height: 100%;
     object-fit: contain;
+    transform: scale(1.6);
     display: block;
     filter: drop-shadow(0 5px 12px rgba(0, 0, 0, 0.28));
   }
-  .nav-arrow.prev { left: 8px; }
-  .nav-arrow.next { right: 8px; }
+  .nav-arrow.prev { left: 6px; }
+  .nav-arrow.next { right: 6px; }
   .nav-arrow.hidden { opacity: 0; pointer-events: none; }
 
   .floating-coin {
@@ -1222,7 +1226,7 @@ function updateMachineProgress() {
     }
     const owned = m.activePrizes.filter((p) => ownedKeys.has(p.key)).length;
     const isComplete = owned >= total;
-    countEl.textContent = isComplete ? `🏆 ${owned}/${total}` : `⭐ ${owned}/${total}`;
+    countEl.textContent = isComplete ? `🏆 ${owned}/${total}` : `${owned}/${total}`;
     countEl.classList.toggle("is-complete", isComplete);
   });
 }
