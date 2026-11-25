@@ -11,7 +11,7 @@
     --accent: #c9202a;
     --gold: rgba(255, 196, 46, 0.98);
     --panel: rgba(255, 255, 255, 0.92);
-    --stage-h: min(75dvh, 720px);
+    --stage-h: min(74dvh, 710px);
     --stage-w: min(74vw, calc(var(--stage-h) * 0.565));
   }
 
@@ -25,12 +25,75 @@
     overflow: hidden;
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
     color: var(--ink);
-    background-color: #d8d8d6;
+    background-color: #e4eff7;
     background-image: url("public/background.jpg");
     background-position: center center;
     background-size: cover;
     background-repeat: no-repeat;
     user-select: none;
+  }
+
+  /* --- Schermata di Caricamento --- */
+  .loading-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    background:
+      radial-gradient(circle at 50% 40%, rgba(255, 255, 255, 0.88) 0%, rgba(222, 237, 248, 0.96) 100%),
+      url("public/background.jpg") center / cover no-repeat;
+    transition: opacity 0.45s ease, visibility 0.45s ease;
+  }
+  .loading-screen.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .loading-logo {
+    width: min(62vw, 300px);
+    height: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 10px 20px rgba(45, 75, 105, 0.18));
+    animation: loadFloat 1.6s ease-in-out infinite;
+  }
+
+  @keyframes loadFloat {
+    0%, 100% { transform: translateY(0px) scale(1); }
+    50% { transform: translateY(-7px) scale(1.02); }
+  }
+
+  .loading-bar-wrap {
+    width: min(56vw, 210px);
+    height: 10px;
+    border-radius: 999px;
+    background: rgba(120, 155, 185, 0.22);
+    overflow: hidden;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.08);
+  }
+
+  .loading-bar-fill {
+    width: 45%;
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #6bb5e8, #ffd54f, #f28b82);
+    animation: loadSlide 1.15s ease-in-out infinite;
+  }
+
+  @keyframes loadSlide {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(240%); }
+  }
+
+  .loading-text {
+    font-size: 13px;
+    font-weight: 700;
+    color: #546e85;
+    letter-spacing: 0.3px;
   }
 
   /* --- Top Bar: Logo a sinistra, Inventario bloccato in alto a destra --- */
@@ -171,7 +234,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 52px 0 112px;
+    padding: 50px 0 116px;
     transition: transform 0.28s cubic-bezier(0.22, 0.85, 0.35, 1), opacity 0.25s ease;
     opacity: 0.78;
     transform: scale(0.91);
@@ -324,44 +387,78 @@
     pointer-events: none;
   }
 
-  .machine-meta {
-    margin-top: 8px;
+  /* --- Badge Prezzo + Progresso Collezione (public/badge3.png) --- */
+  .machine-badge {
+    position: relative;
+    margin-top: 6px;
+    width: 174px;
+    height: 62px;
     display: flex;
     align-items: center;
-    gap: 8px;
-    background: var(--panel);
-    padding: 5px 12px;
-    border-radius: 999px;
-    border: 1px solid rgba(0,0,0,0.06);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    font-size: 12px;
-    font-weight: 700;
+    justify-content: center;
+    filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.22));
+    transition: transform 0.2s ease, filter 0.25s ease;
+  }
+  .machine-badge.is-complete {
+    filter: drop-shadow(0 0 12px rgba(255, 200, 40, 0.85)) drop-shadow(0 6px 12px rgba(0, 0, 0, 0.2));
   }
 
-  .price-tag {
+  .machine-badge-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+    pointer-events: none;
+  }
+
+  .count-tag {
+    position: absolute;
+    left: 22%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 14px;
+    font-weight: 900;
+    color: #2b2318;
+    text-shadow:
+      -1.5px -1.5px 0 rgba(255, 255, 255, 0.92),
+       1.5px -1.5px 0 rgba(255, 255, 255, 0.92),
+      -1.5px  1.5px 0 rgba(255, 255, 255, 0.92),
+       1.5px  1.5px 0 rgba(255, 255, 255, 0.92),
+       0 2px 4px rgba(0, 0, 0, 0.22);
+    letter-spacing: -0.3px;
+    white-space: nowrap;
+    pointer-events: none;
+  }
+  .machine-badge.is-complete .count-tag {
+    color: #b86200;
+  }
+
+  /* Fallback se badge3.png non è ancora presente */
+  .machine-badge.no-badge-img {
+    width: auto;
+    height: auto;
+    background: var(--panel);
+    padding: 5px 14px;
+    border-radius: 999px;
+    border: 1px solid rgba(0,0,0,0.08);
+    gap: 8px;
+  }
+  .machine-badge.no-badge-img .machine-badge-img { display: none; }
+  .machine-badge.no-badge-img .count-tag {
+    position: static;
+    transform: none;
+    text-shadow: none;
+    font-size: 12px;
+  }
+  .badge-fallback-price { display: none; }
+  .machine-badge.no-badge-img .badge-fallback-price {
+    display: inline-block;
     background: var(--ink);
     color: #fff;
     padding: 2px 9px;
     border-radius: 999px;
     font-size: 11px;
-  }
-
-  .count-tag {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    padding: 2px 9px;
-    border-radius: 999px;
-    background: rgba(26, 26, 29, 0.08);
-    color: var(--ink);
-    font-size: 11px;
     font-weight: 800;
-    transition: background 0.25s ease, color 0.25s ease;
-  }
-  .count-tag.is-complete {
-    background: linear-gradient(135deg, #ffd54f, #f4a900);
-    color: #3d2600;
-    box-shadow: 0 2px 8px rgba(244, 169, 0, 0.35);
   }
 
   /* Dock inferiore + Moneta extra-grande */
@@ -806,6 +903,20 @@
 </head>
 <body>
 
+  <!-- Schermata di Caricamento -->
+  <div class="loading-screen" id="loadingScreen">
+    <img
+      src="public/logo.png"
+      alt="Momixapon"
+      class="loading-logo"
+      onerror="if(!this.dataset.triedJpg){this.dataset.triedJpg='1';this.src='public/logo.jpg';}else{this.style.display='none';}"
+    />
+    <div class="loading-bar-wrap">
+      <div class="loading-bar-fill"></div>
+    </div>
+    <div class="loading-text">Caricamento macchinette...</div>
+  </div>
+
   <header class="topbar">
     <div class="brand-logo-wrap">
       <img
@@ -945,6 +1056,7 @@ const MACHINES = [
   { id: 5, prefix: "m6", price: 3, machinePhoto: "public/macchinetta_2.png", posterPhoto: "public/locandina-6.jpg", posterCover: false, activePrizes: [] },
   { id: 6, prefix: "m7", price: 3, machinePhoto: "public/macchinetta_2.png", posterPhoto: "public/locandina-7.jpg", posterCover: false, activePrizes: [] },
   { id: 7, prefix: "m8", price: 3, machinePhoto: "public/macchinetta_2.png", posterPhoto: "public/locandina-8.jpg", posterCover: false, activePrizes: [] },
+  { id: 8, prefix: "m9", price: 3, machinePhoto: "public/macchinetta_2.png", posterPhoto: "public/locandina-9.jpg", posterCover: false, activePrizes: [] }
 ];
 
 function checkImageExists(url) {
@@ -969,7 +1081,7 @@ function initCoinImage() {
   const imgDock = document.getElementById("coinImgDock");
   const imgFloat = document.getElementById("coinImgFloat");
 
-  checkImageExists("public/coin.png").then((ok) => {
+  return checkImageExists("public/coin.png").then((ok) => {
     if (ok) {
       imgDock.src = "public/coin.png";
       imgFloat.src = "public/coin.png";
@@ -983,8 +1095,7 @@ function initCoinImage() {
 }
 
 async function detectAllPrizes() {
-  for (let mIdx = 0; mIdx < MACHINES.length; mIdx++) {
-    const m = MACHINES[mIdx];
+  await Promise.all(MACHINES.map(async (m) => {
     const checks = [];
     for (let n = 1; n <= MAX_PRIZES_PROBE; n++) {
       const url = `public/${m.prefix}-premio-${n}.jpg`;
@@ -1006,9 +1117,8 @@ async function detectAllPrizes() {
         photo: `public/${m.prefix}-premio-${i + 1}.jpg`
       }));
     }
-
-    updateMachineProgress();
-  }
+  }));
+  updateMachineProgress();
 }
 
 /* --- Inventario & Progresso Collezione --- */
@@ -1050,18 +1160,19 @@ const invSummary = document.getElementById("invSummary");
 function updateMachineProgress() {
   const ownedKeys = new Set(inventory.map((item) => item.key));
   MACHINES.forEach((m, idx) => {
-    const badge = document.getElementById(`count-${idx}`);
-    if (!badge) return;
+    const countEl = document.getElementById(`count-${idx}`);
+    const badgeWrap = document.getElementById(`badgeWrap-${idx}`);
+    if (!countEl || !badgeWrap) return;
     const total = m.activePrizes.length;
     if (total === 0) {
-      badge.textContent = "...";
-      badge.classList.remove("is-complete");
+      countEl.textContent = "...";
+      badgeWrap.classList.remove("is-complete");
       return;
     }
     const owned = m.activePrizes.filter((p) => ownedKeys.has(p.key)).length;
     const isComplete = owned >= total;
-    badge.textContent = isComplete ? `🏆 ${owned}/${total}` : `⭐ ${owned}/${total}`;
-    badge.classList.toggle("is-complete", isComplete);
+    countEl.textContent = `${owned}/${total}`;
+    badgeWrap.classList.toggle("is-complete", isComplete);
   });
 }
 
@@ -1198,8 +1309,14 @@ function renderCorridor() {
         </div>
         <div class="chute-origin" id="chute-${idx}"></div>
       </div>
-      <div class="machine-meta">
-        <span class="price-tag">€${m.price}</span>
+      <div class="machine-badge" id="badgeWrap-${idx}">
+        <img
+          src="public/badge3.png"
+          alt="3€"
+          class="machine-badge-img"
+          onerror="this.parentElement.classList.add('no-badge-img');"
+        />
+        <span class="badge-fallback-price">€${m.price}</span>
         <span class="count-tag" id="count-${idx}">...</span>
       </div>
     `;
@@ -1671,11 +1788,34 @@ document.getElementById("openInvFromReveal").addEventListener("click", () => {
   openInventory();
 });
 
-initCoinImage();
-detectCapsules();
-loadInventory();
-renderCorridor();
-detectAllPrizes();
+/* --- Avvio & Precaricamento --- */
+async function bootApp() {
+  loadInventory();
+  renderCorridor();
+
+  const coreAssets = [
+    "public/background.jpg",
+    "public/macchinetta_2.png",
+    "public/badge3.png",
+    ...MACHINES.map((m) => m.posterPhoto)
+  ];
+
+  const loadTasks = Promise.all([
+    initCoinImage(),
+    detectCapsules(),
+    detectAllPrizes(),
+    ...coreAssets.map((url) => checkImageExists(url))
+  ]);
+
+  const safetyTimeout = new Promise((resolve) => setTimeout(resolve, 3500));
+  await Promise.race([loadTasks, safetyTimeout]);
+
+  centerMachine(activeIndex, false);
+  const loader = document.getElementById("loadingScreen");
+  if (loader) loader.classList.add("hidden");
+}
+
+bootApp();
 </script>
 </body>
 </html>
