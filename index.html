@@ -387,78 +387,71 @@
     pointer-events: none;
   }
 
-  /* --- Badge Prezzo + Progresso Collezione (public/badge3.png) --- */
-  .machine-badge {
-    position: relative;
-    margin-top: 6px;
-    width: 174px;
-    height: 62px;
+  /* --- Prezzo (badge3.png a sinistra) + Progresso Collezione (a destra) --- */
+  .machine-meta {
+    margin-top: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
-    filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.22));
-    transition: transform 0.2s ease, filter 0.25s ease;
+    gap: 10px;
   }
-  .machine-badge.is-complete {
-    filter: drop-shadow(0 0 12px rgba(255, 200, 40, 0.85)) drop-shadow(0 6px 12px rgba(0, 0, 0, 0.2));
+
+  .machine-badge {
+    position: relative;
+    width: 118px;
+    height: 46px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: visible;
+    filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.22));
   }
 
   .machine-badge-img {
     width: 100%;
     height: 100%;
     object-fit: contain;
+    transform: scale(1.65);
     display: block;
     pointer-events: none;
   }
 
-  .count-tag {
-    position: absolute;
-    left: 22%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 14px;
-    font-weight: 900;
-    color: #2b2318;
-    text-shadow:
-      -1.5px -1.5px 0 rgba(255, 255, 255, 0.92),
-       1.5px -1.5px 0 rgba(255, 255, 255, 0.92),
-      -1.5px  1.5px 0 rgba(255, 255, 255, 0.92),
-       1.5px  1.5px 0 rgba(255, 255, 255, 0.92),
-       0 2px 4px rgba(0, 0, 0, 0.22);
-    letter-spacing: -0.3px;
-    white-space: nowrap;
-    pointer-events: none;
-  }
-  .machine-badge.is-complete .count-tag {
-    color: #b86200;
-  }
-
-  /* Fallback se badge3.png non è ancora presente */
   .machine-badge.no-badge-img {
     width: auto;
     height: auto;
-    background: var(--panel);
-    padding: 5px 14px;
-    border-radius: 999px;
-    border: 1px solid rgba(0,0,0,0.08);
-    gap: 8px;
   }
   .machine-badge.no-badge-img .machine-badge-img { display: none; }
-  .machine-badge.no-badge-img .count-tag {
-    position: static;
-    transform: none;
-    text-shadow: none;
-    font-size: 12px;
-  }
   .badge-fallback-price { display: none; }
   .machine-badge.no-badge-img .badge-fallback-price {
     display: inline-block;
     background: var(--ink);
     color: #fff;
-    padding: 2px 9px;
+    padding: 4px 11px;
     border-radius: 999px;
-    font-size: 11px;
+    font-size: 13px;
     font-weight: 800;
+  }
+
+  .count-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 5px 12px;
+    border-radius: 999px;
+    background: var(--panel);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    color: var(--ink);
+    font-size: 12px;
+    font-weight: 800;
+    white-space: nowrap;
+    transition: background 0.25s ease, color 0.25s ease;
+  }
+  .count-tag.is-complete {
+    background: linear-gradient(135deg, #ffd54f, #f4a900);
+    color: #3d2600;
+    border-color: rgba(244, 169, 0, 0.5);
+    box-shadow: 0 3px 10px rgba(244, 169, 0, 0.4);
   }
 
   /* Dock inferiore + Moneta extra-grande */
@@ -494,7 +487,10 @@
   }
   .coin-visual.has-coin-img { border: none; background: transparent; box-shadow: none; overflow: visible; }
   .coin-visual img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; pointer-events: none; }
-  .coin-visual.has-coin-img img { filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.35)); }
+  .coin-visual.has-coin-img img {
+    transform: scale(2.1);
+    filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.32));
+  }
   .coin-visual.has-coin-img .coin-text { display: none; }
 
   .coin-btn {
@@ -1161,18 +1157,17 @@ function updateMachineProgress() {
   const ownedKeys = new Set(inventory.map((item) => item.key));
   MACHINES.forEach((m, idx) => {
     const countEl = document.getElementById(`count-${idx}`);
-    const badgeWrap = document.getElementById(`badgeWrap-${idx}`);
-    if (!countEl || !badgeWrap) return;
+    if (!countEl) return;
     const total = m.activePrizes.length;
     if (total === 0) {
       countEl.textContent = "...";
-      badgeWrap.classList.remove("is-complete");
+      countEl.classList.remove("is-complete");
       return;
     }
     const owned = m.activePrizes.filter((p) => ownedKeys.has(p.key)).length;
     const isComplete = owned >= total;
-    countEl.textContent = `${owned}/${total}`;
-    badgeWrap.classList.toggle("is-complete", isComplete);
+    countEl.textContent = isComplete ? `🏆 ${owned}/${total}` : `⭐ ${owned}/${total}`;
+    countEl.classList.toggle("is-complete", isComplete);
   });
 }
 
@@ -1309,14 +1304,16 @@ function renderCorridor() {
         </div>
         <div class="chute-origin" id="chute-${idx}"></div>
       </div>
-      <div class="machine-badge" id="badgeWrap-${idx}">
-        <img
-          src="public/badge3.png"
-          alt="3€"
-          class="machine-badge-img"
-          onerror="this.parentElement.classList.add('no-badge-img');"
-        />
-        <span class="badge-fallback-price">€${m.price}</span>
+      <div class="machine-meta">
+        <div class="machine-badge" id="badgeWrap-${idx}">
+          <img
+            src="public/badge3.png"
+            alt="3€"
+            class="machine-badge-img"
+            onerror="this.parentElement.classList.add('no-badge-img');"
+          />
+          <span class="badge-fallback-price">€${m.price}</span>
+        </div>
         <span class="count-tag" id="count-${idx}">...</span>
       </div>
     `;
