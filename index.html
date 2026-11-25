@@ -11,11 +11,22 @@
     --accent: #c9202a;
     --gold: rgba(255, 196, 46, 0.98);
     --panel: rgba(255, 255, 255, 0.92);
-    --stage-h: min(74dvh, 710px);
+    --stage-h: min(75dvh, 720px);
     --stage-w: min(74vw, calc(var(--stage-h) * 0.565));
   }
 
-  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  * {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+  }
+
+  img {
+    -webkit-user-drag: none;
+    user-drag: none;
+  }
 
   html, body {
     margin: 0;
@@ -30,7 +41,6 @@
     background-position: center center;
     background-size: cover;
     background-repeat: no-repeat;
-    user-select: none;
   }
 
   /* --- Schermata di Caricamento --- */
@@ -199,7 +209,7 @@
     box-shadow: 0 3px 8px rgba(0, 0, 0, 0.28);
   }
 
-  .mute-icon-btn {
+  .mute-icon-btn, .random-icon-btn {
     border: none;
     background: transparent;
     padding: 0;
@@ -212,8 +222,8 @@
     overflow: visible;
     transition: transform 0.15s ease, opacity 0.2s ease, filter 0.2s ease;
   }
-  .mute-icon-btn:active { transform: scale(0.92); }
-  .mute-icon-btn img {
+  .mute-icon-btn:active, .random-icon-btn:active { transform: scale(0.9); }
+  .mute-icon-btn img, .random-icon-btn img {
     width: 100%;
     height: 100%;
     object-fit: contain;
@@ -221,10 +231,13 @@
     display: block;
     filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.26));
   }
-  .mute-icon-btn.is-muted {
-    opacity: 0.45;
-    filter: grayscale(100%);
+  .mute-icon-btn.is-muted { opacity: 0.45; filter: grayscale(100%); }
+  .random-icon-btn.is-shuffling {
+    opacity: 0.6;
+    pointer-events: none;
+    animation: spinDice 0.35s linear infinite;
   }
+  @keyframes spinDice { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
   /* --- Corridoio Sala Gashapon --- */
   .corridor-wrap {
@@ -261,7 +274,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 50px 0 116px;
+    padding: 48px 0 116px;
     transition: transform 0.28s cubic-bezier(0.22, 0.85, 0.35, 1), opacity 0.25s ease;
     opacity: 0.78;
     transform: scale(0.91);
@@ -346,14 +359,29 @@
 
   .poster-zoom-badge {
     position: absolute;
-    right: 6px; bottom: 6px;
+    right: 6px;
+    bottom: 6px;
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+  }
+  .poster-zoom-badge img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+    filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.35));
+  }
+  .poster-zoom-badge .zoom-fallback {
     background: rgba(0, 0, 0, 0.56);
     color: #fff;
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 700;
     padding: 3px 7px;
     border-radius: 999px;
-    pointer-events: none;
   }
 
   .coin-hotspot {
@@ -414,62 +442,65 @@
     pointer-events: none;
   }
 
-  /* --- Prezzo (badge3.png a sinistra) + Progresso Collezione (a destra) --- */
+  /* --- Prezzo (badge3.png) + Progresso Collezione SULLA scocca in basso a sinistra --- */
   .machine-meta {
-    margin-top: 8px;
+    position: absolute;
+    top: 81.5%;
+    left: 5.5%;
+    width: 51%;
+    height: 14.5%;
+    z-index: 6;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
+    gap: 6px;
+    pointer-events: none;
   }
 
   .machine-badge {
     position: relative;
-    width: 118px;
-    height: 46px;
+    width: 58%;
+    height: 74%;
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: visible;
-    filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.22));
+    filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.25));
   }
 
   .machine-badge-img {
     width: 100%;
     height: 100%;
     object-fit: contain;
-    transform: scale(1.65);
+    transform: scale(1.6);
     display: block;
     pointer-events: none;
   }
 
-  .machine-badge.no-badge-img {
-    width: auto;
-    height: auto;
-  }
+  .machine-badge.no-badge-img { width: auto; height: auto; }
   .machine-badge.no-badge-img .machine-badge-img { display: none; }
   .badge-fallback-price { display: none; }
   .machine-badge.no-badge-img .badge-fallback-price {
     display: inline-block;
     background: var(--ink);
     color: #fff;
-    padding: 4px 11px;
+    padding: 3px 9px;
     border-radius: 999px;
-    font-size: 13px;
+    font-size: clamp(10px, 2.8vw, 13px);
     font-weight: 800;
   }
 
   .count-tag {
     display: inline-flex;
     align-items: center;
-    gap: 4px;
-    padding: 5px 12px;
+    justify-content: center;
+    padding: 3px 9px;
     border-radius: 999px;
     background: var(--panel);
-    border: 1px solid rgba(0, 0, 0, 0.08);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.16);
     color: var(--ink);
-    font-size: 12px;
+    font-size: clamp(10px, 2.8vw, 13px);
     font-weight: 800;
     white-space: nowrap;
     transition: background 0.25s ease, color 0.25s ease;
@@ -481,23 +512,41 @@
     box-shadow: 0 3px 10px rgba(244, 169, 0, 0.4);
   }
 
-  /* Dock inferiore + Moneta extra-grande */
+  /* --- Dock inferiore con sfondo public/nuvola.png e pallini trasparenti --- */
   .coin-dock {
     position: fixed;
     bottom: 18px;
     left: 50%;
     transform: translateX(-50%);
     z-index: 35;
+    isolation: isolate;
     display: flex;
     align-items: center;
     gap: 12px;
+    background: transparent;
+    padding: 14px 26px 14px 18px;
+    max-width: 90vw;
+  }
+
+  .dock-cloud-bg {
+    position: absolute;
+    top: -68%;
+    left: -32%;
+    width: 164%;
+    height: 235%;
+    object-fit: fill;
+    z-index: -1;
+    pointer-events: none;
+    filter: drop-shadow(0 8px 18px rgba(68, 92, 118, 0.28));
+  }
+
+  .coin-dock.no-cloud-img {
     background: var(--panel);
-    padding: 8px 16px 8px 10px;
     border-radius: 999px;
     border: 1px solid rgba(0,0,0,0.08);
     box-shadow: 0 8px 24px rgba(0,0,0,0.18);
-    max-width: 96vw;
   }
+  .coin-dock.no-cloud-img .dock-cloud-bg { display: none; }
 
   .coin-visual {
     position: relative;
@@ -522,8 +571,8 @@
 
   .coin-btn {
     flex-shrink: 0;
-    width: 116px;
-    height: 116px;
+    width: 112px;
+    height: 112px;
     margin: -34px 0 -22px -6px;
     cursor: grab;
     touch-action: none;
@@ -533,24 +582,31 @@
   .coin-btn:active { cursor: grabbing; }
 
   @media (max-width: 480px) {
-    .coin-btn { width: 96px; height: 96px; margin: -26px 0 -16px -4px; }
+    .coin-dock { padding: 12px 20px 12px 14px; gap: 10px; }
+    .coin-btn { width: 92px; height: 92px; margin: -26px 0 -16px -4px; }
   }
 
-  .dock-hint { font-size: 11px; font-weight: 600; color: var(--muted); max-width: 145px; line-height: 1.25; }
+  .dock-info { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
+  .dock-hint { font-size: 11px; font-weight: 800; color: #1e364a; max-width: 170px; line-height: 1.2; }
 
-  .dots { display: flex; gap: 5px; flex-wrap: nowrap; overflow-x: auto; max-width: 38vw; scrollbar-width: none; }
-  .dots::-webkit-scrollbar { display: none; }
+  .dots { display: flex; align-items: center; gap: 7px; padding: 2px 0; }
   .dot {
     flex-shrink: 0;
-    width: 24px; height: 24px;
+    width: 10px;
+    height: 10px;
+    padding: 0;
     border-radius: 50%;
-    border: 1px solid rgba(0,0,0,0.12);
-    background: #fff;
-    font-size: 11px; font-weight: 800;
+    border: 1.5px solid rgba(255, 255, 255, 0.72);
+    background: rgba(255, 255, 255, 0.28);
     cursor: pointer;
-    display: grid; place-items: center;
+    transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
   }
-  .dot.active { background: var(--ink); color: #fff; border-color: var(--ink); }
+  .dot.active {
+    background: #fff9d6;
+    border-color: #ffd54f;
+    box-shadow: 0 0 8px rgba(255, 213, 79, 0.95), 0 0 14px rgba(255, 255, 255, 0.85);
+    transform: scale(1.3);
+  }
 
   .nav-arrow {
     position: fixed;
@@ -638,12 +694,12 @@
     display: grid; place-items: center;
   }
 
-  /* --- Drawer Inventario (Banner PNG + Griglia) --- */
+  /* --- Sidebar Inventario con sfondo a nuvole (public/sidebar.png) --- */
   .inv-backdrop {
     position: fixed;
     inset: 0;
     z-index: 92;
-    background: rgba(15, 16, 20, 0.52);
+    background: rgba(15, 16, 20, 0.48);
     display: flex;
     justify-content: flex-end;
     opacity: 0;
@@ -653,56 +709,86 @@
   .inv-backdrop.open { opacity: 1; pointer-events: auto; }
 
   .inv-drawer {
-    width: min(92vw, 400px);
+    position: relative;
+    isolation: isolate;
+    width: min(94vw, 430px);
     height: 100%;
-    background: #f7f6f2;
+    background: transparent;
     display: flex;
     flex-direction: column;
-    box-shadow: -14px 0 40px rgba(0, 0, 0, 0.28);
     transform: translateX(100%);
     transition: transform 0.28s cubic-bezier(0.22, 0.85, 0.35, 1);
   }
   .inv-backdrop.open .inv-drawer { transform: translateX(0); }
 
+  /* Spostato più a sinistra così la colonna di nuvole copre meglio la griglia */
+  .inv-sidebar-bg {
+    position: absolute;
+    top: -3%;
+    right: 2%;
+    width: 122%;
+    height: 106%;
+    object-fit: fill;
+    z-index: -1;
+    pointer-events: none;
+    filter: drop-shadow(-12px 0 26px rgba(32, 54, 78, 0.32));
+  }
+
+  /* Fallback se public/sidebar.png non carica */
+  .inv-drawer.no-sidebar-img {
+    background: #eaf4fc;
+    box-shadow: -14px 0 40px rgba(0, 0, 0, 0.28);
+  }
+  .inv-drawer.no-sidebar-img .inv-sidebar-bg { display: none; }
+
   .inv-header {
-    padding: 12px 16px;
-    background: #fff;
-    border-bottom: 1px solid rgba(0,0,0,0.08);
+    padding: 18px 24px 8px 34px;
+    background: transparent;
+    border-bottom: none;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: space-between;
-    gap: 12px;
+    gap: 8px;
   }
   .inv-header-left {
+    flex: 1;
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
+    text-align: center;
     gap: 2px;
   }
   .inv-banner-img {
-    height: 52px;
+    height: 76px;
     width: auto;
-    max-width: 220px;
+    max-width: 280px;
     object-fit: contain;
     display: block;
+    filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.18));
   }
-  .inv-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .inv-sub {
+    font-size: 12px;
+    font-weight: 800;
+    color: #2b475e;
+    margin-top: 2px;
+  }
 
   .inv-grid {
     flex: 1;
     overflow-y: auto;
-    padding: 14px;
+    padding: 8px 26px 14px 36px;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
+    gap: 9px;
     align-content: start;
   }
 
   .inv-empty {
     grid-column: 1 / -1;
     text-align: center;
-    color: var(--muted);
+    color: #2b475e;
     font-size: 13px;
+    font-weight: 700;
     line-height: 1.5;
     padding: 48px 16px;
   }
@@ -711,14 +797,14 @@
   .inv-tile {
     position: relative;
     aspect-ratio: 1 / 1;
-    background: #fff;
-    border: 1px solid rgba(0,0,0,0.08);
-    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.92);
+    border: 2px solid rgba(255, 255, 255, 0.95);
+    border-radius: 16px;
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    box-shadow: 0 5px 14px rgba(45, 75, 105, 0.14);
     cursor: pointer;
     transition: transform 0.14s ease;
   }
@@ -728,7 +814,7 @@
 
   .inv-qty {
     position: absolute;
-    top: 6px; right: 6px;
+    top: 5px; right: 5px;
     background: #1a1a1d;
     color: #fff;
     font-size: 11px; font-weight: 800;
@@ -737,21 +823,22 @@
   }
 
   .inv-footer {
-    padding: 12px 16px;
-    background: #fff;
-    border-top: 1px solid rgba(0,0,0,0.08);
+    padding: 12px 26px 18px 36px;
+    background: transparent;
+    border-top: none;
     display: flex;
     justify-content: space-between;
     align-items: center;
   }
   .btn-clear {
-    border: 1px solid rgba(201, 32, 42, 0.25);
-    background: rgba(201, 32, 42, 0.08);
+    border: 1px solid rgba(201, 32, 42, 0.3);
+    background: rgba(255, 255, 255, 0.85);
     color: var(--accent);
-    padding: 7px 12px;
+    padding: 7px 14px;
     border-radius: 999px;
-    font-size: 12px; font-weight: 700;
+    font-size: 12px; font-weight: 800;
     cursor: pointer;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
   }
 
   /* --- Overlay Capsula PNG & Apertura Dorata --- */
@@ -849,9 +936,33 @@
     will-change: opacity;
   }
 
-  .squeeze-ui { margin-top: 32px; display: flex; flex-direction: column; align-items: center; gap: 10px; transition: opacity 0.25s ease; }
+  .squeeze-ui { margin-top: 32px; display: flex; flex-direction: column; align-items: center; gap: 14px; transition: opacity 0.25s ease; }
   .squeeze-bar-bg { width: 210px; height: 8px; border-radius: 99px; background: rgba(0,0,0,0.12); overflow: hidden; }
   .squeeze-bar-fill { width: 100%; height: 100%; transform-origin: left center; transform: scaleX(0); background: linear-gradient(90deg, #b8860b, #ffd54f); will-change: transform; }
+
+  .btn-open-cap {
+    border: none;
+    background: transparent;
+    padding: 0;
+    cursor: pointer;
+    width: min(74vw, 270px);
+    height: 86px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    overflow: visible;
+    transition: transform 0.15s ease;
+  }
+  .btn-open-cap:active { transform: scale(0.94); }
+  .btn-open-cap img {
+    width: 132%;
+    max-height: 220%;
+    height: auto;
+    object-fit: contain;
+    display: block;
+    pointer-events: none;
+    filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.22));
+  }
 
   .btn-primary {
     border: none;
@@ -868,7 +979,7 @@
   #fxCanvas { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 80; pointer-events: none; }
   .flash-screen { position: fixed; inset: 0; z-index: 85; background: #fff9e6; opacity: 0; pointer-events: none; transition: opacity 0.28s ease; will-change: opacity; }
 
-  /* --- Reveal Screen (Chiaro, abbinato a background.jpg) --- */
+  /* --- Reveal Screen con Nuvoletta grande e proporzionata (public/nuvola.png) --- */
   .reveal-overlay {
     position: fixed;
     inset: 0;
@@ -877,7 +988,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 24px;
+    padding: 16px;
     background:
       radial-gradient(circle at 50% 35%, rgba(255, 255, 255, 0.72) 0%, rgba(222, 237, 248, 0.88) 100%),
       url("public/background.jpg") center / cover no-repeat;
@@ -890,50 +1001,99 @@
   .reveal-overlay.active { opacity: 1; pointer-events: auto; }
 
   .reveal-card {
-    width: min(86vw, 340px);
-    background: rgba(255, 255, 255, 0.88);
-    border: 2px solid rgba(168, 200, 224, 0.55);
-    border-radius: 26px;
-    padding: 20px;
+    position: relative;
+    isolation: isolate;
+    width: min(92vw, 480px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    padding: 18px 16px 12px;
     text-align: center;
-    box-shadow: 0 24px 55px rgba(86, 126, 158, 0.22);
     transform-style: preserve-3d;
     will-change: transform;
   }
   .reveal-card.resetting { transition: transform 0.35s cubic-bezier(0.2, 0.9, 0.3, 1); }
 
+  .reveal-cloud-bg {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: min(215vw, 1180px);
+    max-width: none;
+    height: auto;
+    object-fit: contain;
+    z-index: -1;
+    pointer-events: none;
+    filter: drop-shadow(0 18px 34px rgba(68, 92, 118, 0.28));
+  }
+
+  .reveal-card.no-cloud-img {
+    background: rgba(255, 255, 255, 0.88);
+    border: 2px solid rgba(168, 200, 224, 0.55);
+    border-radius: 26px;
+    box-shadow: 0 24px 55px rgba(86, 126, 158, 0.22);
+  }
+  .reveal-card.no-cloud-img .reveal-cloud-bg { display: none; }
+
   .prize-stage {
-    width: 100%;
-    aspect-ratio: 1 / 1;
-    border-radius: 18px;
-    background: radial-gradient(circle at 50% 42%, #ffffff 20%, #e4eff7 100%);
+    width: clamp(135px, 38vw, 205px);
+    height: clamp(135px, 38vw, 205px);
+    margin: 0 auto 10px;
+    border-radius: 28px;
+    background: #ffffff;
+    border: 3px solid rgba(255, 255, 255, 0.95);
+    box-shadow: 0 10px 24px rgba(45, 75, 105, 0.2);
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
-    margin-bottom: 14px;
-    border: 1px solid rgba(168, 200, 224, 0.4);
-    box-shadow: inset 0 2px 10px rgba(120, 155, 185, 0.12);
   }
-  .prize-stage img { width: 88%; height: 88%; object-fit: contain; filter: drop-shadow(0 12px 18px rgba(45, 75, 105, 0.22)); }
-  .prize-fallback-emoji { font-size: 76px; }
+  .prize-stage img {
+    width: 90%;
+    height: 90%;
+    object-fit: contain;
+    border-radius: 20px;
+  }
+  .prize-fallback-emoji { font-size: 68px; }
 
-  .reveal-sub { font-size: 12px; font-weight: 600; color: var(--muted); margin: 0 0 14px; }
-  .reveal-actions { display: flex; align-items: center; gap: 14px; justify-content: center; }
+  .reveal-sub {
+    font-size: clamp(11px, 3.2vw, 13px);
+    font-weight: 800;
+    color: #1e364a;
+    margin: 0 0 10px;
+  }
+  .reveal-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+  }
 
-  .btn-inv-reveal {
+  .btn-reveal-img {
     border: none;
     background: transparent;
     padding: 0;
-    height: 54px;
+    height: clamp(50px, 13vw, 72px);
+    max-width: 46%;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     transition: transform 0.15s ease;
   }
-  .btn-inv-reveal:active { transform: scale(0.93); }
-  .btn-inv-reveal img { height: 100%; width: auto; object-fit: contain; display: block; filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.18)); }
+  .btn-reveal-img:active { transform: scale(0.93); }
+  .btn-reveal-img img {
+    height: 100%;
+    width: auto;
+    max-width: 100%;
+    object-fit: contain;
+    display: block;
+    filter: drop-shadow(0 5px 12px rgba(0, 0, 0, 0.2));
+  }
 </style>
 </head>
 <body>
@@ -980,6 +1140,14 @@
         />
         <span style="display:none;font-size:24px;">🔊</span>
       </button>
+      <button class="random-icon-btn" id="randomBtn" title="Macchinetta casuale">
+        <img
+          src="public/random.png"
+          alt="Random"
+          onerror="this.style.display='none';this.nextElementSibling.style.display='inline';"
+        />
+        <span style="display:none;font-size:26px;">🎲</span>
+      </button>
     </div>
   </header>
 
@@ -1005,12 +1173,21 @@
   </main>
 
   <div class="coin-dock" id="coinDock">
+    <img
+      src="public/nuvola.png"
+      alt=""
+      class="dock-cloud-bg"
+      aria-hidden="true"
+      onerror="this.parentElement.classList.add('no-cloud-img');"
+    />
     <div class="coin-visual coin-btn" id="coinBtn" title="Trascina nella fessura della macchinetta">
       <img id="coinImgDock" alt="€3" />
       <span class="coin-text">€3</span>
     </div>
-    <div class="dock-hint" id="dockHint">Trascina il gettone nella fessura</div>
-    <div class="dots" id="dots"></div>
+    <div class="dock-info">
+      <div class="dock-hint" id="dockHint">Trascina il gettone nella fessura</div>
+      <div class="dots" id="dots"></div>
+    </div>
   </div>
 
   <div class="coin-visual floating-coin" id="floatingCoin">
@@ -1025,9 +1202,16 @@
     </div>
   </div>
 
-  <!-- Drawer Inventario con Banner inventario.png -->
+  <!-- Sidebar Inventario con sfondo nuvole (public/sidebar.png) -->
   <div class="inv-backdrop" id="invBackdrop">
     <aside class="inv-drawer" aria-label="Inventario premi vinti">
+      <img
+        src="public/sidebar.png"
+        alt=""
+        class="inv-sidebar-bg"
+        aria-hidden="true"
+        onerror="this.parentElement.classList.add('no-sidebar-img');"
+      />
       <div class="inv-header">
         <div class="inv-header-left">
           <img
@@ -1065,7 +1249,14 @@
 
     <div class="squeeze-ui" id="squeezeUI">
       <div class="squeeze-bar-bg"><div class="squeeze-bar-fill" id="squeezeFill"></div></div>
-      <button class="btn-primary" id="openCapBtn">Tieni premuto o Tocca per Aprire</button>
+      <button class="btn-open-cap" id="openCapBtn" title="Tieni premuto o Tocca per Aprire">
+        <img
+          src="public/toccaaprire.png"
+          alt="Tieni premuto o Tocca per Aprire"
+          onerror="this.style.display='none';this.nextElementSibling.style.display='inline-flex';"
+        />
+        <span class="btn-primary" style="display:none;">Tieni premuto o Tocca per Aprire</span>
+      </button>
     </div>
   </section>
 
@@ -1074,18 +1265,32 @@
 
   <section class="reveal-overlay" id="revealOverlay">
     <div class="reveal-card" id="revealCard">
+      <img
+        src="public/nuvola.png"
+        alt=""
+        class="reveal-cloud-bg"
+        aria-hidden="true"
+        onerror="this.parentElement.classList.add('no-cloud-img');"
+      />
       <div class="prize-stage" id="prizeStage"></div>
       <p class="reveal-sub">Aggiunto al tuo inventario</p>
       <div class="reveal-actions">
-        <button class="btn-inv-reveal" id="openInvFromReveal" title="Apri Inventario">
+        <button class="btn-reveal-img" id="openInvFromReveal" title="Apri Inventario">
           <img
             src="public/inventario.png"
             alt="Inventario"
-            onerror="this.style.display='none';this.nextElementSibling.style.display='inline';"
+            onerror="this.style.display='none';this.nextElementSibling.style.display='inline-flex';"
           />
-          <span style="display:none;font-size:28px;">🎒</span>
+          <span class="btn-primary" style="display:none;">🎒 Inventario</span>
         </button>
-        <button class="btn-primary" id="againBtn">Continua</button>
+        <button class="btn-reveal-img" id="againBtn" title="Continua">
+          <img
+            src="public/continua.png"
+            alt="Continua"
+            onerror="this.style.display='none';this.nextElementSibling.style.display='inline-flex';"
+          />
+          <span class="btn-primary" style="display:none;">Continua</span>
+        </button>
       </div>
     </div>
   </section>
@@ -1226,7 +1431,7 @@ function updateMachineProgress() {
     }
     const owned = m.activePrizes.filter((p) => ownedKeys.has(p.key)).length;
     const isComplete = owned >= total;
-    countEl.textContent = isComplete ? `🏆 ${owned}/${total}` : `${owned}/${total}`;
+    countEl.textContent = `${owned}/${total}`;
     countEl.classList.toggle("is-complete", isComplete);
   });
 }
@@ -1334,6 +1539,7 @@ const dockHint = document.getElementById("dockHint");
 const floatingCoin = document.getElementById("floatingCoin");
 const prevBtn = document.getElementById("prevBtn");
 const nextBtn = document.getElementById("nextBtn");
+const randomBtn = document.getElementById("randomBtn");
 const posterModal = document.getElementById("posterModal");
 const posterModalImg = document.getElementById("posterModalImg");
 
@@ -1358,7 +1564,10 @@ function renderCorridor() {
           <img class="poster-img ${m.posterCover ? "cover" : ""}" id="pPhoto-${idx}" alt="Locandina" />
           <div class="poster-placeholder" id="pFallback-${idx}">${m.posterPhoto}</div>
           <div class="poster-glass"></div>
-          <span class="poster-zoom-badge">🔍</span>
+          <span class="poster-zoom-badge">
+            <img src="public/zoom.png" alt="Zoom" onerror="this.style.display='none';this.nextElementSibling.style.display='inline';" />
+            <span class="zoom-fallback" style="display:none;">🔍</span>
+          </span>
         </div>
         <div class="coin-hotspot" id="coinSlot-${idx}" title="Trascina qui il gettone"></div>
         <div class="knob-hotspot" id="knob-${idx}" title="Gira la manopola">
@@ -1366,25 +1575,25 @@ function renderCorridor() {
           <div class="knob-fallback"></div>
         </div>
         <div class="chute-origin" id="chute-${idx}"></div>
-      </div>
-      <div class="machine-meta">
-        <div class="machine-badge" id="badgeWrap-${idx}">
-          <img
-            src="public/badge3.png"
-            alt="3€"
-            class="machine-badge-img"
-            onerror="this.parentElement.classList.add('no-badge-img');"
-          />
-          <span class="badge-fallback-price">€${m.price}</span>
+        <div class="machine-meta">
+          <div class="machine-badge" id="badgeWrap-${idx}">
+            <img
+              src="public/badge3.png"
+              alt="3€"
+              class="machine-badge-img"
+              onerror="this.parentElement.classList.add('no-badge-img');"
+            />
+            <span class="badge-fallback-price">€${m.price}</span>
+          </div>
+          <span class="count-tag" id="count-${idx}">...</span>
         </div>
-        <span class="count-tag" id="count-${idx}">...</span>
       </div>
     `;
     corridor.appendChild(slide);
 
     const dot = document.createElement("button");
     dot.className = "dot" + (idx === activeIndex ? " active" : "");
-    dot.textContent = idx + 1;
+    dot.setAttribute("aria-label", `Macchinetta ${idx + 1}`);
     dot.onclick = () => scrollToMachine(idx);
     dotsEl.appendChild(dot);
 
@@ -1485,6 +1694,57 @@ window.addEventListener("load", () => centerMachine(activeIndex, false));
 window.addEventListener("resize", () => centerMachine(activeIndex, false));
 prevBtn.onclick = () => scrollToMachine(activeIndex - 1);
 nextBtn.onclick = () => scrollToMachine(activeIndex + 1);
+
+function shuffleRandomMachine() {
+  if (phase !== "idle" || MACHINES.length < 2) return;
+  phase = "shuffling";
+  randomBtn.classList.add("is-shuffling");
+  corridor.classList.add("locked");
+  updateActiveUI();
+
+  let finalIdx = activeIndex;
+  while (finalIdx === activeIndex) {
+    finalIdx = Math.floor(Math.random() * MACHINES.length);
+  }
+
+  const steps = 6;
+  let step = 0;
+
+  function nextJump() {
+    step++;
+    const isLast = step >= steps;
+    let nextIdx;
+
+    if (isLast) {
+      nextIdx = finalIdx;
+    } else {
+      do {
+        nextIdx = Math.floor(Math.random() * MACHINES.length);
+      } while (nextIdx === activeIndex);
+    }
+
+    activeIndex = nextIdx;
+    centerMachine(activeIndex, true);
+    updateActiveUI();
+    sfxClick();
+
+    if (isLast) {
+      setTimeout(() => {
+        phase = "idle";
+        corridor.classList.remove("locked");
+        randomBtn.classList.remove("is-shuffling");
+        updateActiveUI();
+        playTone(740, 0.14, "triangle", 0.12, 1080);
+      }, 280);
+    } else {
+      setTimeout(nextJump, 110 + step * 35);
+    }
+  }
+
+  nextJump();
+}
+
+randomBtn.onclick = shuffleRandomMachine;
 
 function updateActiveUI() {
   document.querySelectorAll(".slide").forEach((s, i) => s.classList.toggle("is-active", i === activeIndex));
@@ -1661,8 +1921,15 @@ function startCapsuleDrop(idx) {
 
 let squeezeProgress = 0, holding = false, autoSqueeze = false, squeezeRaf = null, lastTime = 0, lastCreakStep = 0;
 
-capsuleWrap.addEventListener("pointerdown", () => {
+capsuleWrap.addEventListener("touchstart", (e) => {
+  if (phase === "squeeze") e.preventDefault();
+}, { passive: false });
+
+capsuleOverlay.addEventListener("contextmenu", (e) => e.preventDefault());
+
+capsuleWrap.addEventListener("pointerdown", (e) => {
   if (phase !== "squeeze") return;
+  e.preventDefault();
   holding = true;
   if (!squeezeRaf) { lastTime = performance.now(); squeezeRaf = requestAnimationFrame(tickSqueeze); }
 });
@@ -1857,9 +2124,15 @@ async function bootApp() {
     "public/background.jpg",
     "public/macchinetta_2.png",
     "public/badge3.png",
+    "public/nuvola.png",
+    "public/sidebar.png",
     "public/mute.png",
+    "public/random.png",
     "public/muovisx.png",
     "public/muovidx.png",
+    "public/zoom.png",
+    "public/continua.png",
+    "public/toccaaprire.png",
     ...MACHINES.map((m) => m.posterPhoto)
   ];
 
