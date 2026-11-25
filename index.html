@@ -577,15 +577,15 @@
   /* Nuvoletta Credito Residuo */
   .wallet-cloud {
     position: absolute;
-    right: calc(100% + 26px);
-    bottom: 4px;
+    right: calc(100% + 34px);
+    bottom: 6px;
     z-index: 5;
     isolation: isolate;
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 12px 18px;
-    min-width: 136px;
+    padding: 10px 18px;
+    min-width: 132px;
     justify-content: center;
     opacity: 0;
     pointer-events: none;
@@ -600,10 +600,10 @@
 
   .wallet-cloud-bg {
     position: absolute;
-    top: -54%;
-    left: -28%;
-    width: 156%;
-    height: 208%;
+    top: -68%;
+    left: -32%;
+    width: 164%;
+    height: 235%;
     object-fit: fill;
     z-index: -1;
     pointer-events: none;
@@ -632,7 +632,7 @@
     color: #4b677f;
   }
   .wallet-amount {
-    font-size: 19px;
+    font-size: 18px;
     font-weight: 900;
     color: #1a3347;
     transition: transform 0.18s ease, color 0.18s ease;
@@ -644,10 +644,10 @@
     border: 2px solid #fff;
     background: linear-gradient(135deg, #ffd54f, #f4a900);
     color: #3d2600;
-    width: 30px;
-    height: 30px;
+    width: 28px;
+    height: 28px;
     border-radius: 50%;
-    font-size: 18px;
+    font-size: 17px;
     font-weight: 900;
     line-height: 1;
     cursor: pointer;
@@ -659,11 +659,23 @@
   }
   .wallet-add-btn:active { transform: scale(0.88); }
 
-  @media (max-width: 640px) {
+  /* Su mobile/touch: sempre visibile, centrata sopra il dock */
+  @media (max-width: 640px), (hover: none) {
     .wallet-cloud {
       right: auto;
-      left: -6px;
-      bottom: calc(100% + 26px);
+      left: 50%;
+      bottom: calc(100% + 16px);
+      transform: translateX(-50%) scale(0.95);
+      opacity: 1;
+      pointer-events: auto;
+      padding: 8px 16px;
+      min-width: 122px;
+    }
+    .wallet-cloud.open {
+      transform: translateX(-50%) scale(1);
+    }
+    .slide {
+      padding: 46px 0 148px;
     }
   }
 
@@ -1355,11 +1367,11 @@
     <!-- Nuvoletta Credito Residuo -->
     <div class="wallet-cloud" id="walletCloud" aria-live="polite">
       <img
-        src="public/nuvoletta.png"
+        src="public/nuvola.png"
         alt=""
         class="wallet-cloud-bg"
         aria-hidden="true"
-        onerror="if(!this.dataset.triedFallback){this.dataset.triedFallback='1';this.src='public/nuvola.png';}else{this.parentElement.classList.add('no-cloud-img');}"
+        onerror="this.parentElement.classList.add('no-cloud-img');"
       />
       <div class="wallet-info">
         <span class="wallet-label">Credito</span>
