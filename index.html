@@ -166,32 +166,144 @@
   }
   .btn-pill:active { transform: scale(0.94); }
 
+  /* Pulsante Accedi / Profilo (personalizzabile con accedi.png / profilo.png) */
   .auth-btn {
+    position: relative;
     border: 2px solid rgba(255, 255, 255, 0.92);
-    background: rgba(255, 255, 255, 0.9);
+    background: rgba(255, 255, 255, 0.94);
     color: #1e364a;
-    padding: 7px 13px;
+    padding: 7px 14px;
     border-radius: 999px;
     font-size: 12px;
     font-weight: 800;
     cursor: pointer;
-    box-shadow: 0 5px 14px rgba(45, 75, 105, 0.2);
+    box-shadow: 0 5px 14px rgba(45, 75, 105, 0.22);
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    max-width: 150px;
-    transition: transform 0.14s ease, background 0.2s ease;
+    max-width: 165px;
+    transition: transform 0.14s ease, background 0.2s ease, border-color 0.2s ease;
   }
   .auth-btn:active { transform: scale(0.94); }
   .auth-btn.is-logged {
     background: linear-gradient(135deg, #e8f6ff, #ffffff);
     border-color: #7cc4f5;
   }
+  .auth-btn:not(.is-logged) {
+    border-color: #ffd54f;
+    background: linear-gradient(135deg, #fffdf4, #fff4cc);
+  }
+  .auth-btn.has-custom-img {
+    border: none;
+    background: transparent;
+    box-shadow: none;
+    padding: 0;
+    border-radius: 0;
+    max-width: none;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+  }
+  .auth-btn-img {
+    height: clamp(46px, 8.5vh, 78px);
+    width: auto;
+    max-width: 40vw;
+    object-fit: contain;
+    display: none;
+    filter: drop-shadow(0 5px 12px rgba(0, 0, 0, 0.26));
+  }
+  .auth-btn.has-custom-img .auth-btn-img { display: block; }
+  .auth-btn.has-custom-img .auth-btn-fallback { display: none; }
+
+  .auth-btn-fallback {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    max-width: 100%;
+  }
   .auth-btn-text {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
+  .auth-img-user-tag {
+    display: none;
+    background: rgba(255, 255, 255, 0.92);
+    color: #1e364a;
+    border: 1.5px solid #7cc4f5;
+    border-radius: 999px;
+    padding: 1px 8px;
+    font-size: 10px;
+    font-weight: 800;
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.16);
+  }
+  .auth-btn.has-custom-img.is-logged .auth-img-user-tag { display: inline-block; }
+
+  /* --- Banner Ospite --- */
+  .guest-banner {
+    position: fixed;
+    top: clamp(92px, 16vh, 132px);
+    left: 50%;
+    z-index: 42;
+    width: min(92vw, 420px);
+    background: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(8px);
+    border: 2px solid rgba(255, 255, 255, 0.98);
+    border-radius: 22px;
+    padding: 12px 14px;
+    box-shadow: 0 12px 28px rgba(32, 58, 86, 0.22);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    opacity: 0;
+    pointer-events: none;
+    transform: translate(-50%, -8px);
+    transition: opacity 0.22s ease, transform 0.22s ease;
+  }
+  .guest-banner.visible {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translate(-50%, 0);
+  }
+  .guest-banner-text {
+    font-size: 12px;
+    font-weight: 700;
+    color: #1e364a;
+    line-height: 1.35;
+    text-align: center;
+  }
+  .guest-banner-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .guest-banner-login {
+    border: none;
+    background: linear-gradient(135deg, #4da3e0, #2c7ec2);
+    color: #fff;
+    padding: 8px 14px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(44, 126, 194, 0.28);
+  }
+  .guest-banner-explore {
+    border: 1.5px solid rgba(30, 54, 74, 0.18);
+    background: #eef6fc;
+    color: #1e364a;
+    padding: 8px 14px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 800;
+    cursor: pointer;
+  }
+  .guest-banner-login:active, .guest-banner-explore:active { transform: scale(0.95); }
 
   .inv-badge {
     background: var(--ink);
@@ -623,6 +735,7 @@
     pointer-events: auto;
     transform: translateY(0) scale(1);
   }
+  .wallet-cloud.is-guest { cursor: pointer; }
 
   .wallet-cloud-bg {
     position: absolute;
@@ -713,7 +826,7 @@
   }
   .coin-btn:hover { transform: scale(1.06); }
   .coin-btn:active { cursor: grabbing; }
-  .coin-btn.is-empty { filter: grayscale(65%); opacity: 0.78; cursor: pointer; }
+  .coin-btn.is-empty { filter: grayscale(75%); opacity: 0.72; cursor: pointer; }
 
   .coin-btn.has-purse-img { border: none; background: transparent; box-shadow: none; overflow: visible; }
   .coin-btn.has-purse-img img { transform: scale(1.75); filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.32)); }
@@ -795,7 +908,7 @@
     100% { transform: translateY(0) scale(1) rotate(0deg); opacity: 1; }
   }
 
-  /* --- Modale Login / Profilo Supabase --- */
+  /* --- Modale Login / Profilo (personalizzabile con login-bg.png/.jpg e login-logo.png) --- */
   .auth-modal {
     position: fixed;
     inset: 0;
@@ -814,16 +927,70 @@
 
   .auth-card {
     position: relative;
-    width: min(92vw, 370px);
+    isolation: isolate;
+    width: min(92vw, 380px);
     background: linear-gradient(180deg, #ffffff 0%, #eef7fd 100%);
     border: 3px solid rgba(255, 255, 255, 0.95);
     border-radius: 26px;
-    padding: 22px 20px 20px;
+    padding: 24px 22px 22px;
     box-shadow: 0 22px 50px rgba(20, 42, 66, 0.28);
     transform: scale(0.94);
     transition: transform 0.22s cubic-bezier(0.22, 1.15, 0.36, 1);
   }
   .auth-modal.open .auth-card { transform: scale(1); }
+
+  .auth-card-bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -2;
+    pointer-events: none;
+    display: none;
+  }
+
+  .auth-card.has-bg-png {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    padding: 36px 28px 30px;
+  }
+  .auth-card.has-bg-png .auth-card-bg {
+    display: block;
+    object-fit: fill;
+    filter: drop-shadow(0 18px 34px rgba(20, 42, 66, 0.32));
+  }
+
+  .auth-card.has-bg-jpg {
+    background: transparent;
+    overflow: hidden;
+  }
+  .auth-card.has-bg-jpg .auth-card-bg {
+    display: block;
+    object-fit: cover;
+  }
+  .auth-card.has-bg-jpg::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: rgba(255, 255, 255, 0.72);
+    backdrop-filter: blur(2px);
+    pointer-events: none;
+  }
+
+  .auth-logo-img {
+    display: none;
+    max-width: 78%;
+    max-height: 68px;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    margin: 0 auto 8px;
+    filter: drop-shadow(0 3px 8px rgba(0, 0, 0, 0.16));
+  }
+  .auth-card.has-login-logo .auth-logo-img { display: block; }
+  .auth-card.has-login-logo .auth-title-guest { display: none; }
 
   .auth-close {
     position: absolute;
@@ -831,37 +998,28 @@
     width: 32px; height: 32px;
     border-radius: 50%;
     border: 1px solid rgba(0, 0, 0, 0.08);
-    background: #fff;
+    background: rgba(255, 255, 255, 0.92);
     color: #365066;
     font-size: 15px;
     font-weight: 800;
     cursor: pointer;
     display: grid;
     place-items: center;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
   }
 
-  .auth-title {
-    margin: 0 0 4px;
-    font-size: 19px;
-    font-weight: 900;
-    color: #1a3347;
-  }
-  .auth-desc {
-    margin: 0 0 16px;
-    font-size: 12px;
-    font-weight: 600;
-    color: #546e85;
-    line-height: 1.4;
-  }
+  .auth-title { margin: 0 0 4px; font-size: 19px; font-weight: 900; color: #1a3347; text-align: center; }
+  .auth-desc { margin: 0 0 14px; font-size: 12px; font-weight: 700; color: #36526a; line-height: 1.4; text-align: center; }
 
   .auth-tabs {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 6px;
-    background: rgba(120, 165, 200, 0.16);
+    background: rgba(255, 255, 255, 0.72);
     padding: 4px;
     border-radius: 14px;
     margin-bottom: 14px;
+    border: 1px solid rgba(110, 150, 185, 0.24);
   }
   .auth-tab {
     border: none;
@@ -874,11 +1032,7 @@
     cursor: pointer;
     transition: background 0.18s ease, color 0.18s ease;
   }
-  .auth-tab.active {
-    background: #fff;
-    color: #1a3347;
-    box-shadow: 0 2px 8px rgba(45, 75, 105, 0.12);
-  }
+  .auth-tab.active { background: #fff; color: #1a3347; box-shadow: 0 2px 8px rgba(45, 75, 105, 0.14); }
 
   .auth-form { display: flex; flex-direction: column; gap: 10px; }
   .auth-input {
@@ -886,7 +1040,7 @@
     padding: 11px 14px;
     border-radius: 14px;
     border: 1.5px solid rgba(110, 150, 185, 0.35);
-    background: #fff;
+    background: rgba(255, 255, 255, 0.95);
     font-size: 14px;
     font-weight: 600;
     color: var(--ink);
@@ -908,22 +1062,25 @@
   }
   .auth-submit:disabled { opacity: 0.6; cursor: wait; }
 
-  .auth-msg {
+  .auth-link-btn {
+    border: none;
+    background: transparent;
+    color: #2c7ec2;
     font-size: 12px;
-    font-weight: 700;
-    min-height: 16px;
-    margin-top: 4px;
-    color: var(--accent);
+    font-weight: 800;
+    cursor: pointer;
+    padding: 4px 6px;
+    align-self: center;
+    text-decoration: underline;
   }
+  .auth-link-btn:active { opacity: 0.7; }
+
+  .auth-msg { font-size: 12px; font-weight: 700; min-height: 16px; margin-top: 2px; color: var(--accent); text-align: center; }
   .auth-msg.ok { color: #1b8a4e; }
 
-  .auth-profile-box {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
+  .auth-profile-box { display: flex; flex-direction: column; gap: 12px; }
   .auth-user-pill {
-    background: #fff;
+    background: rgba(255, 255, 255, 0.94);
     border: 1.5px solid rgba(110, 150, 185, 0.28);
     border-radius: 14px;
     padding: 12px 14px;
@@ -931,10 +1088,11 @@
     font-weight: 700;
     color: #1a3347;
     word-break: break-all;
+    text-align: center;
   }
   .auth-logout-btn {
     border: 1.5px solid rgba(201, 32, 42, 0.28);
-    background: rgba(201, 32, 42, 0.08);
+    background: rgba(255, 255, 255, 0.9);
     color: var(--accent);
     padding: 11px;
     border-radius: 14px;
@@ -1042,6 +1200,18 @@
   }
   .inv-empty { grid-column: 1 / -1; text-align: center; color: #2b475e; font-size: 13px; font-weight: 700; line-height: 1.5; padding: 48px 16px; }
   .inv-empty-icon { font-size: 42px; margin-bottom: 8px; }
+  .inv-login-cta {
+    margin-top: 14px;
+    border: none;
+    background: linear-gradient(135deg, #4da3e0, #2c7ec2);
+    color: #fff;
+    padding: 10px 18px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 6px 14px rgba(44, 126, 194, 0.28);
+  }
 
   .inv-tile {
     position: relative;
@@ -1270,8 +1440,12 @@
     </div>
     <div class="top-actions">
       <button class="auth-btn" id="authBtn" title="Accedi o gestisci profilo">
-        <span>👤</span>
-        <span class="auth-btn-text" id="authBtnText">Accedi</span>
+        <img class="auth-btn-img" id="authBtnImg" alt="Accedi" />
+        <span class="auth-img-user-tag" id="authImgUserTag"></span>
+        <span class="auth-btn-fallback">
+          <span>👤</span>
+          <span class="auth-btn-text" id="authBtnText">Accedi</span>
+        </span>
       </button>
       <button class="inv-icon-btn" id="invBtn" title="Apri Inventario">
         <img
@@ -1300,6 +1474,17 @@
       </button>
     </div>
   </header>
+
+  <!-- Banner Ospite: Accedi/Registrati oppure Esplora le macchine -->
+  <div class="guest-banner" id="guestBanner" role="region" aria-label="Accesso o esplorazione">
+    <div class="guest-banner-text">
+      Esegui il login o registrati per girare le macchine e salvare il tuo inventario, oppure esplora le macchine!
+    </div>
+    <div class="guest-banner-actions">
+      <button type="button" class="guest-banner-login" id="bannerLoginBtn">Accedi / Registrati</button>
+      <button type="button" class="guest-banner-explore" id="bannerExploreBtn">Esplora le macchine</button>
+    </div>
+  </div>
 
   <button class="nav-arrow prev" id="prevBtn" aria-label="Macchina precedente">
     <img src="public/muovisx.png" alt="Precedente" onerror="this.style.display='none';this.nextElementSibling.style.display='inline';" />
@@ -1332,18 +1517,18 @@
         onerror="this.parentElement.classList.add('no-cloud-img');"
       />
       <div class="wallet-info">
-        <span class="wallet-label">Credito</span>
-        <span class="wallet-amount" id="walletAmount">€15</span>
+        <span class="wallet-label" id="walletLabel">Account</span>
+        <span class="wallet-amount" id="walletAmount">Accedi</span>
       </div>
       <button class="wallet-add-btn" id="addCreditBtn" type="button" title="Ricarica +1€">+</button>
     </div>
 
-    <div class="coin-visual coin-btn" id="coinBtn" title="Estrai il gettone dal borsellino">
+    <div class="coin-visual coin-btn is-empty" id="coinBtn" title="Accedi per estrarre il gettone">
       <img id="coinImgDock" alt="Borsellino" />
       <span class="coin-text">€3</span>
     </div>
     <div class="dock-info">
-      <div class="dock-hint" id="dockHint">Estrai il gettone dal borsellino</div>
+      <div class="dock-hint" id="dockHint">Accedi per iniziare a giocare</div>
       <div class="dots" id="dots"></div>
     </div>
   </div>
@@ -1355,15 +1540,17 @@
     </div>
   </div>
 
-  <!-- Modale Login / Profilo -->
+  <!-- Modale Login / Profilo / Recupero Password -->
   <div class="auth-modal" id="authModal" role="dialog" aria-modal="true">
-    <div class="auth-card">
+    <div class="auth-card" id="authCard">
+      <img class="auth-card-bg" id="authCardBg" alt="" aria-hidden="true" />
       <button class="auth-close" id="closeAuthModal" aria-label="Chiudi">✕</button>
 
-      <!-- Vista non loggato -->
+      <!-- Vista non loggato (Accedi / Registrati) -->
       <div id="authGuestView">
-        <h2 class="auth-title">Account Momixapon</h2>
-        <p class="auth-desc">Salva nel cloud il tuo credito e tutti i gadget vinti su qualsiasi dispositivo.</p>
+        <img class="auth-logo-img" id="authLogoImg" alt="Momixapon" />
+        <h2 class="auth-title auth-title-guest">Account Momixapon</h2>
+        <p class="auth-desc" id="authGuestDesc">Accedi o registrati per girare le macchinette, gestire il tuo credito e salvare tutti i gadget vinti.</p>
         <div class="auth-tabs">
           <button type="button" class="auth-tab active" id="tabLogin">Accedi</button>
           <button type="button" class="auth-tab" id="tabSignup">Registrati</button>
@@ -1372,14 +1559,38 @@
           <input class="auth-input" id="authEmail" type="email" placeholder="Email" required autocomplete="email" />
           <input class="auth-input" id="authPassword" type="password" placeholder="Password (min. 6 caratteri)" required minlength="6" autocomplete="current-password" />
           <button class="auth-submit" id="authSubmitBtn" type="submit">Accedi</button>
+          <button type="button" class="auth-link-btn" id="forgotLinkBtn">Password dimenticata?</button>
           <div class="auth-msg" id="authMsg"></div>
+        </form>
+      </div>
+
+      <!-- Vista richiesta reset password -->
+      <div id="authForgotView" style="display:none;">
+        <h2 class="auth-title">Recupera password</h2>
+        <p class="auth-desc">Inserisci la tua email: ti invieremo un link per impostare una nuova password.</p>
+        <form class="auth-form" id="forgotForm">
+          <input class="auth-input" id="forgotEmail" type="email" placeholder="La tua email" required autocomplete="email" />
+          <button class="auth-submit" id="forgotSubmitBtn" type="submit">Invia link di recupero</button>
+          <button type="button" class="auth-link-btn" id="backToLoginBtn">Torna al login</button>
+          <div class="auth-msg" id="forgotMsg"></div>
+        </form>
+      </div>
+
+      <!-- Vista imposta nuova password (dopo click sul link email) -->
+      <div id="authResetView" style="display:none;">
+        <h2 class="auth-title">Nuova password</h2>
+        <p class="auth-desc">Scegli una nuova password di almeno 6 caratteri per il tuo account.</p>
+        <form class="auth-form" id="resetForm">
+          <input class="auth-input" id="newPassword" type="password" placeholder="Nuova password (min. 6 caratteri)" required minlength="6" autocomplete="new-password" />
+          <button class="auth-submit" id="resetSubmitBtn" type="submit">Salva nuova password</button>
+          <div class="auth-msg" id="resetMsg"></div>
         </form>
       </div>
 
       <!-- Vista loggato -->
       <div id="authUserView" class="auth-profile-box" style="display:none;">
         <h2 class="auth-title">Profilo attivo</h2>
-        <p class="auth-desc">Il tuo inventario e il tuo credito sono sincronizzati automaticamente nel cloud.</p>
+        <p class="auth-desc">Il tuo inventario e il tuo credito sono sincronizzati automaticamente sul tuo account.</p>
         <div class="auth-user-pill" id="authUserEmail"></div>
         <button type="button" class="auth-logout-btn" id="logoutBtn">Esci dall'account</button>
       </div>
@@ -1412,8 +1623,8 @@
       </div>
       <div class="inv-grid" id="invGrid"></div>
       <div class="inv-footer">
-        <span class="inv-sub" id="invSyncLabel">Salvato in locale (ospite)</span>
-        <button class="btn-clear" id="clearInvBtn">Svuota</button>
+        <span class="inv-sub" id="invSyncLabel">Accesso richiesto</span>
+        <button class="btn-clear" id="clearInvBtn" style="display:none;">Svuota</button>
       </div>
     </aside>
   </div>
@@ -1493,6 +1704,12 @@ const sb = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE
 
 let currentUser = null;
 let authMode = "login";
+let guestBannerDismissed = false;
+let isRecoveryMode = false;
+
+/* Asset personalizzati per Login & Tasto Accedi */
+let hasAccediImg = false;
+let hasProfiloImg = false;
 
 const MAX_PRIZES_PROBE = 15;
 const CAPSULE_COLORS = ["#18a5d8", "#e85d75", "#e8a825", "#2eb872", "#8c4ce8", "#2d7ff9"];
@@ -1525,6 +1742,38 @@ function checkImageExists(url) {
     img.onerror = () => resolve(false);
     img.src = url;
   });
+}
+
+async function initAuthImages() {
+  const authCardEl = document.getElementById("authCard");
+  const authCardBg = document.getElementById("authCardBg");
+  const authLogoImg = document.getElementById("authLogoImg");
+
+  const [accediOk, profiloOk, bgPngOk, bgJpgOk, logoOk] = await Promise.all([
+    checkImageExists("public/accedi.png"),
+    checkImageExists("public/profilo.png"),
+    checkImageExists("public/login-bg.png"),
+    checkImageExists("public/login-bg.jpg"),
+    checkImageExists("public/login-logo.png")
+  ]);
+
+  hasAccediImg = accediOk;
+  hasProfiloImg = profiloOk;
+
+  if (bgPngOk) {
+    authCardBg.src = "public/login-bg.png";
+    authCardEl.classList.add("has-bg-png");
+  } else if (bgJpgOk) {
+    authCardBg.src = "public/login-bg.jpg";
+    authCardEl.classList.add("has-bg-jpg");
+  }
+
+  if (logoOk) {
+    authLogoImg.src = "public/login-logo.png";
+    authCardEl.classList.add("has-login-logo");
+  }
+
+  updateAuthUI();
 }
 
 async function detectCapsules() {
@@ -1590,44 +1839,46 @@ async function detectAllPrizes() {
   updateMachineProgress();
 }
 
-/* --- Credito / Borsellino --- */
-const CREDIT_STORAGE_KEY = "gashapon_credit_v1";
-let credit = 15;
+/* --- Credito / Borsellino (Solo utenti registrati) --- */
+let credit = 0;
 let walletHideTimer = null;
 
 const walletCloud = document.getElementById("walletCloud");
+const walletLabel = document.getElementById("walletLabel");
 const walletAmount = document.getElementById("walletAmount");
 const addCreditBtn = document.getElementById("addCreditBtn");
 
-function loadLocalCredit() {
-  try {
-    const raw = localStorage.getItem(CREDIT_STORAGE_KEY);
-    if (raw !== null && !isNaN(Number(raw))) credit = Math.max(0, Number(raw));
-    else credit = 15;
-  } catch {
-    credit = 15;
-  }
-  updateCreditUI(false);
-}
-
 async function saveCredit() {
-  if (currentUser && sb) {
-    try {
-      await sb.from("profiles").upsert({
-        id: currentUser.id,
-        credit,
-        updated_at: new Date().toISOString()
-      });
-    } catch (err) {
-      console.error("Errore salvataggio credito cloud:", err);
-    }
-  } else {
-    try { localStorage.setItem(CREDIT_STORAGE_KEY, String(credit)); } catch {}
+  if (!currentUser || !sb) return;
+  try {
+    await sb.from("profiles").upsert({
+      id: currentUser.id,
+      credit,
+      updated_at: new Date().toISOString()
+    });
+  } catch (err) {
+    console.error("Errore salvataggio credito cloud:", err);
   }
 }
 
 function updateCreditUI(animate = true) {
+  if (!currentUser) {
+    walletCloud.classList.add("is-guest");
+    walletLabel.textContent = "Account";
+    walletAmount.textContent = "Accedi";
+    walletAmount.classList.remove("is-low");
+    addCreditBtn.style.display = "none";
+    coinBtn.classList.add("is-empty");
+    coinBtn.title = "Accedi per estrarre il gettone";
+    return;
+  }
+
+  walletCloud.classList.remove("is-guest");
+  walletLabel.textContent = "Credito";
   walletAmount.textContent = `€${credit}`;
+  addCreditBtn.style.display = "grid";
+  coinBtn.title = "Estrai il gettone dal borsellino";
+
   const currentPrice = MACHINES[activeIndex] ? MACHINES[activeIndex].price : 3;
   const low = credit < currentPrice;
   walletAmount.classList.toggle("is-low", low);
@@ -1654,8 +1905,18 @@ function scheduleHideWalletCloud(delay = 240) {
   walletHideTimer = setTimeout(() => walletCloud.classList.remove("open"), delay);
 }
 
+walletCloud.addEventListener("click", () => {
+  if (!currentUser) {
+    openAuthModal("Accedi o registrati per iniziare a giocare e ricevere €15 di benvenuto!");
+  }
+});
+
 addCreditBtn.addEventListener("click", (e) => {
   e.stopPropagation();
+  if (!currentUser) {
+    openAuthModal("Accedi o registrati per ricaricare credito e girare le macchinette!");
+    return;
+  }
   credit += 1;
   saveCredit();
   updateCreditUI(true);
@@ -1666,8 +1927,7 @@ addCreditBtn.addEventListener("click", (e) => {
   showWalletCloud();
 });
 
-/* --- Inventario & Sync Cloud --- */
-const INV_STORAGE_KEY = "gashapon_inventory_v1";
+/* --- Inventario & Sync Cloud (Solo utenti registrati) --- */
 let inventory = [];
 
 const invBadge = document.getElementById("invBadge");
@@ -1675,20 +1935,7 @@ const invBackdrop = document.getElementById("invBackdrop");
 const invGrid = document.getElementById("invGrid");
 const invSummary = document.getElementById("invSummary");
 const invSyncLabel = document.getElementById("invSyncLabel");
-
-function loadLocalInventory() {
-  try {
-    const raw = localStorage.getItem(INV_STORAGE_KEY);
-    inventory = raw ? JSON.parse(raw) : [];
-  } catch {
-    inventory = [];
-  }
-  updateInventoryUI();
-}
-
-function saveLocalInventory() {
-  try { localStorage.setItem(INV_STORAGE_KEY, JSON.stringify(inventory)); } catch {}
-}
+const clearInvBtn = document.getElementById("clearInvBtn");
 
 async function syncItemToCloud(item) {
   if (!currentUser || !sb) return;
@@ -1708,56 +1955,42 @@ async function syncItemToCloud(item) {
 async function loadCloudData(user) {
   if (!sb || !user) return;
   try {
-    // 1. Carica profilo (credito)
-    const { data: profile } = await sb
+    const { data: profile, error: profErr } = await sb
       .from("profiles")
       .select("credit")
       .eq("id", user.id)
       .maybeSingle();
 
-    if (profile && typeof profile.credit === "number") {
+    if (!profErr && profile && typeof profile.credit === "number") {
       credit = profile.credit;
-    } else {
+    } else if (!profErr && !profile) {
       credit = 15;
       await sb.from("profiles").upsert({ id: user.id, credit: 15 });
     }
     updateCreditUI(false);
 
-    // 2. Carica inventario dal cloud
-    const { data: rows } = await sb
+    const { data: rows, error: invErr } = await sb
       .from("inventory")
       .select("prize_key, photo, qty, last_won")
       .eq("user_id", user.id)
       .order("last_won", { ascending: false });
 
-    const cloudItems = (rows || []).map((r) => ({
-      key: r.prize_key,
-      photo: r.photo,
-      qty: r.qty,
-      lastWon: Number(r.last_won) || Date.now()
-    }));
-
-    // Se l'account cloud è nuovo e c'erano gadget vinti da ospite, li migra nel cloud
-    if (cloudItems.length === 0 && inventory.length > 0) {
-      const toUpload = inventory.map((item) => ({
-        user_id: user.id,
-        prize_key: item.key,
-        photo: item.photo,
-        qty: item.qty,
-        last_won: item.lastWon
+    if (!invErr) {
+      inventory = (rows || []).map((r) => ({
+        key: r.prize_key,
+        photo: r.photo,
+        qty: r.qty,
+        lastWon: Number(r.last_won) || Date.now()
       }));
-      await sb.from("inventory").upsert(toUpload, { onConflict: "user_id,prize_key" });
-      try { localStorage.removeItem(INV_STORAGE_KEY); } catch {}
-    } else {
-      inventory = cloudItems;
+      updateInventoryUI();
     }
-    updateInventoryUI();
   } catch (err) {
     console.error("Errore caricamento dati cloud:", err);
   }
 }
 
 function addToInventory(prize) {
+  if (!currentUser || !sb) return;
   const now = Date.now();
   let target = inventory.find((item) => item.key === prize.key);
   if (target) {
@@ -1768,12 +2001,7 @@ function addToInventory(prize) {
     inventory.unshift(target);
   }
   inventory.sort((a, b) => b.lastWon - a.lastWon);
-
-  if (currentUser && sb) {
-    syncItemToCloud(target);
-  } else {
-    saveLocalInventory();
-  }
+  syncItemToCloud(target);
   updateInventoryUI();
 }
 
@@ -1788,8 +2016,8 @@ function updateMachineProgress() {
       countEl.classList.remove("is-complete");
       return;
     }
-    const owned = m.activePrizes.filter((p) => ownedKeys.has(p.key)).length;
-    const isComplete = owned >= total;
+    const owned = currentUser ? m.activePrizes.filter((p) => ownedKeys.has(p.key)).length : 0;
+    const isComplete = currentUser && owned >= total;
     countEl.textContent = `${owned}/${total}`;
     countEl.classList.toggle("is-complete", isComplete);
   });
@@ -1797,11 +2025,30 @@ function updateMachineProgress() {
 
 function updateInventoryUI() {
   updateMachineProgress();
-  const totalCount = inventory.reduce((sum, item) => sum + item.qty, 0);
+  const totalCount = currentUser ? inventory.reduce((sum, item) => sum + item.qty, 0) : 0;
   invBadge.textContent = totalCount;
   invSummary.textContent = `${totalCount} ${totalCount === 1 ? "gadget vinto" : "gadget vinti"}`;
+  clearInvBtn.style.display = (currentUser && inventory.length > 0) ? "inline-block" : "none";
 
   invGrid.innerHTML = "";
+  if (!currentUser) {
+    invGrid.innerHTML = `
+      <div class="inv-empty">
+        <div class="inv-empty-icon">🔒</div>
+        Accedi o registrati per collezionare e salvare i tuoi gadget!<br>
+        <button type="button" class="inv-login-cta" id="invLoginCta">Accedi ora</button>
+      </div>
+    `;
+    const cta = document.getElementById("invLoginCta");
+    if (cta) {
+      cta.onclick = () => {
+        closeInventory();
+        openAuthModal("Accedi o registrati per iniziare la tua collezione!");
+      };
+    }
+    return;
+  }
+
   if (inventory.length === 0) {
     invGrid.innerHTML = `
       <div class="inv-empty">
@@ -1831,26 +2078,43 @@ function closeInventory() { invBackdrop.classList.remove("open"); }
 document.getElementById("invBtn").onclick = openInventory;
 document.getElementById("closeInvBtn").onclick = closeInventory;
 invBackdrop.addEventListener("click", (e) => { if (e.target === invBackdrop) closeInventory(); });
-document.getElementById("clearInvBtn").onclick = async () => {
-  if (inventory.length === 0) return;
-  if (confirm("Vuoi svuotare tutto l'inventario?")) {
+clearInvBtn.onclick = async () => {
+  if (!currentUser || !sb || inventory.length === 0) return;
+  if (confirm("Vuoi svuotare tutto l'inventario del tuo account?")) {
     inventory = [];
-    if (currentUser && sb) {
-      await sb.from("inventory").delete().eq("user_id", currentUser.id);
-    } else {
-      saveLocalInventory();
-    }
+    await sb.from("inventory").delete().eq("user_id", currentUser.id);
     updateInventoryUI();
   }
 };
 
-/* --- Autenticazione UI & Logica --- */
+/* --- Banner Ospite & Autenticazione UI --- */
+const guestBanner = document.getElementById("guestBanner");
+const bannerLoginBtn = document.getElementById("bannerLoginBtn");
+const bannerExploreBtn = document.getElementById("bannerExploreBtn");
+
+function updateGuestBanner() {
+  const shouldShow = !currentUser && !guestBannerDismissed;
+  guestBanner.classList.toggle("visible", shouldShow);
+}
+
+bannerLoginBtn.onclick = () => openAuthModal();
+bannerExploreBtn.onclick = () => {
+  guestBannerDismissed = true;
+  updateGuestBanner();
+};
+
 const authBtn = document.getElementById("authBtn");
+const authBtnImg = document.getElementById("authBtnImg");
+const authImgUserTag = document.getElementById("authImgUserTag");
 const authBtnText = document.getElementById("authBtnText");
 const authModal = document.getElementById("authModal");
 const authGuestView = document.getElementById("authGuestView");
+const authForgotView = document.getElementById("authForgotView");
+const authResetView = document.getElementById("authResetView");
 const authUserView = document.getElementById("authUserView");
+const authGuestDesc = document.getElementById("authGuestDesc");
 const authUserEmail = document.getElementById("authUserEmail");
+
 const authForm = document.getElementById("authForm");
 const authEmail = document.getElementById("authEmail");
 const authPassword = document.getElementById("authPassword");
@@ -1858,23 +2122,67 @@ const authSubmitBtn = document.getElementById("authSubmitBtn");
 const authMsg = document.getElementById("authMsg");
 const tabLogin = document.getElementById("tabLogin");
 const tabSignup = document.getElementById("tabSignup");
+const forgotLinkBtn = document.getElementById("forgotLinkBtn");
+
+const forgotForm = document.getElementById("forgotForm");
+const forgotEmail = document.getElementById("forgotEmail");
+const forgotSubmitBtn = document.getElementById("forgotSubmitBtn");
+const forgotMsg = document.getElementById("forgotMsg");
+const backToLoginBtn = document.getElementById("backToLoginBtn");
+
+const resetForm = document.getElementById("resetForm");
+const newPassword = document.getElementById("newPassword");
+const resetSubmitBtn = document.getElementById("resetSubmitBtn");
+const resetMsg = document.getElementById("resetMsg");
+
+function showAuthView(viewName) {
+  authGuestView.style.display = viewName === "guest" ? "block" : "none";
+  authForgotView.style.display = viewName === "forgot" ? "block" : "none";
+  authResetView.style.display = viewName === "reset" ? "block" : "none";
+  authUserView.style.display = viewName === "user" ? "flex" : "none";
+}
 
 function updateAuthUI() {
   if (currentUser) {
     const shortName = (currentUser.email || "Profilo").split("@")[0];
     authBtn.classList.add("is-logged");
     authBtnText.textContent = shortName;
-    authGuestView.style.display = "none";
-    authUserView.style.display = "flex";
+    authImgUserTag.textContent = shortName;
+
+    if (hasProfiloImg) {
+      authBtnImg.src = "public/profilo.png";
+      authBtnImg.alt = shortName;
+      authBtn.classList.add("has-custom-img");
+    } else {
+      authBtn.classList.remove("has-custom-img");
+    }
+
     authUserEmail.textContent = currentUser.email || "";
     invSyncLabel.textContent = "☁️ Salvato nel cloud";
+    if (phase === "idle") dockHint.textContent = "Estrai il gettone dal borsellino";
+
+    if (isRecoveryMode) showAuthView("reset");
+    else showAuthView("user");
   } else {
     authBtn.classList.remove("is-logged");
     authBtnText.textContent = "Accedi";
-    authGuestView.style.display = "block";
-    authUserView.style.display = "none";
-    invSyncLabel.textContent = "Salvato in locale (ospite)";
+    authImgUserTag.textContent = "";
+
+    if (hasAccediImg) {
+      authBtnImg.src = "public/accedi.png";
+      authBtnImg.alt = "Accedi";
+      authBtn.classList.add("has-custom-img");
+    } else {
+      authBtn.classList.remove("has-custom-img");
+    }
+
+    invSyncLabel.textContent = "Accesso richiesto";
+    if (phase === "idle") dockHint.textContent = "Accedi per iniziare a giocare";
+    showAuthView("guest");
   }
+  updateGuestBanner();
+  updateCreditUI(false);
+  updateInventoryUI();
 }
 
 function setAuthMode(mode) {
@@ -1882,6 +2190,7 @@ function setAuthMode(mode) {
   tabLogin.classList.toggle("active", mode === "login");
   tabSignup.classList.toggle("active", mode === "signup");
   authSubmitBtn.textContent = mode === "login" ? "Accedi" : "Crea account";
+  forgotLinkBtn.style.display = mode === "login" ? "inline-block" : "none";
   authMsg.textContent = "";
   authMsg.classList.remove("ok");
 }
@@ -1889,15 +2198,33 @@ function setAuthMode(mode) {
 tabLogin.onclick = () => setAuthMode("login");
 tabSignup.onclick = () => setAuthMode("signup");
 
-function openAuthModal() {
+forgotLinkBtn.onclick = () => {
+  forgotMsg.textContent = "";
+  forgotMsg.classList.remove("ok");
+  forgotEmail.value = authEmail.value.trim();
+  showAuthView("forgot");
+};
+
+backToLoginBtn.onclick = () => {
   authMsg.textContent = "";
   authMsg.classList.remove("ok");
+  showAuthView("guest");
+};
+
+function openAuthModal(customDesc = null) {
+  authMsg.textContent = "";
+  authMsg.classList.remove("ok");
+  forgotMsg.textContent = "";
+  forgotMsg.classList.remove("ok");
+  resetMsg.textContent = "";
+  resetMsg.classList.remove("ok");
+  authGuestDesc.textContent = customDesc || "Accedi o registrati per girare le macchinette, gestire il tuo credito e salvare tutti i gadget vinti.";
   updateAuthUI();
   authModal.classList.add("open");
 }
 function closeAuthModal() { authModal.classList.remove("open"); }
 
-authBtn.onclick = openAuthModal;
+authBtn.onclick = () => openAuthModal();
 document.getElementById("closeAuthModal").onclick = closeAuthModal;
 authModal.addEventListener("click", (e) => { if (e.target === authModal) closeAuthModal(); });
 
@@ -1926,13 +2253,14 @@ authForm.addEventListener("submit", async (e) => {
       authMsg.textContent = result.error.message;
     } else if (result.data && result.data.user) {
       currentUser = result.data.user;
-      updateAuthUI();
+      guestBannerDismissed = false;
       await loadCloudData(currentUser);
+      updateAuthUI();
       authPassword.value = "";
       closeAuthModal();
     } else {
       authMsg.classList.add("ok");
-      authMsg.textContent = "Account creato! Controlla l'email o accedi.";
+      authMsg.textContent = "Account creato! Ora puoi accedere.";
     }
   } catch (err) {
     authMsg.textContent = "Errore imprevisto. Riprova.";
@@ -1941,13 +2269,76 @@ authForm.addEventListener("submit", async (e) => {
   }
 });
 
+forgotForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  if (!sb) {
+    forgotMsg.textContent = "Errore di connessione a Supabase.";
+    return;
+  }
+
+  const email = forgotEmail.value.trim();
+  forgotSubmitBtn.disabled = true;
+  forgotMsg.textContent = "";
+  forgotMsg.classList.remove("ok");
+
+  try {
+    const redirectTo = window.location.origin + window.location.pathname;
+    const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo });
+    if (error) {
+      forgotMsg.textContent = error.message;
+    } else {
+      forgotMsg.classList.add("ok");
+      forgotMsg.textContent = "Email inviata! Controlla la tua casella (anche nello spam).";
+    }
+  } catch (err) {
+    forgotMsg.textContent = "Errore durante l'invio. Riprova.";
+  } finally {
+    forgotSubmitBtn.disabled = false;
+  }
+});
+
+resetForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  if (!sb) {
+    resetMsg.textContent = "Errore di connessione a Supabase.";
+    return;
+  }
+
+  const pwd = newPassword.value;
+  resetSubmitBtn.disabled = true;
+  resetMsg.textContent = "";
+  resetMsg.classList.remove("ok");
+
+  try {
+    const { error } = await sb.auth.updateUser({ password: pwd });
+    if (error) {
+      resetMsg.textContent = error.message;
+    } else {
+      isRecoveryMode = false;
+      newPassword.value = "";
+      resetMsg.classList.add("ok");
+      resetMsg.textContent = "Password aggiornata con successo!";
+      setTimeout(() => {
+        updateAuthUI();
+        closeAuthModal();
+      }, 1200);
+    }
+  } catch (err) {
+    resetMsg.textContent = "Errore durante l'aggiornamento. Riprova.";
+  } finally {
+    resetSubmitBtn.disabled = false;
+  }
+});
+
 document.getElementById("logoutBtn").onclick = async () => {
   if (!sb) return;
   await sb.auth.signOut();
   currentUser = null;
+  isRecoveryMode = false;
+  guestBannerDismissed = false;
+  credit = 0;
+  inventory = [];
   updateAuthUI();
-  loadLocalCredit();
-  loadLocalInventory();
   closeAuthModal();
 };
 
@@ -1956,25 +2347,45 @@ async function initAuth() {
     updateAuthUI();
     return;
   }
-  const { data } = await sb.auth.getSession();
-  if (data && data.session && data.session.user) {
-    currentUser = data.session.user;
-    updateAuthUI();
-    await loadCloudData(currentUser);
-  } else {
-    updateAuthUI();
-  }
 
   sb.auth.onAuthStateChange(async (event, session) => {
+    if (event === "PASSWORD_RECOVERY") {
+      isRecoveryMode = true;
+      if (session && session.user) {
+        currentUser = session.user;
+        await loadCloudData(currentUser);
+      }
+      updateAuthUI();
+      showAuthView("reset");
+      authModal.classList.add("open");
+      return;
+    }
+
     if (event === "SIGNED_IN" && session && session.user) {
       currentUser = session.user;
-      updateAuthUI();
       await loadCloudData(currentUser);
+      updateAuthUI();
     } else if (event === "SIGNED_OUT") {
       currentUser = null;
+      isRecoveryMode = false;
+      guestBannerDismissed = false;
+      credit = 0;
+      inventory = [];
       updateAuthUI();
     }
   });
+
+  const { data } = await sb.auth.getSession();
+  if (data && data.session && data.session.user) {
+    currentUser = data.session.user;
+    await loadCloudData(currentUser);
+    updateAuthUI();
+  } else {
+    currentUser = null;
+    credit = 0;
+    inventory = [];
+    updateAuthUI();
+  }
 }
 
 /* --- Stato & Audio --- */
@@ -2255,9 +2666,15 @@ function updateActiveUI() {
   updateCreditUI(false);
 }
 
-/* --- Inserimento, Sgancio Moneta & Manopola --- */
+/* --- Inserimento, Sgancio Moneta & Manopola (Solo utenti loggati) --- */
 function insertCoin(idx) {
   if (phase !== "idle" || idx !== activeIndex) return;
+  if (!currentUser) {
+    sfxError();
+    openAuthModal("Accedi o registrati per inserire il gettone e giocare!");
+    return;
+  }
+
   const price = MACHINES[idx].price;
   if (credit < price) {
     sfxError();
@@ -2281,7 +2698,7 @@ function insertCoin(idx) {
 }
 
 function ejectCoin(idx) {
-  if (phase !== "coinInserted" || idx !== activeIndex) return;
+  if (phase !== "coinInserted" || idx !== activeIndex || !currentUser) return;
 
   const price = MACHINES[idx].price;
   credit += price;
@@ -2300,7 +2717,9 @@ function ejectCoin(idx) {
   document.getElementById(`eject-${idx}`).classList.remove("ready");
   dockHint.textContent = "Moneta restituita nel borsellino!";
   setTimeout(() => {
-    if (phase === "idle") dockHint.textContent = "Estrai il gettone dal borsellino";
+    if (phase === "idle") {
+      dockHint.textContent = currentUser ? "Estrai il gettone dal borsellino" : "Accedi per iniziare a giocare";
+    }
   }, 1800);
   updateActiveUI();
 }
@@ -2308,8 +2727,14 @@ function ejectCoin(idx) {
 let draggingCoin = false;
 coinBtn.addEventListener("pointerdown", (e) => {
   if (phase !== "idle") return;
-  const price = MACHINES[activeIndex].price;
 
+  if (!currentUser) {
+    sfxError();
+    openAuthModal("Accedi o registrati per estrarre il gettone e girare le macchinette!");
+    return;
+  }
+
+  const price = MACHINES[activeIndex].price;
   if (credit < price) {
     sfxError();
     dockHint.textContent = "Credito insufficiente! Ricarica con +";
@@ -2365,7 +2790,7 @@ function bindMachineEvents(idx) {
   let turning = false, startAngle = 0, currentDeg = 0, lastDetent = 0, knobCx = 0, knobCy = 0;
 
   knob.addEventListener("pointerdown", (e) => {
-    if (phase !== "coinInserted" || idx !== activeIndex) return;
+    if (phase !== "coinInserted" || idx !== activeIndex || !currentUser) return;
     e.stopPropagation();
     turning = true;
     knob.setPointerCapture(e.pointerId);
@@ -2669,7 +3094,7 @@ function closeReveal() {
   corridor.classList.remove("locked");
   squeezeProgress = 0;
   phase = "idle";
-  dockHint.textContent = "Estrai il gettone dal borsellino";
+  dockHint.textContent = currentUser ? "Estrai il gettone dal borsellino" : "Accedi per iniziare a giocare";
   updateActiveUI();
 }
 
@@ -2681,8 +3106,7 @@ document.getElementById("openInvFromReveal").addEventListener("click", () => {
 
 /* --- Avvio & Precaricamento --- */
 async function bootApp() {
-  loadLocalCredit();
-  loadLocalInventory();
+  updateAuthUI();
   renderCorridor();
 
   const coreAssets = [
@@ -2703,6 +3127,7 @@ async function bootApp() {
   ];
 
   const loadTasks = Promise.all([
+    initAuthImages(),
     initAuth(),
     initCoinImage(),
     detectCapsules(),
