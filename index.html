@@ -3047,7 +3047,10 @@ backToLoginBtn.onclick = () => {
   showAuthView("guest");
 };
 
+let authModalOpenedAt = 0;
+
 function openAuthModal(customDesc = null) {
+  authModalOpenedAt = Date.now();
   authMsg.textContent = "";
   authMsg.classList.remove("ok");
   forgotMsg.textContent = "";
@@ -3062,7 +3065,10 @@ function closeAuthModal() { authModal.classList.remove("open"); }
 
 authBtn.onclick = () => openAuthModal();
 document.getElementById("closeAuthModal").onclick = closeAuthModal;
-authModal.addEventListener("click", (e) => { if (e.target === authModal) closeAuthModal(); });
+authModal.addEventListener("click", (e) => {
+  if (Date.now() - authModalOpenedAt < 300) return;
+  if (e.target === authModal) closeAuthModal();
+});
 
 authForm.addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -3566,7 +3572,9 @@ let draggingCoin = false;
 coinBtn.addEventListener("pointerdown", (e) => {
   if (phase !== "idle") return;
 
-  if (!currentUser) {
+if (!currentUser) {
+    e.preventDefault();
+    e.stopPropagation();
     sfxError();
     openAuthModal("Accedi o registrati per estrarre il gettone e girare le macchinette!");
     return;
