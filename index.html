@@ -49,18 +49,17 @@
     background-repeat: no-repeat;
   }
 
-  /* --- Schermata di Caricamento --- */
+  /* --- Schermata di Caricamento (Solo Progress Bar in Pongo) --- */
   .loading-screen {
     position: fixed;
     inset: 0;
     z-index: 200;
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 18px;
+    padding: 24px;
     background:
-      radial-gradient(circle at 50% 40%, rgba(255, 255, 255, 0.88) 0%, rgba(222, 237, 248, 0.96) 100%),
+      radial-gradient(circle at 50% 45%, rgba(255, 255, 255, 0.92) 0%, rgba(222, 237, 248, 0.98) 100%),
       url("public/background.jpg") center / cover no-repeat;
     transition: opacity 0.45s ease, visibility 0.45s ease;
   }
@@ -70,46 +69,74 @@
     pointer-events: none;
   }
 
-  .loading-logo {
-    width: min(62vw, 300px);
-    height: auto;
-    object-fit: contain;
-    filter: drop-shadow(0 10px 20px rgba(45, 75, 105, 0.18));
-    animation: loadFloat 1.6s ease-in-out infinite;
-  }
-
-  @keyframes loadFloat {
-    0%, 100% { transform: translateY(0px) scale(1); }
-    50% { transform: translateY(-7px) scale(1.02); }
-  }
-
-  .loading-bar-wrap {
-    width: min(56vw, 210px);
-    height: 10px;
+  .loading-bar-shell {
+    position: relative;
+    width: min(82vw, 380px);
+    height: 34px;
     border-radius: 999px;
-    background: rgba(120, 155, 185, 0.22);
+    background: rgba(255, 255, 255, 0.85);
+    border: 3px solid rgba(255, 255, 255, 0.98);
+    padding: 4px;
+    box-shadow:
+      inset 0 2px 6px rgba(45, 75, 105, 0.16),
+      0 12px 28px rgba(45, 75, 105, 0.22);
     overflow: hidden;
-    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.08);
+  }
+
+  .loading-bar-bg-img {
+    display: none;
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: fill;
+    z-index: 0;
+    pointer-events: none;
+  }
+  .loading-bar-shell.has-bg-img {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    overflow: visible;
+    filter: drop-shadow(0 10px 20px rgba(45, 75, 105, 0.24));
+  }
+  .loading-bar-shell.has-bg-img .loading-bar-bg-img {
+    display: block;
+  }
+
+  .loading-bar-track {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    border-radius: 999px;
+    overflow: hidden;
   }
 
   .loading-bar-fill {
-    width: 45%;
+    position: absolute;
+    inset: 0;
+    width: 100%;
     height: 100%;
     border-radius: 999px;
     background: linear-gradient(90deg, #6bb5e8, #ffd54f, #f28b82);
-    animation: loadSlide 1.15s ease-in-out infinite;
+    clip-path: inset(0 100% 0 0);
+    transition: clip-path 0.22s ease-out;
+    will-change: clip-path;
+  }
+  .loading-bar-fill.has-fill-img {
+    background: transparent;
   }
 
-  @keyframes loadSlide {
-    0% { transform: translateX(-100%); }
-    100% { transform: translateX(240%); }
+  .loading-bar-fill-img {
+    display: none;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    pointer-events: none;
   }
-
-  .loading-text {
-    font-size: 13px;
-    font-weight: 700;
-    color: #546e85;
-    letter-spacing: 0.3px;
+  .loading-bar-fill.has-fill-img .loading-bar-fill-img {
+    display: block;
   }
 
   /* --- Top Bar --- */
@@ -124,8 +151,8 @@
     position: fixed;
     top: 6px;
     left: 12px;
-    height: clamp(104px, 18vh, 210px);
-    max-width: 58vw;
+    height: clamp(72px, 12vh, 135px);
+    max-width: 48vw;
     pointer-events: none;
   }
 
@@ -174,7 +201,7 @@
   }
   .btn-pill:active { transform: scale(0.94); }
 
-  /* Pulsante Accedi / Profilo (personalizzabile con accedi.png / profilo.png) */
+  /* Pulsante Accedi / Profilo */
   .auth-btn {
     position: relative;
     border: 2px solid rgba(255, 255, 255, 0.92);
@@ -251,7 +278,7 @@
   }
   .auth-btn.has-custom-img.is-logged .auth-img-user-tag { display: inline-block; }
 
-  /* --- Banner Ospite (personalizzabile con banner-bg, banner-login, banner-esplora) --- */
+  /* --- Banner Ospite --- */
   .guest-banner {
     position: fixed;
     top: clamp(92px, 16vh, 132px);
@@ -294,7 +321,7 @@
     backdrop-filter: none;
     border: none;
     box-shadow: none;
-    padding: 24px 26px;
+    padding: 26px 28px;
   }
   .guest-banner.has-bg-png .guest-banner-bg {
     display: block;
@@ -319,6 +346,19 @@
     backdrop-filter: blur(2px);
     pointer-events: none;
   }
+
+  .guest-banner-text-img {
+    display: none;
+    max-width: 92%;
+    max-height: 76px;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    margin: 0 auto;
+    filter: drop-shadow(0 3px 8px rgba(0, 0, 0, 0.14));
+  }
+  .guest-banner.has-text-img .guest-banner-text-img { display: block; }
+  .guest-banner.has-text-img .guest-banner-text { display: none; }
 
   .guest-banner-text {
     font-size: 12px;
@@ -400,9 +440,9 @@
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    height: clamp(72px, 11.5vh, 112px);
+    height: clamp(38px, 5.5vh, 50px);
     width: auto;
-    max-width: 44vw;
+    max-width: 38vw;
     transition: transform 0.15s ease;
   }
   .inv-icon-btn:active { transform: scale(0.94); }
@@ -412,14 +452,14 @@
     max-width: 100%;
     object-fit: contain;
     display: block;
-    filter: drop-shadow(0 5px 12px rgba(0, 0, 0, 0.28));
+    filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.26));
   }
   .inv-icon-btn .inv-badge {
     position: absolute;
-    top: 8px;
-    right: 2px;
-    min-width: 24px;
-    height: 24px;
+    top: -6px;
+    right: -6px;
+    min-width: 22px;
+    height: 22px;
     font-size: 11px;
     border: 2px solid #fff;
     box-shadow: 0 3px 8px rgba(0, 0, 0, 0.28);
@@ -430,12 +470,11 @@
     background: transparent;
     padding: 0;
     cursor: pointer;
-    height: clamp(64px, 11vh, 96px);
-    width: clamp(64px, 11vh, 96px);
+    height: clamp(44px, 6.2vh, 56px);
+    width: clamp(44px, 6.2vh, 56px);
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    overflow: visible;
     transition: transform 0.15s ease, opacity 0.2s ease, filter 0.2s ease;
   }
   .mute-icon-btn:active, .random-icon-btn:active { transform: scale(0.9); }
@@ -443,9 +482,8 @@
     width: 100%;
     height: 100%;
     object-fit: contain;
-    transform: scale(1.5);
     display: block;
-    filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.26));
+    filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.24));
   }
   .mute-icon-btn.is-muted { opacity: 0.45; filter: grayscale(100%); }
   .random-icon-btn.is-shuffling {
@@ -454,6 +492,41 @@
     animation: spinDice 0.35s linear infinite;
   }
   @keyframes spinDice { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+  /* Tasto ? (Guida / Wizard - stessa misura di Muto e Random) */
+  .help-icon-btn {
+    border: 2.5px solid rgba(255, 255, 255, 0.95);
+    background: linear-gradient(135deg, #ffffff, #e6f4ff);
+    color: #1e364a;
+    width: clamp(44px, 6.2vh, 56px);
+    height: clamp(44px, 6.2vh, 56px);
+    border-radius: 50%;
+    font-size: 20px;
+    font-weight: 900;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 6px 14px rgba(45, 75, 105, 0.24);
+    transition: transform 0.15s ease;
+  }
+  .help-icon-btn:active { transform: scale(0.9); }
+  .help-icon-btn.has-custom-img {
+    border: none;
+    background: transparent;
+    box-shadow: none;
+    padding: 0;
+    border-radius: 0;
+  }
+  .help-icon-btn img {
+    display: none;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.24));
+  }
+  .help-icon-btn.has-custom-img img { display: block; }
+  .help-icon-btn.has-custom-img span { display: none; }
 
   /* --- Corridoio Sala Gashapon --- */
   .corridor-wrap {
@@ -943,8 +1016,8 @@
     top: 50%;
     transform: translateY(-50%);
     z-index: 30;
-    width: clamp(72px, 16vw, 110px);
-    height: clamp(72px, 16vw, 110px);
+    width: clamp(50px, 7.5vw, 68px);
+    height: clamp(50px, 7.5vw, 68px);
     border: none;
     background: transparent;
     padding: 0;
@@ -953,13 +1026,18 @@
     cursor: pointer;
     display: grid;
     place-items: center;
-    overflow: visible;
     transition: opacity 0.2s ease, transform 0.15s ease;
   }
   .nav-arrow:active { transform: translateY(-50%) scale(0.9); }
-  .nav-arrow img { width: 100%; height: 100%; object-fit: contain; transform: scale(1.6); display: block; filter: drop-shadow(0 5px 12px rgba(0, 0, 0, 0.28)); }
-  .nav-arrow.prev { left: 6px; }
-  .nav-arrow.next { right: 6px; }
+  .nav-arrow img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+    filter: drop-shadow(0 5px 12px rgba(0, 0, 0, 0.28));
+  }
+  .nav-arrow.prev { left: 12px; }
+  .nav-arrow.next { right: 12px; }
   .nav-arrow.hidden { opacity: 0; pointer-events: none; }
 
   .floating-coin {
@@ -979,7 +1057,264 @@
     100% { transform: translateY(0) scale(1) rotate(0deg); opacity: 1; }
   }
 
-  /* --- Modale Login / Profilo (personalizzabile con login-bg.png/.jpg e login-logo.png) --- */
+  /* --- Modale Tutorial / Wizard sulla nuvola --- */
+  .wizard-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 108;
+    background: rgba(15, 22, 32, 0.58);
+    backdrop-filter: blur(5px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.24s ease;
+  }
+  .wizard-modal.open { opacity: 1; pointer-events: auto; }
+
+  .wizard-card {
+    position: relative;
+    isolation: isolate;
+    width: min(94vw, 660px);
+    max-height: 90dvh;
+    overflow-y: auto;
+    background: linear-gradient(180deg, #ffffff 0%, #eef7fd 100%);
+    border: 3px solid rgba(255, 255, 255, 0.96);
+    border-radius: 28px;
+    padding: 26px 26px 22px;
+    box-shadow: 0 24px 54px rgba(20, 42, 66, 0.32);
+    transform: scale(0.94);
+    transition: transform 0.24s cubic-bezier(0.22, 1.15, 0.36, 1);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .wizard-modal.open .wizard-card { transform: scale(1); }
+
+  .wizard-card-bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -2;
+    pointer-events: none;
+    display: none;
+  }
+  .wizard-card.has-bg-png {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    padding: 42px 38px 34px;
+  }
+  .wizard-card.has-bg-png .wizard-card-bg {
+    display: block;
+    object-fit: fill;
+    filter: drop-shadow(0 18px 36px rgba(20, 42, 66, 0.34));
+  }
+
+  .wizard-close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    background: rgba(255, 255, 255, 0.94);
+    color: #365066;
+    font-size: 15px;
+    font-weight: 800;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.14);
+    z-index: 3;
+    transition: transform 0.14s ease;
+  }
+  .wizard-close:active { transform: scale(0.92); }
+  .wizard-close.has-custom-img {
+    border: none;
+    background: transparent;
+    box-shadow: none;
+    padding: 0;
+    width: 44px;
+    height: 44px;
+  }
+  .wizard-close-img {
+    display: none;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 3px 8px rgba(0, 0, 0, 0.22));
+  }
+  .wizard-close.has-custom-img .wizard-close-img { display: block; }
+  .wizard-close.has-custom-img .wizard-close-text { display: none; }
+
+  .wizard-body {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .wizard-media {
+    flex: 1.15;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: 20px;
+    overflow: hidden;
+    background: #f6f4f0;
+    border: 3px solid rgba(255, 255, 255, 0.98);
+    box-shadow: 0 10px 24px rgba(32, 58, 86, 0.18);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .wizard-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .wizard-media-fallback {
+    display: none;
+    font-size: 52px;
+  }
+
+  .wizard-copy {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.76);
+    padding: 14px 16px;
+    border-radius: 18px;
+    border: 1.5px solid rgba(255, 255, 255, 0.9);
+  }
+  .wizard-step-pill {
+    background: #e3f2fd;
+    color: #1e6091;
+    font-size: 11px;
+    font-weight: 900;
+    padding: 3px 10px;
+    border-radius: 999px;
+    letter-spacing: 0.3px;
+  }
+  .wizard-title {
+    margin: 0;
+    font-size: 19px;
+    font-weight: 900;
+    color: #1a3347;
+    line-height: 1.2;
+  }
+  .wizard-desc {
+    margin: 0;
+    font-size: 13px;
+    font-weight: 600;
+    color: #36526a;
+    line-height: 1.45;
+  }
+
+  .wizard-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding-top: 2px;
+  }
+  .wizard-dots {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .wizard-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    border: none;
+    padding: 0;
+    background: rgba(44, 126, 194, 0.28);
+    cursor: pointer;
+    transition: transform 0.18s ease, background 0.18s ease;
+  }
+  .wizard-dot.active {
+    background: #2c7ec2;
+    transform: scale(1.3);
+  }
+
+  .wizard-nav {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .wizard-btn-sec, .wizard-btn-pri {
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 800;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.14s ease;
+  }
+  .wizard-btn-sec {
+    border: 1.5px solid rgba(30, 54, 74, 0.2);
+    background: rgba(255, 255, 255, 0.92);
+    color: #1e364a;
+    padding: 9px 15px;
+  }
+  .wizard-btn-pri {
+    border: none;
+    background: linear-gradient(135deg, #4da3e0, #2c7ec2);
+    color: #fff;
+    padding: 9px 18px;
+    box-shadow: 0 6px 14px rgba(44, 126, 194, 0.28);
+  }
+  .wizard-btn-sec:active, .wizard-btn-pri:active { transform: scale(0.95); }
+
+  .wizard-btn-sec.has-custom-img,
+  .wizard-btn-pri.has-custom-img {
+    border: none;
+    background: transparent;
+    box-shadow: none;
+    padding: 0;
+    border-radius: 0;
+  }
+  .wizard-btn-img {
+    display: none;
+    height: clamp(40px, 6.5vh, 56px);
+    width: auto;
+    max-width: 38vw;
+    object-fit: contain;
+    filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.22));
+  }
+  .has-custom-img .wizard-btn-img { display: block; }
+  .has-custom-img .wizard-btn-text { display: none; }
+
+  @media (max-width: 620px) {
+    .wizard-card.has-bg-png {
+      padding: 34px 24px 26px;
+    }
+    .wizard-body {
+      flex-direction: column;
+      gap: 12px;
+    }
+    .wizard-copy {
+      width: 100%;
+      align-items: center;
+      text-align: center;
+      padding: 12px 14px;
+    }
+    .wizard-title { font-size: 17px; }
+    .wizard-desc { font-size: 12.5px; }
+  }
+
+  /* --- Modale Login / Profilo --- */
   .auth-modal {
     position: fixed;
     inset: 0;
@@ -1000,6 +1335,8 @@
     position: relative;
     isolation: isolate;
     width: min(92vw, 380px);
+    max-height: 90dvh;
+    overflow-y: auto;
     background: linear-gradient(180deg, #ffffff 0%, #eef7fd 100%);
     border: 3px solid rgba(255, 255, 255, 0.95);
     border-radius: 26px;
@@ -1266,10 +1603,10 @@
   }
   .inv-header-left { flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 2px; }
   .inv-banner-img {
-    height: clamp(120px, 17vh, 160px);
+    height: clamp(54px, 8vh, 74px);
     width: auto;
-    max-width: 100%;
-    margin: -22px 0 -16px;
+    max-width: 90%;
+    margin: 0 0 4px;
     object-fit: contain;
     display: block;
     filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.18));
@@ -1318,6 +1655,20 @@
   .inv-tile img { width: 86%; height: 86%; object-fit: contain; }
   .inv-tile-emoji { font-size: 36px; }
   .inv-qty { position: absolute; top: 5px; right: 5px; background: #1a1a1d; color: #fff; font-size: 11px; font-weight: 800; padding: 2px 7px; border-radius: 999px; }
+  .inv-new-badge {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    background: linear-gradient(135deg, #ff5252, #d91e2a);
+    color: #fff;
+    font-size: 9px;
+    font-weight: 900;
+    letter-spacing: 0.4px;
+    padding: 2px 6px;
+    border-radius: 999px;
+    box-shadow: 0 2px 6px rgba(217, 30, 42, 0.38);
+    z-index: 2;
+  }
 
   .inv-footer {
     padding: 12px 26px 18px 36px;
@@ -1382,18 +1733,22 @@
 
   .seam-stress { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; z-index: 6; pointer-events: none; will-change: opacity; }
 
-  .squeeze-ui { margin-top: 32px; display: flex; flex-direction: column; align-items: center; gap: 14px; transition: opacity 0.25s ease; }
-  .squeeze-bar-bg { width: 210px; height: 8px; border-radius: 99px; background: rgba(0,0,0,0.12); overflow: hidden; }
-  .squeeze-bar-fill { width: 100%; height: 100%; transform-origin: left center; transform: scaleX(0); background: linear-gradient(90deg, #b8860b, #ffd54f); will-change: transform; }
-
-  .btn-open-cap {
-    border: none; background: transparent; padding: 0; cursor: pointer;
-    width: min(74vw, 270px); height: 86px;
-    display: inline-flex; align-items: center; justify-content: center; overflow: visible;
-    transition: transform 0.15s ease;
+  .squeeze-ui {
+    margin-top: 32px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: opacity 0.25s ease;
   }
-  .btn-open-cap:active { transform: scale(0.94); }
-  .btn-open-cap img { width: 132%; max-height: 220%; height: auto; object-fit: contain; display: block; pointer-events: none; filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.22)); }
+
+  .squeeze-ui .loading-bar-shell {
+    width: min(74vw, 280px);
+    height: 28px;
+  }
+
+  .squeeze-ui .loading-bar-fill {
+    transition: none;
+  }
 
   .btn-primary {
     border: none; background: var(--ink); color: #fff;
@@ -1485,19 +1840,24 @@
   }
   .btn-reveal-img:active { transform: scale(0.93); }
   .btn-reveal-img img { height: 100%; width: auto; max-width: 100%; object-fit: contain; display: block; filter: drop-shadow(0 5px 12px rgba(0, 0, 0, 0.2)); }
-/* --- Fix Topbar su Mobile (evita sovrapposizione Logo / Inventario) --- */
+
+  /* --- Fix Topbar e Bottoni su Mobile --- */
   @media (max-width: 640px) {
     .brand-logo-wrap {
       top: 6px;
       left: 8px;
-      height: clamp(58px, 9.5vh, 84px);
-      max-width: 38vw;
+      height: clamp(48px, 7.5vh, 66px);
+      max-width: 40vw;
+    }
+
+    .guest-banner {
+      top: 72px;
     }
 
     .top-actions {
-      top: 6px;
+      top: 8px;
       right: 8px;
-      gap: 4px;
+      gap: 6px;
     }
 
     .top-row {
@@ -1505,14 +1865,14 @@
     }
 
     .inv-icon-btn {
-      height: clamp(50px, 8vh, 66px);
-      max-width: 36vw;
+      height: clamp(34px, 5.2vh, 42px);
+      max-width: 34vw;
     }
     .inv-icon-btn .inv-badge {
-      top: 2px;
-      right: 0;
-      min-width: 20px;
-      height: 20px;
+      top: -5px;
+      right: -5px;
+      min-width: 19px;
+      height: 19px;
       font-size: 10px;
     }
 
@@ -1520,17 +1880,27 @@
       height: clamp(32px, 5vh, 40px);
     }
 
-    /* Su schermi stretti nasconde la pillola col nome: resta l'icona profilo pulita */
     .auth-btn.has-custom-img.is-logged .auth-img-user-tag {
       display: none;
     }
 
-    .mute-icon-btn, .random-icon-btn {
-      height: 50px;
-      width: 50px;
+    .mute-icon-btn,
+    .random-icon-btn,
+    .help-icon-btn,
+    .help-icon-btn.has-custom-img {
+      height: 40px;
+      width: 40px;
+      font-size: 17px;
+      margin-right: 0;
     }
-  }
 
+    .nav-arrow {
+      width: 44px;
+      height: 44px;
+    }
+    .nav-arrow.prev { left: 6px; }
+    .nav-arrow.next { right: 6px; }
+  }
 </style>
 </head>
 <body>
@@ -1547,18 +1917,16 @@
     </defs>
   </svg>
 
-  <!-- Schermata di Caricamento -->
-  <div class="loading-screen" id="loadingScreen">
-    <img
-      src="public/logo.png"
-      alt="Momixapon"
-      class="loading-logo"
-      onerror="if(!this.dataset.triedJpg){this.dataset.triedJpg='1';this.src='public/logo.jpg';}else{this.style.display='none';}"
-    />
-    <div class="loading-bar-wrap">
-      <div class="loading-bar-fill"></div>
+  <!-- Schermata di Caricamento (Solo Progress Bar personalizzabile in pongo) -->
+  <div class="loading-screen" id="loadingScreen" aria-label="Caricamento in corso">
+    <div class="loading-bar-shell" id="loadingBarShell">
+      <img class="loading-bar-bg-img" id="loadingBarBgImg" alt="" aria-hidden="true" />
+      <div class="loading-bar-track">
+        <div class="loading-bar-fill" id="loadingBarFill">
+          <img class="loading-bar-fill-img" id="loadingBarFillImg" alt="" aria-hidden="true" />
+        </div>
+      </div>
     </div>
-    <div class="loading-text">Caricamento macchinette...</div>
   </div>
 
   <header class="topbar">
@@ -1607,13 +1975,22 @@
         />
         <span style="display:none;font-size:26px;">🎲</span>
       </button>
+      <button class="help-icon-btn" id="helpBtn" title="Come funziona">
+        <img id="helpBtnImg" alt="Guida" />
+        <span>?</span>
+      </button>
     </div>
   </header>
 
-  <!-- Banner Ospite: Accedi/Registrati oppure Esplora le macchine -->
+  <!-- Banner Ospite -->
   <div class="guest-banner" id="guestBanner" role="region" aria-label="Accesso o esplorazione">
     <img class="guest-banner-bg" id="guestBannerBg" alt="" aria-hidden="true" />
-    <div class="guest-banner-text">
+    <img
+      class="guest-banner-text-img"
+      id="guestBannerTextImg"
+      alt="Esegui il login o registrati per girare le macchine e salvare il tuo inventario, oppure esplora le macchine!"
+    />
+    <div class="guest-banner-text" id="guestBannerText">
       Esegui il login o registrati per girare le macchine e salvare il tuo inventario, oppure esplora le macchine!
     </div>
     <div class="guest-banner-actions">
@@ -1682,13 +2059,49 @@
     </div>
   </div>
 
+  <!-- Modale Tutorial / Wizard -->
+  <div class="wizard-modal" id="wizardModal" role="dialog" aria-modal="true" aria-label="Guida Momixapon">
+    <div class="wizard-card" id="wizardCard">
+      <img class="wizard-card-bg" id="wizardCardBg" alt="" aria-hidden="true" />
+      <button class="wizard-close" id="closeWizardBtn" aria-label="Chiudi tutorial">
+        <img class="wizard-close-img" id="wizardCloseImg" alt="Chiudi" />
+        <span class="wizard-close-text">✕</span>
+      </button>
+
+      <div class="wizard-body">
+        <div class="wizard-media">
+          <img id="wizardGif" alt="Tutorial Momixapon" />
+          <span class="wizard-media-fallback" id="wizardFallback">🎁</span>
+        </div>
+        <div class="wizard-copy">
+          <span class="wizard-step-pill" id="wizardStepPill">1 / 4</span>
+          <h2 class="wizard-title" id="wizardTitle"></h2>
+          <p class="wizard-desc" id="wizardDesc"></p>
+        </div>
+      </div>
+
+      <div class="wizard-footer">
+        <div class="wizard-dots" id="wizardDots"></div>
+        <div class="wizard-nav">
+          <button type="button" class="wizard-btn-sec" id="wizardPrevBtn">
+            <img class="wizard-btn-img" id="wizardPrevImg" alt="Indietro" />
+            <span class="wizard-btn-text">Indietro</span>
+          </button>
+          <button type="button" class="wizard-btn-pri" id="wizardNextBtn">
+            <img class="wizard-btn-img" id="wizardNextImg" alt="Avanti" />
+            <span class="wizard-btn-text" id="wizardNextText">Avanti</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Modale Login / Profilo / Recupero Password -->
   <div class="auth-modal" id="authModal" role="dialog" aria-modal="true">
     <div class="auth-card" id="authCard">
       <img class="auth-card-bg" id="authCardBg" alt="" aria-hidden="true" />
       <button class="auth-close" id="closeAuthModal" aria-label="Chiudi">✕</button>
 
-      <!-- Vista non loggato (Accedi / Registrati) -->
       <div id="authGuestView">
         <img class="auth-logo-img" id="authLogoImg" alt="Momixapon" />
         <h2 class="auth-title auth-title-guest">Account Momixapon</h2>
@@ -1706,7 +2119,6 @@
         </form>
       </div>
 
-      <!-- Vista richiesta reset password -->
       <div id="authForgotView" style="display:none;">
         <h2 class="auth-title">Recupera password</h2>
         <p class="auth-desc">Inserisci la tua email: ti invieremo un link per impostare una nuova password.</p>
@@ -1718,7 +2130,6 @@
         </form>
       </div>
 
-      <!-- Vista imposta nuova password (dopo click sul link email) -->
       <div id="authResetView" style="display:none;">
         <h2 class="auth-title">Nuova password</h2>
         <p class="auth-desc">Scegli una nuova password di almeno 6 caratteri per il tuo account.</p>
@@ -1729,7 +2140,6 @@
         </form>
       </div>
 
-      <!-- Vista loggato -->
       <div id="authUserView" class="auth-profile-box" style="display:none;">
         <h2 class="auth-title">Profilo attivo</h2>
         <p class="auth-desc">Il tuo inventario e il tuo credito sono sincronizzati automaticamente sul tuo account.</p>
@@ -1799,15 +2209,14 @@
     </div>
 
     <div class="squeeze-ui" id="squeezeUI">
-      <div class="squeeze-bar-bg"><div class="squeeze-bar-fill" id="squeezeFill"></div></div>
-      <button class="btn-open-cap" id="openCapBtn" title="Tieni premuto o Tocca per Aprire">
-        <img
-          src="public/toccaaprire.png"
-          alt="Tieni premuto o Tocca per Aprire"
-          onerror="this.style.display='none';this.nextElementSibling.style.display='inline-flex';"
-        />
-        <span class="btn-primary" style="display:none;">Tieni premuto o Tocca per Aprire</span>
-      </button>
+      <div class="loading-bar-shell" id="squeezeBarShell">
+        <img class="loading-bar-bg-img" id="squeezeBarBgImg" alt="" aria-hidden="true" />
+        <div class="loading-bar-track">
+          <div class="loading-bar-fill" id="squeezeFill">
+            <img class="loading-bar-fill-img" id="squeezeBarFillImg" alt="" aria-hidden="true" />
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -1849,9 +2258,30 @@ let authMode = "login";
 let guestBannerDismissed = false;
 let isRecoveryMode = false;
 
-/* Asset personalizzati per Login & Tasto Accedi */
+/* Badge NEW di sessione (sopravvive al refresh nella stessa scheda, si azzera al logout) */
+const SESSION_NEW_KEY = "momixapon_session_new_keys";
+let sessionNewKeys = new Set();
+try {
+  const savedNew = JSON.parse(sessionStorage.getItem(SESSION_NEW_KEY) || "[]");
+  if (Array.isArray(savedNew)) sessionNewKeys = new Set(savedNew);
+} catch (e) {}
+
+function markSessionNew(prizeKey) {
+  sessionNewKeys.add(prizeKey);
+  try { sessionStorage.setItem(SESSION_NEW_KEY, JSON.stringify([...sessionNewKeys])); } catch (e) {}
+}
+
+function clearSessionNew() {
+  sessionNewKeys.clear();
+  try { sessionStorage.removeItem(SESSION_NEW_KEY); } catch (e) {}
+}
+
+/* Asset personalizzati */
 let hasAccediImg = false;
 let hasProfiloImg = false;
+let hasWizardNextImg = false;
+let hasWizardLoginImg = false;
+let hasWizardStartImg = false;
 
 const MAX_PRIZES_PROBE = 15;
 const CAPSULE_COLORS = ["#18a5d8", "#e85d75", "#e8a825", "#2eb872", "#8c4ce8", "#2d7ff9"];
@@ -1877,6 +2307,151 @@ const MACHINES = [
   { id: 8, prefix: "m9", price: 3, machinePhoto: "public/macchinetta_2.png", posterPhoto: "public/locandina-9.jpg", posterCover: false, activePrizes: [] }
 ];
 
+/* --- Configurazione Tutorial / Wizard --- */
+const WIZARD_STORAGE_KEY = "momixapon_wizard_seen_v1";
+const WIZARD_STEPS = [
+  {
+    gif: "public/wizard-1.gif",
+    emoji: "👛",
+    title: "Estrai il gettone",
+    desc: "Scegli la macchinetta che preferisci, prendi un gettone dal borsellino in basso e trascinalo nella fessura!"
+  },
+  {
+    gif: "public/wizard-2.gif",
+    emoji: "🎡",
+    title: "Gira la manopola",
+    desc: "Ruota la manopola centrale per far scendere la tua capsula, poi tienila premuta per aprirla."
+  },
+  {
+    gif: "public/wizard-3.gif",
+    emoji: "🧸",
+    title: "Colleziona i premi",
+    desc: "Ogni gadget vinto finisce nel tuo inventario personale e resta salvato automaticamente sul tuo account."
+  },
+  {
+    gif: "public/wizard-4.gif",
+    emoji: "✨",
+    title: "Pronto a iniziare?",
+    desc: "Registrati per ricevere €15 di credito di benvenuto e iniziare subito a collezionare, oppure esplora liberamente le macchine!"
+  }
+];
+
+let wizardIndex = 0;
+const wizardModal = document.getElementById("wizardModal");
+const wizardCard = document.getElementById("wizardCard");
+const wizardCardBg = document.getElementById("wizardCardBg");
+const closeWizardBtn = document.getElementById("closeWizardBtn");
+const wizardCloseImg = document.getElementById("wizardCloseImg");
+const wizardGif = document.getElementById("wizardGif");
+const wizardFallback = document.getElementById("wizardFallback");
+const wizardStepPill = document.getElementById("wizardStepPill");
+const wizardTitle = document.getElementById("wizardTitle");
+const wizardDesc = document.getElementById("wizardDesc");
+const wizardDots = document.getElementById("wizardDots");
+const wizardPrevBtn = document.getElementById("wizardPrevBtn");
+const wizardPrevImg = document.getElementById("wizardPrevImg");
+const wizardNextBtn = document.getElementById("wizardNextBtn");
+const wizardNextImg = document.getElementById("wizardNextImg");
+const wizardNextText = document.getElementById("wizardNextText");
+const helpBtn = document.getElementById("helpBtn");
+const helpBtnImg = document.getElementById("helpBtnImg");
+
+function renderWizardStep() {
+  const step = WIZARD_STEPS[wizardIndex];
+  const isFirst = wizardIndex === 0;
+  const isLast = wizardIndex === WIZARD_STEPS.length - 1;
+
+  wizardStepPill.textContent = `${wizardIndex + 1} / ${WIZARD_STEPS.length}`;
+  wizardTitle.textContent = step.title;
+  wizardDesc.textContent = step.desc;
+  wizardFallback.textContent = step.emoji;
+
+  wizardGif.style.display = "block";
+  wizardFallback.style.display = "none";
+  wizardGif.onerror = () => {
+    wizardGif.style.display = "none";
+    wizardFallback.style.display = "block";
+  };
+  wizardGif.src = step.gif;
+
+  wizardDots.innerHTML = "";
+  WIZARD_STEPS.forEach((_, idx) => {
+    const d = document.createElement("button");
+    d.type = "button";
+    d.className = "wizard-dot" + (idx === wizardIndex ? " active" : "");
+    d.setAttribute("aria-label", `Passo ${idx + 1}`);
+    d.onclick = () => { wizardIndex = idx; renderWizardStep(); };
+    wizardDots.appendChild(d);
+  });
+
+  wizardPrevBtn.style.visibility = isFirst ? "hidden" : "visible";
+
+  if (isLast) {
+    if (currentUser) {
+      wizardNextText.textContent = "Inizia a giocare!";
+      if (hasWizardStartImg) {
+        wizardNextImg.src = "public/wizard-inizia.png";
+        wizardNextImg.alt = "Inizia a giocare!";
+        wizardNextBtn.classList.add("has-custom-img");
+      } else {
+        wizardNextBtn.classList.remove("has-custom-img");
+      }
+    } else {
+      wizardNextText.textContent = "Accedi / Registrati";
+      if (hasWizardLoginImg) {
+        wizardNextImg.src = "public/wizard-accedi.png";
+        wizardNextImg.alt = "Accedi / Registrati";
+        wizardNextBtn.classList.add("has-custom-img");
+      } else {
+        wizardNextBtn.classList.remove("has-custom-img");
+      }
+    }
+  } else {
+    wizardNextText.textContent = "Avanti";
+    if (hasWizardNextImg) {
+      wizardNextImg.src = "public/wizard-avanti.png";
+      wizardNextImg.alt = "Avanti";
+      wizardNextBtn.classList.add("has-custom-img");
+    } else {
+      wizardNextBtn.classList.remove("has-custom-img");
+    }
+  }
+}
+
+function openWizard(startIdx = 0) {
+  wizardIndex = startIdx;
+  renderWizardStep();
+  wizardModal.classList.add("open");
+  updateGuestBanner();
+}
+
+function closeWizard() {
+  wizardModal.classList.remove("open");
+  try { localStorage.setItem(WIZARD_STORAGE_KEY, "1"); } catch (e) {}
+  updateGuestBanner();
+}
+
+helpBtn.onclick = () => openWizard(0);
+closeWizardBtn.onclick = closeWizard;
+wizardModal.addEventListener("click", (e) => { if (e.target === wizardModal) closeWizard(); });
+
+wizardPrevBtn.onclick = () => {
+  if (wizardIndex > 0) {
+    wizardIndex--;
+    renderWizardStep();
+  }
+};
+
+wizardNextBtn.onclick = () => {
+  if (wizardIndex < WIZARD_STEPS.length - 1) {
+    wizardIndex++;
+    renderWizardStep();
+  } else {
+    closeWizard();
+    if (!currentUser) openAuthModal();
+  }
+};
+
 function checkImageExists(url) {
   return new Promise((resolve) => {
     const img = new Image();
@@ -1886,18 +2461,58 @@ function checkImageExists(url) {
   });
 }
 
+async function initLoadingBarImages() {
+  const shellEl = document.getElementById("loadingBarShell");
+  const bgImg = document.getElementById("loadingBarBgImg");
+  const fillEl = document.getElementById("loadingBarFill");
+  const fillImg = document.getElementById("loadingBarFillImg");
+
+  const sqShellEl = document.getElementById("squeezeBarShell");
+  const sqBgImg = document.getElementById("squeezeBarBgImg");
+  const sqFillEl = document.getElementById("squeezeFill");
+  const sqFillImg = document.getElementById("squeezeBarFillImg");
+
+  const [bgOk, fillPngOk, fillJpgOk] = await Promise.all([
+    checkImageExists("public/loading-bar-bg.png"),
+    checkImageExists("public/loading-bar-fill.png"),
+    checkImageExists("public/loading-bar-fill.jpg")
+  ]);
+
+  if (bgOk) {
+    bgImg.src = "public/loading-bar-bg.png";
+    shellEl.classList.add("has-bg-img");
+    if (sqBgImg && sqShellEl) {
+      sqBgImg.src = "public/loading-bar-bg.png";
+      sqShellEl.classList.add("has-bg-img");
+    }
+  }
+
+  const fillSrc = fillPngOk ? "public/loading-bar-fill.png" : (fillJpgOk ? "public/loading-bar-fill.jpg" : null);
+  if (fillSrc) {
+    fillImg.src = fillSrc;
+    fillEl.classList.add("has-fill-img");
+    if (sqFillImg && sqFillEl) {
+      sqFillImg.src = fillSrc;
+      sqFillEl.classList.add("has-fill-img");
+    }
+  }
+}
+
 async function initAuthImages() {
   const authCardEl = document.getElementById("authCard");
   const authCardBg = document.getElementById("authCardBg");
   const authLogoImg = document.getElementById("authLogoImg");
   const guestBannerEl = document.getElementById("guestBanner");
   const guestBannerBg = document.getElementById("guestBannerBg");
+  const guestBannerTextImg = document.getElementById("guestBannerTextImg");
   const bannerLoginImg = document.getElementById("bannerLoginImg");
   const bannerExploreImg = document.getElementById("bannerExploreImg");
 
   const [
     accediOk, profiloOk, bgPngOk, bgJpgOk, logoOk,
-    bannerBgPngOk, bannerBgJpgOk, bannerLoginOk, bannerExploreOk
+    bannerBgPngOk, bannerBgJpgOk, bannerTextOk, bannerLoginOk, bannerExploreOk,
+    wizardBgPngOk, helpImgOk,
+    wizardCloseOk, wizardPrevOk, wizardNextOk, wizardLoginOk, wizardStartOk
   ] = await Promise.all([
     checkImageExists("public/accedi.png"),
     checkImageExists("public/profilo.png"),
@@ -1906,12 +2521,23 @@ async function initAuthImages() {
     checkImageExists("public/login-logo.png"),
     checkImageExists("public/banner-bg.png"),
     checkImageExists("public/banner-bg.jpg"),
+    checkImageExists("public/banner-testo.png"),
     checkImageExists("public/banner-login.png"),
-    checkImageExists("public/banner-esplora.png")
+    checkImageExists("public/banner-esplora.png"),
+    checkImageExists("public/wizard-bg.png"),
+    checkImageExists("public/help.png"),
+    checkImageExists("public/wizard-chiudi.png"),
+    checkImageExists("public/wizard-indietro.png"),
+    checkImageExists("public/wizard-avanti.png"),
+    checkImageExists("public/wizard-accedi.png"),
+    checkImageExists("public/wizard-inizia.png")
   ]);
 
   hasAccediImg = accediOk;
   hasProfiloImg = profiloOk;
+  hasWizardNextImg = wizardNextOk;
+  hasWizardLoginImg = wizardLoginOk;
+  hasWizardStartImg = wizardStartOk;
 
   if (bgPngOk) {
     authCardBg.src = "public/login-bg.png";
@@ -1919,6 +2545,29 @@ async function initAuthImages() {
   } else if (bgJpgOk) {
     authCardBg.src = "public/login-bg.jpg";
     authCardEl.classList.add("has-bg-jpg");
+  }
+
+  if (wizardBgPngOk) {
+    wizardCardBg.src = "public/wizard-bg.png";
+    wizardCard.classList.add("has-bg-png");
+  } else if (bgPngOk) {
+    wizardCardBg.src = "public/login-bg.png";
+    wizardCard.classList.add("has-bg-png");
+  }
+
+  if (wizardCloseOk) {
+    wizardCloseImg.src = "public/wizard-chiudi.png";
+    closeWizardBtn.classList.add("has-custom-img");
+  }
+
+  if (wizardPrevOk) {
+    wizardPrevImg.src = "public/wizard-indietro.png";
+    wizardPrevBtn.classList.add("has-custom-img");
+  }
+
+  if (helpImgOk) {
+    helpBtnImg.src = "public/help.png";
+    helpBtn.classList.add("has-custom-img");
   }
 
   if (logoOk) {
@@ -1932,6 +2581,11 @@ async function initAuthImages() {
   } else if (bannerBgJpgOk) {
     guestBannerBg.src = "public/banner-bg.jpg";
     guestBannerEl.classList.add("has-bg-jpg");
+  }
+
+  if (bannerTextOk) {
+    guestBannerTextImg.src = "public/banner-testo.png";
+    guestBannerEl.classList.add("has-text-img");
   }
 
   if (bannerLoginOk) {
@@ -2162,7 +2816,7 @@ async function loadCloudData(user) {
 }
 
 function addToInventory(prize) {
-  if (!currentUser || !sb) return;
+  if (!currentUser || !sb || !prize) return;
   const now = Date.now();
   let target = inventory.find((item) => item.key === prize.key);
   if (target) {
@@ -2172,6 +2826,7 @@ function addToInventory(prize) {
     target = { key: prize.key, photo: prize.photo, qty: 1, lastWon: now };
     inventory.unshift(target);
   }
+  markSessionNew(prize.key);
   inventory.sort((a, b) => b.lastWon - a.lastWon);
   syncItemToCloud(target);
   updateInventoryUI();
@@ -2234,7 +2889,9 @@ function updateInventoryUI() {
   inventory.forEach((item) => {
     const tile = document.createElement("div");
     tile.className = "inv-tile";
+    const newBadgeHtml = sessionNewKeys.has(item.key) ? `<span class="inv-new-badge">NEW</span>` : "";
     tile.innerHTML = `
+      ${newBadgeHtml}
       <img src="${item.photo}" alt="Premio" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" />
       <span class="inv-tile-emoji" style="display:none;">🎁</span>
       <span class="inv-qty">x${item.qty}</span>
@@ -2254,6 +2911,7 @@ clearInvBtn.onclick = async () => {
   if (!currentUser || !sb || inventory.length === 0) return;
   if (confirm("Vuoi svuotare tutto l'inventario del tuo account?")) {
     inventory = [];
+    clearSessionNew();
     await sb.from("inventory").delete().eq("user_id", currentUser.id);
     updateInventoryUI();
   }
@@ -2265,7 +2923,8 @@ const bannerLoginBtn = document.getElementById("bannerLoginBtn");
 const bannerExploreBtn = document.getElementById("bannerExploreBtn");
 
 function updateGuestBanner() {
-  const shouldShow = !currentUser && !guestBannerDismissed;
+  const wizardOpen = wizardModal.classList.contains("open");
+  const shouldShow = !currentUser && !guestBannerDismissed && !wizardOpen;
   guestBanner.classList.toggle("visible", shouldShow);
 }
 
@@ -2512,6 +3171,7 @@ document.getElementById("logoutBtn").onclick = async () => {
   guestBannerDismissed = false;
   credit = 0;
   inventory = [];
+  clearSessionNew();
   updateAuthUI();
   closeAuthModal();
 };
@@ -2545,6 +3205,7 @@ async function initAuth() {
       guestBannerDismissed = false;
       credit = 0;
       inventory = [];
+      clearSessionNew();
       updateAuthUI();
     }
   });
@@ -2840,7 +3501,7 @@ function updateActiveUI() {
   updateCreditUI(false);
 }
 
-/* --- Inserimento, Sgancio Moneta & Manopola (Solo utenti loggati) --- */
+/* --- Inserimento, Sgancio Moneta & Manopola --- */
 function insertCoin(idx) {
   if (phase !== "idle" || idx !== activeIndex) return;
   if (!currentUser) {
@@ -3026,7 +3687,8 @@ const seamStress = document.getElementById("seamStress");
 const goldGlow = document.getElementById("goldGlow");
 const squeezeFill = document.getElementById("squeezeFill");
 const squeezeUI = document.getElementById("squeezeUI");
-const openCapBtn = document.getElementById("openCapBtn");
+
+let squeezeProgress = 0, holding = false, squeezeRaf = null, lastTime = 0, lastCreakStep = 0;
 
 function pickRandomPrize(machineIdx) {
   const pool = MACHINES[machineIdx].activePrizes;
@@ -3039,7 +3701,13 @@ function pickRandomPrize(machineIdx) {
 
 function startCapsuleDrop(idx) {
   phase = "dropping";
+  squeezeProgress = 0;
+  holding = false;
+  lastCreakStep = 0;
+
+  /* Estrae e salva subito il premio: anche in caso di refresh/crash è già nell'inventario */
   currentPrize = pickRandomPrize(idx);
+  addToInventory(currentPrize);
 
   if (availableCapsules.length > 0) {
     const capUrl = availableCapsules[Math.floor(Math.random() * availableCapsules.length)];
@@ -3058,7 +3726,7 @@ function startCapsuleDrop(idx) {
   capBottom.style.opacity = "1";
   seamStress.style.opacity = "0";
   goldGlow.style.opacity = "0";
-  squeezeFill.style.transform = "scaleX(0)";
+  squeezeFill.style.clipPath = "inset(0 100% 0 0)";
   squeezeUI.style.opacity = "0";
 
   capsuleOverlay.classList.add("active");
@@ -3085,7 +3753,7 @@ function startCapsuleDrop(idx) {
   };
 }
 
-let squeezeProgress = 0, holding = false, autoSqueeze = false, squeezeRaf = null, lastTime = 0, lastCreakStep = 0;
+const stopHolding = () => { holding = false; };
 
 capsuleWrap.addEventListener("touchstart", (e) => { if (phase === "squeeze") e.preventDefault(); }, { passive: false });
 capsuleOverlay.addEventListener("contextmenu", (e) => e.preventDefault());
@@ -3094,22 +3762,21 @@ capsuleWrap.addEventListener("pointerdown", (e) => {
   if (phase !== "squeeze") return;
   e.preventDefault();
   holding = true;
+  try { capsuleWrap.setPointerCapture(e.pointerId); } catch (_) {}
   if (!squeezeRaf) { lastTime = performance.now(); squeezeRaf = requestAnimationFrame(tickSqueeze); }
 });
-window.addEventListener("pointerup", () => { holding = false; });
-openCapBtn.addEventListener("click", () => {
-  if (phase !== "squeeze") return;
-  autoSqueeze = true;
-  if (!squeezeRaf) { lastTime = performance.now(); squeezeRaf = requestAnimationFrame(tickSqueeze); }
-});
+
+window.addEventListener("pointerup", stopHolding);
+window.addEventListener("pointercancel", stopHolding);
+window.addEventListener("blur", stopHolding);
 
 function tickSqueeze(now) {
   if (phase !== "squeeze") { squeezeRaf = null; return; }
   const dt = Math.min(0.05, (now - lastTime) / 1000);
   lastTime = now;
 
-  if (holding || autoSqueeze) {
-    squeezeProgress = Math.min(100, squeezeProgress + (autoSqueeze ? 46 : 62) * dt);
+  if (holding) {
+    squeezeProgress = Math.min(100, squeezeProgress + 62 * dt);
     const creakStep = Math.floor(squeezeProgress / 16);
     if (creakStep > lastCreakStep) { lastCreakStep = creakStep; playTone(190 + squeezeProgress * 3.5, 0.055, "sawtooth", 0.04); }
   } else {
@@ -3118,7 +3785,7 @@ function tickSqueeze(now) {
   }
 
   const p = squeezeProgress / 100;
-  squeezeFill.style.transform = `scaleX(${p})`;
+  squeezeFill.style.clipPath = `inset(0 ${100 - squeezeProgress}% 0 0)`;
   const amp = p > 0.38 ? (p - 0.38) * 11 : 0;
   const shakeX = amp ? Math.sin(now * 0.075) * amp : 0;
   const shakeY = amp ? Math.cos(now * 0.092) * amp * 0.7 : 0;
@@ -3128,12 +3795,12 @@ function tickSqueeze(now) {
   goldGlow.style.transform = `scale(${0.85 + p * 0.5})`;
 
   if (squeezeProgress >= 100) {
-    squeezeRaf = null; autoSqueeze = false; holding = false; lastCreakStep = 0;
+    squeezeRaf = null; holding = false; lastCreakStep = 0;
     triggerExplosionAndReveal();
     return;
   }
 
-  if (holding || autoSqueeze || squeezeProgress > 0) squeezeRaf = requestAnimationFrame(tickSqueeze);
+  if (holding || squeezeProgress > 0) squeezeRaf = requestAnimationFrame(tickSqueeze);
   else squeezeRaf = null;
 }
 
@@ -3159,7 +3826,6 @@ function triggerExplosionAndReveal() {
     flash.style.opacity = "1";
     setTimeout(() => {
       capsuleOverlay.classList.remove("active");
-      addToInventory(currentPrize);
       showRevealScreen();
       flash.style.opacity = "0";
     }, 420);
@@ -3278,17 +3944,28 @@ document.getElementById("openInvFromReveal").addEventListener("click", () => {
   openInventory();
 });
 
-/* --- Avvio & Precaricamento --- */
+/* --- Avvio & Precaricamento reale con Progress Bar --- */
 async function bootApp() {
+  const fillEl = document.getElementById("loadingBarFill");
+  const setProgress = (pct) => {
+    const clamped = Math.max(0, Math.min(100, pct));
+    if (fillEl) fillEl.style.clipPath = `inset(0 ${100 - clamped}% 0 0)`;
+  };
+
+  await initLoadingBarImages();
+  setProgress(6);
+
   updateAuthUI();
   renderCorridor();
 
   const coreAssets = [
+    "public/logo.png",
     "public/background.jpg",
     "public/macchinetta_2.png",
     "public/badge3.png",
     "public/nuvola.png",
     "public/sidebar.png",
+    "public/inventario.png",
     "public/borsellino.png",
     "public/mute.png",
     "public/random.png",
@@ -3296,25 +3973,44 @@ async function bootApp() {
     "public/muovidx.png",
     "public/zoom.png",
     "public/continua.png",
-    "public/toccaaprire.png",
     ...MACHINES.map((m) => m.posterPhoto)
   ];
 
-  const loadTasks = Promise.all([
+  const tasks = [
     initAuthImages(),
-    initAuth(),
+    Promise.race([initAuth(), new Promise((resolve) => setTimeout(resolve, 6000))]),
     initCoinImage(),
     detectCapsules(),
     detectAllPrizes(),
     ...coreAssets.map((url) => checkImageExists(url))
-  ]);
+  ];
 
-  const safetyTimeout = new Promise((resolve) => setTimeout(resolve, 3500));
-  await Promise.race([loadTasks, safetyTimeout]);
+  let completed = 0;
+  const total = tasks.length;
 
+  await Promise.all(
+    tasks.map((p) =>
+      Promise.resolve(p).finally(() => {
+        completed++;
+        const pct = 6 + Math.round((completed / total) * 94);
+        setProgress(pct);
+      })
+    )
+  );
+
+  setProgress(100);
   centerMachine(activeIndex, false);
+
+  await new Promise((resolve) => setTimeout(resolve, 280));
+
   const loader = document.getElementById("loadingScreen");
   if (loader) loader.classList.add("hidden");
+
+  let wizardSeen = false;
+  try { wizardSeen = Boolean(localStorage.getItem(WIZARD_STORAGE_KEY)); } catch (e) {}
+  if (!currentUser && !wizardSeen && !isRecoveryMode) {
+    setTimeout(() => openWizard(0), 250);
+  }
 }
 
 bootApp();
