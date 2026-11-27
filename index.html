@@ -2132,6 +2132,143 @@
       bottom: 0;
     }
   }
+
+/* --- Pulsante e Pannello Admin --- */
+  .admin-icon-btn {
+    border: 2.5px solid #ffd54f;
+    background: linear-gradient(135deg, #1e364a, #2c5270);
+    color: #fff;
+    width: clamp(44px, 6.2vh, 56px);
+    height: clamp(44px, 6.2vh, 56px);
+    border-radius: 50%;
+    font-size: 20px;
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 6px 14px rgba(20, 42, 66, 0.34);
+    transition: transform 0.15s ease;
+  }
+  .admin-icon-btn:active { transform: scale(0.9); }
+
+  .admin-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 120;
+    background: rgba(15, 22, 32, 0.65);
+    backdrop-filter: blur(6px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 14px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+  }
+  .admin-modal.open { opacity: 1; pointer-events: auto; }
+
+  .admin-card {
+    width: min(96vw, 760px);
+    max-height: 90dvh;
+    background: #f5f9fc;
+    border: 2px solid #fff;
+    border-radius: 22px;
+    box-shadow: 0 24px 60px rgba(15, 30, 48, 0.36);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .admin-header {
+    padding: 14px 18px;
+    background: #1e364a;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .admin-header h2 { margin: 0; font-size: 17px; font-weight: 900; }
+  .admin-tabs {
+    display: flex;
+    gap: 6px;
+    padding: 10px 16px;
+    background: #e6f0f8;
+    border-bottom: 1px solid rgba(30, 54, 74, 0.12);
+  }
+  .admin-tab {
+    border: none;
+    background: transparent;
+    color: #36526a;
+    padding: 8px 14px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 800;
+    cursor: pointer;
+  }
+  .admin-tab.active { background: #fff; color: #1a3347; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+  .admin-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .admin-box {
+    background: #fff;
+    border: 1px solid rgba(30, 54, 74, 0.12);
+    border-radius: 16px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .admin-box h3 { margin: 0; font-size: 14px; font-weight: 900; color: #1a3347; }
+  .admin-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  @media (max-width: 560px) { .admin-grid-2 { grid-template-columns: 1fr; } }
+
+  .admin-input, .admin-select {
+    width: 100%;
+    padding: 9px 11px;
+    border-radius: 10px;
+    border: 1.5px solid rgba(110, 150, 185, 0.35);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+    background: #fff;
+  }
+  .admin-btn {
+    border: none;
+    background: linear-gradient(135deg, #4da3e0, #2c7ec2);
+    color: #fff;
+    padding: 9px 14px;
+    border-radius: 10px;
+    font-size: 12.5px;
+    font-weight: 800;
+    cursor: pointer;
+  }
+  .admin-btn.sec { background: #e8f1f8; color: #1e364a; }
+  .admin-btn.danger { background: #fdecec; color: var(--accent); }
+  .admin-btn:disabled { opacity: 0.6; cursor: wait; }
+
+  .admin-list { display: flex; flex-direction: column; gap: 8px; }
+  .admin-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px;
+    border-radius: 12px;
+    background: #f8fbfd;
+    border: 1px solid rgba(30, 54, 74, 0.1);
+    flex-wrap: wrap;
+  }
+  .admin-row-info { display: flex; align-items: center; gap: 10px; min-width: 180px; flex: 1; }
+  .admin-thumb { width: 42px; height: 42px; object-fit: contain; border-radius: 8px; background: #fff; border: 1px solid rgba(0,0,0,0.08); }
+  .admin-row-actions { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .admin-msg { font-size: 12px; font-weight: 800; color: #1b8a4e; min-height: 16px; }
+  .admin-msg.err { color: var(--accent); }
+
 </style>
 </head>
 <body>
@@ -2208,6 +2345,7 @@
       </button>
       <button class="help-icon-btn" id="helpBtn" title="Come funziona">
         <img id="helpBtnImg" alt="Guida" />
+        <button class="admin-icon-btn" id="adminBtn" title="Pannello Admin">⚙️</button>
         <span>?</span>
       </button>
     </div>
@@ -2500,7 +2638,84 @@
       </div>
     </div>
   </section>
+<!-- Modale Pannello Admin -->
+  <div class="admin-modal" id="adminModal" role="dialog" aria-modal="true" aria-label="Pannello Admin">
+    <div class="admin-card">
+      <div class="admin-header">
+        <h2>⚙️ Pannello Admin Momipon</h2>
+        <button type="button" class="btn-pill" id="closeAdminBtn">✕</button>
+      </div>
+      <div class="admin-tabs">
+        <button type="button" class="admin-tab active" id="adminTabMachines">Macchinette</button>
+        <button type="button" class="admin-tab" id="adminTabPrizes">Sorpresine &amp; Stock</button>
+      </div>
+      <div class="admin-body">
+        <div class="admin-msg" id="adminMsg"></div>
 
+        <!-- TAB MACCHINETTE -->
+        <div id="adminMachinesView" style="display:flex;flex-direction:column;gap:12px;">
+          <div class="admin-box">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+              <h3>Nuova Macchinetta</h3>
+              <button type="button" class="admin-btn sec" id="importDefaultsBtn">📥 Importa le 9 macchine attuali nel DB</button>
+            </div>
+            <form id="adminMachineForm" style="display:flex;flex-direction:column;gap:8px;">
+              <div class="admin-grid-2">
+                <input class="admin-input" id="admSlug" placeholder="Codice serie (es. m10)" required />
+                <input class="admin-input" id="admTitle" placeholder="Titolo macchinetta" required />
+              </div>
+              <div class="admin-grid-2">
+                <input class="admin-input" id="admPrice" type="number" min="0" value="3" placeholder="Prezzo €" required />
+                <input class="admin-input" id="admOrder" type="number" value="10" placeholder="Ordine (es. 10)" required />
+              </div>
+              <div class="admin-grid-2">
+                <label style="font-size:11px;font-weight:700;">Foto Macchinetta (opzionale, default macchinetta_2.png)
+                  <input class="admin-input" id="admMachineFile" type="file" accept="image/*" />
+                </label>
+                <label style="font-size:11px;font-weight:700;">Foto Locandina (obbligatoria)
+                  <input class="admin-input" id="admPosterFile" type="file" accept="image/*" required />
+                </label>
+              </div>
+              <button type="submit" class="admin-btn" id="admSaveMachineBtn">+ Aggiungi Macchinetta</button>
+            </form>
+          </div>
+
+          <div class="admin-box">
+            <h3>Macchinette nel Database</h3>
+            <div class="admin-list" id="adminMachinesList"></div>
+          </div>
+        </div>
+
+        <!-- TAB SORPRESINE & STOCK -->
+        <div id="adminPrizesView" style="display:none;flex-direction:column;gap:12px;">
+          <div class="admin-box">
+            <h3>Seleziona Macchinetta</h3>
+            <select class="admin-select" id="admPrizeMachineSelect"></select>
+          </div>
+
+          <div class="admin-box">
+            <h3>Aggiungi Sorpresina</h3>
+            <form id="adminPrizeForm" style="display:flex;flex-direction:column;gap:8px;">
+              <div class="admin-grid-2">
+                <input class="admin-input" id="admPrizeKey" placeholder="Chiave univoca (es. m1-7)" required />
+                <input class="admin-input" id="admPrizeName" placeholder="Nome sorpresina" required />
+              </div>
+              <div class="admin-grid-2">
+                <input class="admin-input" id="admPrizeStock" type="number" min="0" value="10" placeholder="Stock iniziale" required />
+                <input class="admin-input" id="admPrizeFile" type="file" accept="image/*" required />
+              </div>
+              <button type="submit" class="admin-btn" id="admSavePrizeBtn">+ Aggiungi Sorpresina</button>
+            </form>
+          </div>
+
+          <div class="admin-box">
+            <h3>Sorpresine e Stock</h3>
+            <div class="admin-list" id="adminPrizesList"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 <script>
 /* --- Configurazione Supabase --- */
 const SUPABASE_URL = "https://wsppmilxgbyrtojaiten.supabase.co";
@@ -2551,7 +2766,7 @@ const CAPSULE_IMAGES = [
 ];
 let availableCapsules = [];
 
-const MACHINES = [
+let MACHINES = [
   { id: 0, prefix: "m1", price: 3, machinePhoto: "public/macchinetta_2.png", posterPhoto: "public/locandina-1.jpg", posterCover: false, activePrizes: [] },
   { id: 1, prefix: "m2", price: 3, machinePhoto: "public/macchinetta_2.png", posterPhoto: "public/locandina-2.jpg", posterCover: false, activePrizes: [] },
   { id: 2, prefix: "m3", price: 3, machinePhoto: "public/macchinetta_2.png", posterPhoto: "public/locandina-3.jpg", posterCover: false, activePrizes: [] },
@@ -4507,6 +4722,333 @@ async function bootApp() {
     setTimeout(() => openWizard(0), 250);
   }
 }
+
+/* --- Catalogo Dinamico + Pannello Admin (Step 2) --- */
+let isAdmin = false;
+let dbCatalogActive = false;
+let adminMachinesCache = [];
+
+const adminBtn = document.getElementById("adminBtn");
+const adminModal = document.getElementById("adminModal");
+const closeAdminBtn = document.getElementById("closeAdminBtn");
+const adminMsg = document.getElementById("adminMsg");
+const adminTabMachines = document.getElementById("adminTabMachines");
+const adminTabPrizes = document.getElementById("adminTabPrizes");
+const adminMachinesView = document.getElementById("adminMachinesView");
+const adminPrizesView = document.getElementById("adminPrizesView");
+const adminMachinesList = document.getElementById("adminMachinesList");
+const admPrizeMachineSelect = document.getElementById("admPrizeMachineSelect");
+const adminPrizesList = document.getElementById("adminPrizesList");
+
+function setAdminMsg(text, isErr = false) {
+  adminMsg.textContent = text;
+  adminMsg.classList.toggle("err", isErr);
+}
+
+async function checkAdminStatus() {
+  isAdmin = false;
+  if (sb && currentUser) {
+    try {
+      const { data, error } = await sb.rpc("is_admin");
+      if (!error && data === true) isAdmin = true;
+    } catch (e) {}
+  }
+  adminBtn.style.display = isAdmin ? "inline-flex" : "none";
+}
+
+async function loadCatalogFromDB() {
+  if (!sb) return false;
+  try {
+    const { data: mRows, error: mErr } = await sb
+      .from("machines")
+      .select("*")
+      .eq("is_active", true)
+      .order("sort_order", { ascending: true });
+
+    if (mErr || !mRows || mRows.length === 0) return false;
+
+    const { data: pRows } = await sb
+      .from("prizes")
+      .select("*")
+      .eq("is_active", true)
+      .order("prize_key", { ascending: true });
+
+    const prizesByMachine = {};
+    (pRows || []).forEach((p) => {
+      if (!prizesByMachine[p.machine_id]) prizesByMachine[p.machine_id] = [];
+      prizesByMachine[p.machine_id].push(p);
+    });
+
+    MACHINES = mRows.map((m, idx) => ({
+      id: idx,
+      dbId: m.id,
+      prefix: m.slug,
+      title: m.title,
+      price: m.price,
+      machinePhoto: m.machine_photo_url,
+      posterPhoto: m.poster_photo_url,
+      posterCover: false,
+      activePrizes: (prizesByMachine[m.id] || []).map((p, i) => ({
+        dbId: p.id,
+        key: p.prize_key,
+        name: p.name,
+        stock: p.stock_qty,
+        color: CAPSULE_COLORS[i % CAPSULE_COLORS.length],
+        photo: p.photo_url
+      }))
+    }));
+
+    dbCatalogActive = true;
+    if (activeIndex >= MACHINES.length) activeIndex = Math.max(0, MACHINES.length - 1);
+    renderCorridor();
+    return true;
+  } catch (err) {
+    console.error("Errore caricamento catalogo DB:", err);
+    return false;
+  }
+}
+
+async function uploadAssetFile(file, folder) {
+  const cleanName = file.name.toLowerCase().replace(/[^a-z0-9._-]/g, "-");
+  const path = `${folder}/${Date.now()}-${cleanName}`;
+  const { error } = await sb.storage.from("momipon-assets").upload(path, file, { upsert: true });
+  if (error) throw error;
+  const { data } = sb.storage.from("momipon-assets").getPublicUrl(path);
+  return data.publicUrl;
+}
+
+async function loadAdminMachines() {
+  const { data, error } = await sb.from("machines").select("*").order("sort_order", { ascending: true });
+  if (error) { setAdminMsg(error.message, true); return; }
+  adminMachinesCache = data || [];
+
+  adminMachinesList.innerHTML = adminMachinesCache.length === 0
+    ? `<div style="font-size:12px;color:#556;">Nessuna macchinetta nel database. Usa "Importa le 9 macchine attuali" qui sopra!</div>`
+    : "";
+
+  adminMachinesCache.forEach((m) => {
+    const row = document.createElement("div");
+    row.className = "admin-row";
+    row.innerHTML = `
+      <div class="admin-row-info">
+        <img class="admin-thumb" src="${m.poster_photo_url}" alt="" />
+        <div>
+          <div style="font-size:13px;font-weight:800;">${m.title} (${m.slug})</div>
+          <div style="font-size:11px;color:#4b677f;">€${m.price} · Ordine ${m.sort_order} · ${m.is_active ? "Attiva" : "Nascosta"}</div>
+        </div>
+      </div>
+      <div class="admin-row-actions">
+        <button type="button" class="admin-btn sec" data-toggle="${m.id}">${m.is_active ? "Nascondi" : "Attiva"}</button>
+        <button type="button" class="admin-btn danger" data-del="${m.id}">Elimina</button>
+      </div>
+    `;
+    row.querySelector("[data-toggle]").onclick = async () => {
+      await sb.from("machines").update({ is_active: !m.is_active }).eq("id", m.id);
+      await loadAdminMachines();
+      await loadCatalogFromDB();
+    };
+    row.querySelector("[data-del]").onclick = async () => {
+      if (!confirm(`Eliminare la macchinetta "${m.title}" e tutte le sue sorpresine?`)) return;
+      await sb.from("machines").delete().eq("id", m.id);
+      await loadAdminMachines();
+      await loadCatalogFromDB();
+    };
+    adminMachinesList.appendChild(row);
+  });
+
+  admPrizeMachineSelect.innerHTML = adminMachinesCache
+    .map((m) => `<option value="${m.id}">${m.title} (${m.slug})</option>`)
+    .join("");
+  if (adminMachinesCache.length > 0) loadAdminPrizes();
+}
+
+async function loadAdminPrizes() {
+  const machineId = admPrizeMachineSelect.value;
+  if (!machineId) { adminPrizesList.innerHTML = ""; return; }
+  const { data, error } = await sb
+    .from("prizes")
+    .select("*")
+    .eq("machine_id", machineId)
+    .order("prize_key", { ascending: true });
+
+  if (error) { setAdminMsg(error.message, true); return; }
+  const rows = data || [];
+  adminPrizesList.innerHTML = rows.length === 0
+    ? `<div style="font-size:12px;color:#556;">Nessuna sorpresina per questa macchinetta.</div>`
+    : "";
+
+  rows.forEach((p) => {
+    const row = document.createElement("div");
+    row.className = "admin-row";
+    row.innerHTML = `
+      <div class="admin-row-info">
+        <img class="admin-thumb" src="${p.photo_url}" alt="" />
+        <div>
+          <div style="font-size:13px;font-weight:800;">${p.name} (${p.prize_key})</div>
+          <div style="font-size:11px;color:#4b677f;">Stock: <b>${p.stock_qty}</b></div>
+        </div>
+      </div>
+      <div class="admin-row-actions">
+        <input type="number" min="0" value="${p.stock_qty}" class="admin-input" style="width:72px;padding:6px 8px;" />
+        <button type="button" class="admin-btn sec">Salva stock</button>
+        <button type="button" class="admin-btn danger">Elimina</button>
+      </div>
+    `;
+    const stockInput = row.querySelector("input");
+    const [saveBtn, delBtn] = row.querySelectorAll("button");
+    saveBtn.onclick = async () => {
+      const val = Math.max(0, parseInt(stockInput.value, 10) || 0);
+      await sb.from("prizes").update({ stock_qty: val }).eq("id", p.id);
+      setAdminMsg(`Stock aggiornato per ${p.prize_key}: ${val}`);
+      await loadAdminPrizes();
+      await loadCatalogFromDB();
+    };
+    delBtn.onclick = async () => {
+      if (!confirm(`Eliminare la sorpresina "${p.name}"?`)) return;
+      await sb.from("prizes").delete().eq("id", p.id);
+      await loadAdminPrizes();
+      await loadCatalogFromDB();
+    };
+    adminPrizesList.appendChild(row);
+  });
+}
+
+document.getElementById("importDefaultsBtn").onclick = async () => {
+  if (!confirm("Importare le 9 macchinette e le sorpresine attuali nel database Supabase?")) return;
+  setAdminMsg("Importazione in corso...");
+  try {
+    for (let i = 0; i < MACHINES.length; i++) {
+      const m = MACHINES[i];
+      const { data: insM, error: mErr } = await sb
+        .from("machines")
+        .upsert({
+          slug: m.prefix,
+          title: `Macchinetta ${i + 1}`,
+          price: m.price,
+          sort_order: i + 1,
+          is_active: true,
+          machine_photo_url: m.machinePhoto,
+          poster_photo_url: m.posterPhoto
+        }, { onConflict: "slug" })
+        .select()
+        .single();
+      if (mErr) throw mErr;
+
+      for (const p of (m.activePrizes || [])) {
+        await sb.from("prizes").upsert({
+          machine_id: insM.id,
+          prize_key: p.key,
+          name: `Sorpresa ${p.key}`,
+          photo_url: p.photo,
+          stock_qty: 10,
+          is_active: true
+        }, { onConflict: "prize_key" });
+      }
+    }
+    setAdminMsg("Importazione completata!");
+    await loadAdminMachines();
+    await loadCatalogFromDB();
+  } catch (err) {
+    setAdminMsg("Errore importazione: " + err.message, true);
+  }
+};
+
+document.getElementById("adminMachineForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const btn = document.getElementById("admSaveMachineBtn");
+  btn.disabled = true;
+  setAdminMsg("Salvataggio macchinetta...");
+  try {
+    const slug = document.getElementById("admSlug").value.trim().toLowerCase();
+    const title = document.getElementById("admTitle").value.trim();
+    const price = parseInt(document.getElementById("admPrice").value, 10) || 3;
+    const sort_order = parseInt(document.getElementById("admOrder").value, 10) || 0;
+    const mFile = document.getElementById("admMachineFile").files[0];
+    const pFile = document.getElementById("admPosterFile").files[0];
+
+    const machine_photo_url = mFile ? await uploadAssetFile(mFile, "machines") : "public/macchinetta_2.png";
+    const poster_photo_url = await uploadAssetFile(pFile, "posters");
+
+    const { error } = await sb.from("machines").insert({
+      slug, title, price, sort_order, is_active: true, machine_photo_url, poster_photo_url
+    });
+    if (error) throw error;
+
+    e.target.reset();
+    setAdminMsg("Macchinetta aggiunta!");
+    await loadAdminMachines();
+    await loadCatalogFromDB();
+  } catch (err) {
+    setAdminMsg("Errore: " + err.message, true);
+  } finally {
+    btn.disabled = false;
+  }
+});
+
+document.getElementById("adminPrizeForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const btn = document.getElementById("admSavePrizeBtn");
+  btn.disabled = true;
+  setAdminMsg("Caricamento sorpresina...");
+  try {
+    const machine_id = admPrizeMachineSelect.value;
+    const prize_key = document.getElementById("admPrizeKey").value.trim().toLowerCase();
+    const name = document.getElementById("admPrizeName").value.trim();
+    const stock_qty = Math.max(0, parseInt(document.getElementById("admPrizeStock").value, 10) || 0);
+    const file = document.getElementById("admPrizeFile").files[0];
+    const photo_url = await uploadAssetFile(file, "prizes");
+
+    const { error } = await sb.from("prizes").insert({
+      machine_id, prize_key, name, photo_url, stock_qty, is_active: true
+    });
+    if (error) throw error;
+
+    e.target.reset();
+    setAdminMsg("Sorpresina aggiunta!");
+    await loadAdminPrizes();
+    await loadCatalogFromDB();
+  } catch (err) {
+    setAdminMsg("Errore: " + err.message, true);
+  } finally {
+    btn.disabled = false;
+  }
+});
+
+adminTabMachines.onclick = () => {
+  adminTabMachines.classList.add("active");
+  adminTabPrizes.classList.remove("active");
+  adminMachinesView.style.display = "flex";
+  adminPrizesView.style.display = "none";
+};
+adminTabPrizes.onclick = () => {
+  adminTabPrizes.classList.add("active");
+  adminTabMachines.classList.remove("active");
+  adminMachinesView.style.display = "none";
+  adminPrizesView.style.display = "flex";
+  loadAdminPrizes();
+};
+admPrizeMachineSelect.onchange = loadAdminPrizes;
+
+adminBtn.onclick = async () => {
+  setAdminMsg("");
+  adminModal.classList.add("open");
+  await loadAdminMachines();
+};
+closeAdminBtn.onclick = () => adminModal.classList.remove("open");
+adminModal.addEventListener("click", (e) => { if (e.target === adminModal) adminModal.classList.remove("open"); });
+
+/* Hook automatico su auth e avvio */
+const _origUpdateAuthUI = updateAuthUI;
+updateAuthUI = function() {
+  _origUpdateAuthUI();
+  checkAdminStatus();
+};
+
+const _origBootApp = bootApp;
+bootApp = async function() {
+  await loadCatalogFromDB();
+  await _origBootApp();
+};
 
 bootApp();
 </script>
