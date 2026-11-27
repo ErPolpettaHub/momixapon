@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<title>Momixapon</title>
+<title>Momipon</title>
 <link rel="icon" href="/public/favicon.png?v=3" />
 <link rel="shortcut icon" href="/public/favicon.png?v=3" />
 <link rel="apple-touch-icon" href="/public/favicon.png?v=3" />
@@ -826,6 +826,124 @@
     color: #3d2600;
     border-color: rgba(244, 169, 0, 0.5);
     box-shadow: 0 3px 10px rgba(244, 169, 0, 0.4);
+  }
+
+  /* --- Mascotte Cagnolino (Momipon Pet) --- */
+  .pet-dog {
+    position: fixed;
+    left: 0;
+    bottom: 2px;
+    z-index: 32;
+    width: clamp(54px, 7.5vw, 72px);
+    height: clamp(54px, 7.5vw, 72px);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    will-change: transform;
+  }
+  .pet-dog.is-ready {
+    opacity: 1;
+  }
+  .pet-dog-dir {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transform: scaleX(1);
+    transition: transform 0.22s ease;
+  }
+  .pet-dog.facing-left .pet-dog-dir {
+    transform: scaleX(-1);
+  }
+  .pet-dog-body {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transform-origin: bottom center;
+    will-change: transform;
+  }
+  .pet-dog-sprite {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: bottom center;
+    opacity: 0;
+    transition: opacity 0.16s ease;
+    filter: drop-shadow(0 5px 8px rgba(30, 48, 68, 0.28));
+    pointer-events: none;
+  }
+  .pet-dog[data-state="walk"] .sprite-walk,
+  .pet-dog[data-state="sit"] .sprite-sit,
+  .pet-dog[data-state="sleep"] .sprite-sleep {
+    opacity: 1;
+  }
+
+  .pet-dog[data-state="walk"] .pet-dog-body {
+    animation: dogWalkBounce 0.56s ease-in-out infinite;
+  }
+  .pet-dog[data-state="sit"] .pet-dog-body {
+    animation: dogBreathe 2.8s ease-in-out infinite;
+  }
+  .pet-dog[data-state="sleep"] .pet-dog-body {
+    animation: dogSleepBreathe 3.6s ease-in-out infinite;
+  }
+  .pet-dog.is-squishing .pet-dog-body {
+    animation: dogSquish 0.24s cubic-bezier(0.22, 1.25, 0.36, 1);
+  }
+
+  @keyframes dogWalkBounce {
+    0%, 100% { transform: translateY(0) rotate(-3deg) scale(1.03, 0.97); }
+    50% { transform: translateY(-6px) rotate(3deg) scale(0.97, 1.04); }
+  }
+  @keyframes dogBreathe {
+    0%, 100% { transform: scale(1, 1); }
+    50% { transform: scale(1.02, 0.97); }
+  }
+  @keyframes dogSleepBreathe {
+    0%, 100% { transform: scale(1, 1); }
+    50% { transform: scale(1.04, 0.95); }
+  }
+  @keyframes dogSquish {
+    0% { transform: scale(1, 1); }
+    45% { transform: scale(1.12, 0.88); }
+    100% { transform: scale(1, 1); }
+  }
+
+  .pet-zzz {
+    position: absolute;
+    top: -10px;
+    right: 4px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  .pet-dog[data-state="sleep"] .pet-zzz {
+    opacity: 1;
+  }
+  .pet-zzz span {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    font-size: 11px;
+    font-weight: 900;
+    color: #2c6ca8;
+    text-shadow: 0 1px 4px rgba(255, 255, 255, 0.95);
+    opacity: 0;
+    animation: floatZzz 2.6s ease-out infinite;
+  }
+  .pet-zzz span:nth-child(2) {
+    font-size: 13px;
+    animation-delay: 0.85s;
+  }
+  .pet-zzz span:nth-child(3) {
+    font-size: 15px;
+    animation-delay: 1.7s;
+  }
+  @keyframes floatZzz {
+    0% { transform: translate(0, 0) scale(0.7); opacity: 0; }
+    20% { opacity: 0.95; }
+    100% { transform: translate(12px, -24px) scale(1.15); opacity: 0; }
   }
 
   /* --- Dock inferiore --- */
@@ -2032,7 +2150,7 @@
       <img
         id="brandLogo"
         src="public/logo.png"
-        alt="Logo"
+        alt="Momipon"
         class="brand-logo"
         onerror="if(!this.dataset.triedJpg){this.dataset.triedJpg='1';this.src='public/logo.jpg';}else{this.style.display='none';}"
       />
@@ -2116,6 +2234,18 @@
     <div class="corridor" id="corridor"></div>
   </main>
 
+  <!-- Mascotte Cagnolino -->
+  <div class="pet-dog" id="petDog" data-state="sit" aria-hidden="true">
+    <div class="pet-zzz"><span>z</span><span>Z</span><span>z</span></div>
+    <div class="pet-dog-dir">
+      <div class="pet-dog-body">
+        <img class="pet-dog-sprite sprite-walk" id="petImgWalk" alt="" />
+        <img class="pet-dog-sprite sprite-sit" id="petImgSit" alt="" />
+        <img class="pet-dog-sprite sprite-sleep" id="petImgSleep" alt="" />
+      </div>
+    </div>
+  </div>
+
   <div class="coin-dock" id="coinDock">
     <img
       src="public/nuvola.png"
@@ -2158,7 +2288,7 @@
   </div>
 
   <!-- Modale Tutorial / Wizard -->
-  <div class="wizard-modal" id="wizardModal" role="dialog" aria-modal="true" aria-label="Guida Momixapon">
+  <div class="wizard-modal" id="wizardModal" role="dialog" aria-modal="true" aria-label="Guida Momipon">
     <div class="wizard-card" id="wizardCard">
       <img class="wizard-card-bg" id="wizardCardBg" alt="" aria-hidden="true" />
       <button class="wizard-close" id="closeWizardBtn" aria-label="Chiudi tutorial">
@@ -2168,7 +2298,7 @@
 
       <div class="wizard-body">
         <div class="wizard-media">
-          <img id="wizardGif" alt="Tutorial Momixapon" />
+          <img id="wizardGif" alt="Tutorial Momipon" />
           <span class="wizard-media-fallback" id="wizardFallback">🎁</span>
         </div>
         <div class="wizard-copy">
@@ -2201,8 +2331,8 @@
       <button class="auth-close" id="closeAuthModal" aria-label="Chiudi">✕</button>
 
       <div id="authGuestView">
-        <img class="auth-logo-img" id="authLogoImg" alt="Momixapon" />
-        <h2 class="auth-title auth-title-guest">Account Momixapon</h2>
+        <img class="auth-logo-img" id="authLogoImg" alt="Momipon" />
+        <h2 class="auth-title auth-title-guest">Account Momipon</h2>
         <p class="auth-desc" id="authGuestDesc">Accedi o registrati per girare le macchinette, gestire il tuo credito e salvare tutti i gadget vinti.</p>
         <div class="auth-tabs">
           <button type="button" class="auth-tab active" id="tabLogin">Accedi</button>
@@ -2780,6 +2910,119 @@ async function detectAllPrizes() {
     }
   }));
   updateMachineProgress();
+}
+
+/* --- Mascotte Cagnolino in loop lento --- */
+async function initPetDog() {
+  const petEl = document.getElementById("petDog");
+  const imgWalk = document.getElementById("petImgWalk");
+  const imgSit = document.getElementById("petImgSit");
+  const imgSleep = document.getElementById("petImgSleep");
+  if (!petEl) return;
+
+  const [hasWalk, hasSit, hasSleep] = await Promise.all([
+    checkImageExists("public/cane-cammina.png"),
+    checkImageExists("public/cane-seduto.png"),
+    checkImageExists("public/cane-dorme.png")
+  ]);
+
+  if (!hasWalk && !hasSit && !hasSleep) return;
+
+  const walkSrc = hasWalk ? "public/cane-cammina.png" : (hasSit ? "public/cane-seduto.png" : "public/cane-dorme.png");
+  const sitSrc = hasSit ? "public/cane-seduto.png" : walkSrc;
+  const sleepSrc = hasSleep ? "public/cane-dorme.png" : sitSrc;
+
+  imgWalk.src = walkSrc;
+  imgSit.src = sitSrc;
+  imgSleep.src = sleepSrc;
+
+  let dogX = 24;
+  let targetX = 24;
+  let state = "sit";
+  let lastTs = performance.now();
+  let cycleCount = 0;
+
+  const getBounds = () => {
+    const w = petEl.offsetWidth || 64;
+    const minX = 14;
+    const maxX = Math.max(minX + 20, window.innerWidth - w - 14);
+    return { minX, maxX };
+  };
+
+  const setDogState = (next) => {
+    if (state === next) return;
+    state = next;
+    petEl.classList.remove("is-squishing");
+    void petEl.offsetWidth;
+    petEl.classList.add("is-squishing");
+    petEl.dataset.state = next;
+    setTimeout(() => petEl.classList.remove("is-squishing"), 250);
+  };
+
+  const renderX = () => {
+    petEl.style.transform = `translate3d(${dogX.toFixed(1)}px, 0, 0)`;
+  };
+
+  const pickNextAction = () => {
+    const { minX, maxX } = getBounds();
+    const span = maxX - minX;
+
+    /* Ogni 2-3 passeggiate si concede un pisolino rilassato */
+    if (hasSleep && cycleCount >= 2 && Math.random() < 0.55) {
+      cycleCount = 0;
+      setDogState("sleep");
+      setTimeout(() => {
+        setDogState("sit");
+        setTimeout(pickNextAction, 1800 + Math.random() * 1400);
+      }, 8500 + Math.random() * 4000);
+      return;
+    }
+
+    const goRight = dogX < minX + span * 0.35
+      ? true
+      : (dogX > minX + span * 0.65 ? false : Math.random() < 0.5);
+
+    const stepDist = Math.min(span * 0.72, 110 + Math.random() * (span * 0.45));
+    targetX = goRight
+      ? Math.min(maxX, dogX + stepDist)
+      : Math.max(minX, dogX - stepDist);
+
+    petEl.classList.toggle("facing-left", targetX < dogX);
+    setDogState("walk");
+    cycleCount++;
+  };
+
+  const tickDog = (now) => {
+    const dt = Math.min(0.05, (now - lastTs) / 1000);
+    lastTs = now;
+
+    if (state === "walk") {
+      const speed = 34; /* passo lento e tranquillo (px/sec) */
+      const diff = targetX - dogX;
+      if (Math.abs(diff) <= speed * dt + 1) {
+        dogX = targetX;
+        renderX();
+        setDogState("sit");
+        setTimeout(pickNextAction, 3200 + Math.random() * 2600);
+      } else {
+        dogX += Math.sign(diff) * speed * dt;
+        renderX();
+      }
+    }
+    requestAnimationFrame(tickDog);
+  };
+
+  window.addEventListener("resize", () => {
+    const { minX, maxX } = getBounds();
+    dogX = Math.max(minX, Math.min(maxX, dogX));
+    targetX = Math.max(minX, Math.min(maxX, targetX));
+    renderX();
+  });
+
+  renderX();
+  petEl.classList.add("is-ready");
+  requestAnimationFrame(tickDog);
+  setTimeout(pickNextAction, 2200);
 }
 
 /* --- Credito / Borsellino (Solo utenti registrati) --- */
@@ -4197,6 +4440,8 @@ async function bootApp() {
 
   const loader = document.getElementById("loadingScreen");
   if (loader) loader.classList.add("hidden");
+
+  initPetDog();
 
   let wizardSeen = false;
   try { wizardSeen = Boolean(localStorage.getItem(WIZARD_STORAGE_KEY)); } catch (e) {}
