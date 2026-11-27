@@ -2,7 +2,7 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <title>Momixapon</title>
 <link rel="icon" href="/public/favicon.png?v=3" />
 <link rel="shortcut icon" href="/public/favicon.png?v=3" />
@@ -30,6 +30,10 @@
   input {
     -webkit-user-select: text;
     user-select: text;
+  }
+
+  button {
+    touch-action: manipulation;
   }
 
   img {
@@ -1060,7 +1064,7 @@
     100% { transform: translateY(0) scale(1) rotate(0deg); opacity: 1; }
   }
 
-  /* --- Modale Tutorial / Wizard sulla nuvola --- */
+  /* --- Modale Tutorial / Wizard --- */
   .wizard-modal {
     position: fixed;
     inset: 0;
@@ -2260,6 +2264,7 @@ let currentUser = null;
 let authMode = "login";
 let guestBannerDismissed = false;
 let isRecoveryMode = false;
+let authModalOpenedAt = 0;
 
 /* Badge NEW di sessione (sopravvive al refresh nella stessa scheda, si azzera al logout) */
 const SESSION_NEW_KEY = "momixapon_session_new_keys";
@@ -2455,11 +2460,19 @@ wizardNextBtn.onclick = () => {
   }
 };
 
-function checkImageExists(url) {
+function checkImageExists(url, timeoutMs = 4500) {
   return new Promise((resolve) => {
+    let settled = false;
+    const done = (val) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      resolve(val);
+    };
+    const timer = setTimeout(() => done(false), timeoutMs);
     const img = new Image();
-    img.onload = () => resolve(true);
-    img.onerror = () => resolve(false);
+    img.onload = () => done(true);
+    img.onerror = () => done(false);
     img.src = url;
   });
 }
@@ -2476,9 +2489,9 @@ async function initLoadingBarImages() {
   const sqFillImg = document.getElementById("squeezeBarFillImg");
 
   const [bgOk, fillPngOk, fillJpgOk] = await Promise.all([
-    checkImageExists("public/loading-bar-bg.png"),
-    checkImageExists("public/loading-bar-fill.png"),
-    checkImageExists("public/loading-bar-fill.jpg")
+    checkImageExists("public/loading-bar-bg.png", 2500),
+    checkImageExists("public/loading-bar-fill.png", 2500),
+    checkImageExists("public/loading-bar-fill.jpg", 2500)
   ]);
 
   if (bgOk) {
@@ -2732,12 +2745,6 @@ function scheduleHideWalletCloud(delay = 240) {
   clearTimeout(walletHideTimer);
   walletHideTimer = setTimeout(() => walletCloud.classList.remove("open"), delay);
 }
-
-walletCloud.addEventListener("click", () => {
-  if (!currentUser) {
-    openAuthModal("Accedi o registrati per iniziare a giocare e ricevere €15 di benvenuto!");
-  }
-});
 
 addCreditBtn.addEventListener("click", (e) => {
   e.stopPropagation();
@@ -3047,8 +3054,6 @@ backToLoginBtn.onclick = () => {
   showAuthView("guest");
 };
 
-let authModalOpenedAt = 0;
-
 function openAuthModal(customDesc = null) {
   authModalOpenedAt = Date.now();
   authMsg.textContent = "";
@@ -3066,7 +3071,7 @@ function closeAuthModal() { authModal.classList.remove("open"); }
 authBtn.onclick = () => openAuthModal();
 document.getElementById("closeAuthModal").onclick = closeAuthModal;
 authModal.addEventListener("click", (e) => {
-  if (Date.now() - authModalOpenedAt < 300) return;
+  if (Date.now() - authModalOpenedAt < 320) return;
   if (e.target === authModal) closeAuthModal();
 });
 
@@ -3242,10 +3247,23 @@ let audioCtx = null;
 
 function ensureAudio() {
   if (muted) return null;
-  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  if (audioCtx.state === "suspended") audioCtx.resume();
+  if (!audioCtx) {
+    const AudioCtor = window.AudioContext || window.webkitAudioContext;
+    if (AudioCtor) audioCtx = new AudioCtor();
+  }
+  if (audioCtx && audioCtx.state === "suspended") {
+    audioCtx.resume().catch(() => {});
+  }
   return audioCtx;
 }
+
+/* Sblocca/ripristina l'audio al primo gesto su iOS/Android e al ritorno sull'app */
+window.addEventListener("pointerdown", () => { if (!muted && audioCtx && audioCtx.state === "suspended") audioCtx.resume().catch(() => {}); }, { passive: true });
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden && !muted && audioCtx && audioCtx.state === "suspended") {
+    audioCtx.resume().catch(() => {});
+  }
+});
 
 function playTone(freq, dur, type = "sine", vol = 0.12, endFreq = null) {
   const ctx = ensureAudio();
@@ -3428,6 +3446,7 @@ corridor.addEventListener("scroll", () => {
   });
 }, { passive: true });
 
+/* Drag con mouse solo su desktop (non interferisce con il touch nativo su mobile) */
 let mouseDragging = false, mouseDragMoved = false, dragStartX = 0, dragStartScroll = 0, suppressNextClick = false;
 corridor.addEventListener("mousedown", (e) => {
   if (e.button !== 0 || phase !== "idle") return;
@@ -3572,7 +3591,7 @@ let draggingCoin = false;
 coinBtn.addEventListener("pointerdown", (e) => {
   if (phase !== "idle") return;
 
-if (!currentUser) {
+  if (!currentUser) {
     e.preventDefault();
     e.stopPropagation();
     sfxError();
@@ -3589,7 +3608,7 @@ if (!currentUser) {
   }
 
   draggingCoin = true;
-  coinBtn.setPointerCapture(e.pointerId);
+  try { coinBtn.setPointerCapture(e.pointerId); } catch (_) {}
 
   coinBtn.classList.remove("is-popping");
   void coinBtn.offsetWidth;
@@ -3608,17 +3627,23 @@ window.addEventListener("pointermove", (e) => {
   if (!draggingCoin) return;
   floatingCoin.style.transform = `translate3d(calc(${e.clientX}px - 50%), calc(${e.clientY}px - 50%), 0) scale(1.06)`;
 });
-window.addEventListener("pointerup", (e) => {
+const cancelCoinDrag = () => {
   if (!draggingCoin) return;
   draggingCoin = false;
   floatingCoin.style.display = "none";
   floatingCoin.classList.remove("is-emerging");
   const slot = document.getElementById(`coinSlot-${activeIndex}`);
-  slot.classList.remove("highlight");
+  if (slot) slot.classList.remove("highlight");
+};
+window.addEventListener("pointerup", (e) => {
+  if (!draggingCoin) return;
+  const slot = document.getElementById(`coinSlot-${activeIndex}`);
   const r = slot.getBoundingClientRect();
   const hitSlot = e.clientX >= r.left - 24 && e.clientX <= r.right + 24 && e.clientY >= r.top - 24 && e.clientY <= r.bottom + 24;
+  cancelCoinDrag();
   if (hitSlot) insertCoin(activeIndex);
 });
+window.addEventListener("pointercancel", cancelCoinDrag);
 
 function bindMachineEvents(idx) {
   document.getElementById(`posterWin-${idx}`).addEventListener("click", () => {
@@ -3639,7 +3664,7 @@ function bindMachineEvents(idx) {
     if (phase !== "coinInserted" || idx !== activeIndex || !currentUser) return;
     e.stopPropagation();
     turning = true;
-    knob.setPointerCapture(e.pointerId);
+    try { knob.setPointerCapture(e.pointerId); } catch (_) {}
     const r = knob.getBoundingClientRect();
     knobCx = r.left + r.width / 2; knobCy = r.top + r.height / 2;
     startAngle = Math.atan2(e.clientY - knobCy, e.clientX - knobCx) * (180 / Math.PI) - currentDeg;
@@ -3662,6 +3687,8 @@ function bindMachineEvents(idx) {
     turning = false;
     if (currentDeg < 35) { currentDeg = 0; lastDetent = 0; autoTurnKnob(idx, knob); }
   });
+
+  knob.addEventListener("pointercancel", () => { turning = false; });
 }
 
 function autoTurnKnob(idx, knob) {
@@ -3681,6 +3708,7 @@ function autoTurnKnob(idx, knob) {
 }
 
 function finishKnobTurn(idx, knob) {
+  if (phase !== "coinInserted") return;
   knob.classList.remove("ready");
   document.getElementById(`eject-${idx}`).classList.remove("ready");
   knob.style.transform = "rotate3d(0,0,1,0deg)";
@@ -3716,7 +3744,7 @@ function startCapsuleDrop(idx) {
   holding = false;
   lastCreakStep = 0;
 
-  /* Estrae e salva subito il premio: anche in caso di refresh/crash è già nell'inventario */
+  /* Estrae e salva subito il premio una sola volta: al sicuro anche in caso di refresh/crash */
   currentPrize = pickRandomPrize(idx);
   addToInventory(currentPrize);
 
@@ -3999,20 +4027,23 @@ async function bootApp() {
   let completed = 0;
   const total = tasks.length;
 
-  await Promise.all(
-    tasks.map((p) =>
-      Promise.resolve(p).finally(() => {
-        completed++;
-        const pct = 6 + Math.round((completed / total) * 94);
-        setProgress(pct);
-      })
-    )
-  );
+  await Promise.race([
+    Promise.all(
+      tasks.map((p) =>
+        Promise.resolve(p).finally(() => {
+          completed++;
+          const pct = 6 + Math.round((completed / total) * 94);
+          setProgress(pct);
+        })
+      )
+    ),
+    new Promise((resolve) => setTimeout(resolve, 8000))
+  ]);
 
   setProgress(100);
   centerMachine(activeIndex, false);
 
-  await new Promise((resolve) => setTimeout(resolve, 280));
+  await new Promise((resolve) => setTimeout(resolve, 260));
 
   const loader = document.getElementById("loadingScreen");
   if (loader) loader.classList.add("hidden");
