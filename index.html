@@ -1760,6 +1760,7 @@
     height: 100%;
     object-fit: contain;
     display: block;
+    pointer-events: none;
     filter: drop-shadow(0 10px 14px rgba(0, 0, 0, 0.45));
   }
   .chute-capsule-fallback {
@@ -3926,7 +3927,19 @@ function openCapsuleFromChute() {
   capsuleOverlay.classList.add("active");
 }
 
-chuteCapsule.addEventListener("click", openCapsuleFromChute);
+chuteOverlay.addEventListener("contextmenu", (e) => e.preventDefault());
+chuteCapsule.addEventListener("pointerdown", (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+  openCapsuleFromChute();
+});
+
+/* Blindatura globale: blocca il menu "Salva immagine" su tutto il gioco (tranne nei campi email/password) */
+document.addEventListener("contextmenu", (e) => {
+  if (e.target && e.target.tagName !== "INPUT") {
+    e.preventDefault();
+  }
+});
 
 const stopHolding = () => { holding = false; };
 
