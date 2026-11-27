@@ -2134,23 +2134,27 @@
   }
 
 /* --- Pulsante e Pannello Admin --- */
-  .admin-icon-btn {
-    border: 2.5px solid #ffd54f;
-    background: linear-gradient(135deg, #1e364a, #2c5270);
-    color: #fff;
+ .admin-icon-btn {
+    border: none;
+    background: transparent;
+    padding: 0;
     width: clamp(44px, 6.2vh, 56px);
     height: clamp(44px, 6.2vh, 56px);
-    border-radius: 50%;
-    font-size: 20px;
+    font-size: 24px;
     cursor: pointer;
     display: none;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 6px 14px rgba(20, 42, 66, 0.34);
     transition: transform 0.15s ease;
   }
   .admin-icon-btn:active { transform: scale(0.9); }
-
+  .admin-icon-btn img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+    filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.24));
+  }
   .admin-modal {
     position: fixed;
     inset: 0;
@@ -2345,8 +2349,13 @@
       </button>
       <button class="help-icon-btn" id="helpBtn" title="Come funziona">
         <img id="helpBtnImg" alt="Guida" />
-        <button class="admin-icon-btn" id="adminBtn" title="Pannello Admin">⚙️</button>
-        <span>?</span>
+<button class="admin-icon-btn" id="adminBtn" title="Pannello Admin">
+        <img
+          src="public/admin.png"
+          alt="Admin"
+          onerror="this.style.display='none';this.nextElementSibling.style.display='inline';"
+        />
+        <span style="display:none;">⚙️</span>
       </button>
     </div>
   </header>
