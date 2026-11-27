@@ -833,9 +833,9 @@
     position: fixed;
     left: 0;
     bottom: 2px;
-    z-index: 32;
-    width: clamp(54px, 7.5vw, 72px);
-    height: clamp(54px, 7.5vw, 72px);
+    z-index: 38;
+    width: clamp(56px, 7.8vw, 76px);
+    height: clamp(56px, 7.8vw, 76px);
     pointer-events: none;
     opacity: 0;
     transition: opacity 0.4s ease;
@@ -869,7 +869,7 @@
     object-fit: contain;
     object-position: bottom center;
     opacity: 0;
-    transition: opacity 0.16s ease;
+    transition: opacity 0.18s ease;
     filter: drop-shadow(0 5px 8px rgba(30, 48, 68, 0.28));
     pointer-events: none;
   }
@@ -879,9 +879,6 @@
     opacity: 1;
   }
 
-  .pet-dog[data-state="walk"] .pet-dog-body {
-    animation: dogWalkBounce 0.56s ease-in-out infinite;
-  }
   .pet-dog[data-state="sit"] .pet-dog-body {
     animation: dogBreathe 2.8s ease-in-out infinite;
   }
@@ -892,10 +889,6 @@
     animation: dogSquish 0.24s cubic-bezier(0.22, 1.25, 0.36, 1);
   }
 
-  @keyframes dogWalkBounce {
-    0%, 100% { transform: translateY(0) rotate(-3deg) scale(1.03, 0.97); }
-    50% { transform: translateY(-6px) rotate(3deg) scale(0.97, 1.04); }
-  }
   @keyframes dogBreathe {
     0%, 100% { transform: scale(1, 1); }
     50% { transform: scale(1.02, 0.97); }
@@ -2057,7 +2050,7 @@
   .btn-reveal-img:active { transform: scale(0.93); }
   .btn-reveal-img img { height: 100%; width: auto; max-width: 100%; object-fit: contain; display: block; filter: drop-shadow(0 5px 12px rgba(0, 0, 0, 0.2)); }
 
-  /* --- Fix Topbar e Bottoni su Mobile --- */
+  /* --- Fix Topbar, Bottoni e Cagnolino su Mobile --- */
   @media (max-width: 640px) {
     .brand-logo-wrap {
       top: 6px;
@@ -2116,6 +2109,12 @@
     }
     .nav-arrow.prev { left: 6px; }
     .nav-arrow.next { right: 6px; }
+
+    .pet-dog {
+      width: 48px;
+      height: 48px;
+      bottom: 0;
+    }
   }
 </style>
 </head>
@@ -2234,7 +2233,7 @@
     <div class="corridor" id="corridor"></div>
   </main>
 
-  <!-- Mascotte Cagnolino -->
+  <!-- Mascotte Cagnolino (GIF cammina + PNG seduto/dorme) -->
   <div class="pet-dog" id="petDog" data-state="sit" aria-hidden="true">
     <div class="pet-zzz"><span>z</span><span>Z</span><span>z</span></div>
     <div class="pet-dog-dir">
@@ -2912,7 +2911,7 @@ async function detectAllPrizes() {
   updateMachineProgress();
 }
 
-/* --- Mascotte Cagnolino in loop lento --- */
+/* --- Mascotte Cagnolino (GIF cammina + PNG seduto/dorme in loop lento) --- */
 async function initPetDog() {
   const petEl = document.getElementById("petDog");
   const imgWalk = document.getElementById("petImgWalk");
@@ -2920,15 +2919,17 @@ async function initPetDog() {
   const imgSleep = document.getElementById("petImgSleep");
   if (!petEl) return;
 
-  const [hasWalk, hasSit, hasSleep] = await Promise.all([
+  const [hasWalkGif, hasWalkPng, hasSit, hasSleep] = await Promise.all([
+    checkImageExists("public/cane-cammina.gif"),
     checkImageExists("public/cane-cammina.png"),
     checkImageExists("public/cane-seduto.png"),
     checkImageExists("public/cane-dorme.png")
   ]);
 
-  if (!hasWalk && !hasSit && !hasSleep) return;
+  const walkUrl = hasWalkGif ? "public/cane-cammina.gif" : (hasWalkPng ? "public/cane-cammina.png" : null);
+  if (!walkUrl && !hasSit && !hasSleep) return;
 
-  const walkSrc = hasWalk ? "public/cane-cammina.png" : (hasSit ? "public/cane-seduto.png" : "public/cane-dorme.png");
+  const walkSrc = walkUrl || (hasSit ? "public/cane-seduto.png" : "public/cane-dorme.png");
   const sitSrc = hasSit ? "public/cane-seduto.png" : walkSrc;
   const sleepSrc = hasSleep ? "public/cane-dorme.png" : sitSrc;
 
@@ -2936,16 +2937,16 @@ async function initPetDog() {
   imgSit.src = sitSrc;
   imgSleep.src = sleepSrc;
 
-  let dogX = 24;
-  let targetX = 24;
+  let dogX = 20;
+  let targetX = 20;
   let state = "sit";
   let lastTs = performance.now();
   let cycleCount = 0;
 
   const getBounds = () => {
-    const w = petEl.offsetWidth || 64;
-    const minX = 14;
-    const maxX = Math.max(minX + 20, window.innerWidth - w - 14);
+    const w = petEl.offsetWidth || 56;
+    const minX = 10;
+    const maxX = Math.max(minX + 20, window.innerWidth - w - 10);
     return { minX, maxX };
   };
 
@@ -2982,7 +2983,7 @@ async function initPetDog() {
       ? true
       : (dogX > minX + span * 0.65 ? false : Math.random() < 0.5);
 
-    const stepDist = Math.min(span * 0.72, 110 + Math.random() * (span * 0.45));
+    const stepDist = Math.min(span * 0.75, 100 + Math.random() * (span * 0.45));
     targetX = goRight
       ? Math.min(maxX, dogX + stepDist)
       : Math.max(minX, dogX - stepDist);
@@ -3022,7 +3023,7 @@ async function initPetDog() {
   renderX();
   petEl.classList.add("is-ready");
   requestAnimationFrame(tickDog);
-  setTimeout(pickNextAction, 2200);
+  setTimeout(pickNextAction, 2000);
 }
 
 /* --- Credito / Borsellino (Solo utenti registrati) --- */
