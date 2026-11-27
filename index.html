@@ -1695,6 +1695,96 @@
     box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
   }
 
+  /* --- Overlay Sportello Zoomato (raccolta pallina) --- */
+  .chute-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 62;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(15, 22, 32, 0.58);
+    backdrop-filter: blur(5px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.22s ease;
+  }
+  .chute-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .chute-stage {
+    position: relative;
+    width: min(88vw, 380px);
+    aspect-ratio: 1 / 0.94;
+    border-radius: 28px;
+    overflow: hidden;
+    border: 4px solid rgba(255, 255, 255, 0.96);
+    box-shadow: 0 24px 54px rgba(18, 34, 52, 0.45);
+    background: #8a8f96;
+    transform: scale(0.92);
+    transition: transform 0.24s cubic-bezier(0.22, 1.15, 0.36, 1);
+  }
+  .chute-overlay.active .chute-stage {
+    transform: scale(1);
+  }
+
+  .chute-bg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    pointer-events: none;
+  }
+
+  .chute-capsule {
+    position: absolute;
+    left: 52%;
+    top: 64%;
+    width: 38%;
+    aspect-ratio: 1 / 1;
+    transform: translate(-50%, -50%);
+    cursor: pointer;
+    touch-action: manipulation;
+    border: none;
+    background: transparent;
+    padding: 0;
+    display: grid;
+    place-items: center;
+    z-index: 4;
+  }
+  .chute-capsule img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+    filter: drop-shadow(0 10px 14px rgba(0, 0, 0, 0.45));
+  }
+  .chute-capsule-fallback {
+    display: none;
+    width: 86%;
+    height: 86%;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #ffffff 0%, var(--cap-color, #e8a825) 65%, #7a5200 100%);
+    box-shadow: 0 10px 16px rgba(0, 0, 0, 0.42);
+  }
+  .chute-capsule.no-photo img { display: none; }
+  .chute-capsule.no-photo .chute-capsule-fallback { display: block; }
+
+  .chute-capsule.is-ready {
+    animation: chutePulse 1.1s ease-in-out infinite;
+  }
+  .chute-capsule:active {
+    transform: translate(-50%, -50%) scale(0.92);
+  }
+
+  @keyframes chutePulse {
+    0%, 100% { filter: drop-shadow(0 0 0 rgba(255, 220, 90, 0)); transform: translate(-50%, -50%) scale(1); }
+    50% { filter: drop-shadow(0 0 18px rgba(255, 220, 90, 0.95)); transform: translate(-50%, -50%) scale(1.06); }
+  }
+
   /* --- Overlay Capsula PNG & Apertura Curva Dorata --- */
   .capsule-overlay {
     position: fixed;
@@ -2187,6 +2277,17 @@
       </div>
     </aside>
   </div>
+
+  <!-- Overlay Sportello Zoomato -->
+  <section class="chute-overlay" id="chuteOverlay" aria-label="Prendi la pallina">
+    <div class="chute-stage">
+      <img src="public/sportello.jpg" alt="Sportello Gashapon" class="chute-bg" />
+      <button type="button" class="chute-capsule" id="chuteCapsule" title="Tocca per prendere la pallina">
+        <img id="chuteCapImg" alt="Capsula" />
+        <span class="chute-capsule-fallback"></span>
+      </button>
+    </div>
+  </section>
 
   <section class="capsule-overlay" id="capsuleOverlay">
     <div class="capsule-wrap" id="capsuleWrap">
@@ -3257,7 +3358,6 @@ function ensureAudio() {
   return audioCtx;
 }
 
-/* Sblocca/ripristina l'audio al primo gesto su iOS/Android e al ritorno sull'app */
 window.addEventListener("pointerdown", () => { if (!muted && audioCtx && audioCtx.state === "suspended") audioCtx.resume().catch(() => {}); }, { passive: true });
 document.addEventListener("visibilitychange", () => {
   if (!document.hidden && !muted && audioCtx && audioCtx.state === "suspended") {
@@ -3446,7 +3546,6 @@ corridor.addEventListener("scroll", () => {
   });
 }, { passive: true });
 
-/* Drag con mouse solo su desktop (non interferisce con il touch nativo su mobile) */
 let mouseDragging = false, mouseDragMoved = false, dragStartX = 0, dragStartScroll = 0, suppressNextClick = false;
 corridor.addEventListener("mousedown", (e) => {
   if (e.button !== 0 || phase !== "idle") return;
@@ -3715,7 +3814,10 @@ function finishKnobTurn(idx, knob) {
   startCapsuleDrop(idx);
 }
 
-/* --- Discesa Capsula & Esplosione Dorata --- */
+/* --- Sportello Zoomato, Raccolta Pallina & Esplosione Dorata --- */
+const chuteOverlay = document.getElementById("chuteOverlay");
+const chuteCapsule = document.getElementById("chuteCapsule");
+const chuteCapImg = document.getElementById("chuteCapImg");
 const capsuleOverlay = document.getElementById("capsuleOverlay");
 const capsuleWrap = document.getElementById("capsuleWrap");
 const capTop = document.getElementById("capTop");
@@ -3727,6 +3829,7 @@ const goldGlow = document.getElementById("goldGlow");
 const squeezeFill = document.getElementById("squeezeFill");
 const squeezeUI = document.getElementById("squeezeUI");
 
+let currentCapUrl = null;
 let squeezeProgress = 0, holding = false, squeezeRaf = null, lastTime = 0, lastCreakStep = 0;
 
 function pickRandomPrize(machineIdx) {
@@ -3739,7 +3842,7 @@ function pickRandomPrize(machineIdx) {
 }
 
 function startCapsuleDrop(idx) {
-  phase = "dropping";
+  phase = "chuteReady";
   squeezeProgress = 0;
   holding = false;
   lastCreakStep = 0;
@@ -3749,16 +3852,49 @@ function startCapsuleDrop(idx) {
   addToInventory(currentPrize);
 
   if (availableCapsules.length > 0) {
-    const capUrl = availableCapsules[Math.floor(Math.random() * availableCapsules.length)];
-    capImgTop.src = capUrl;
-    capImgBottom.src = capUrl;
+    currentCapUrl = availableCapsules[Math.floor(Math.random() * availableCapsules.length)];
+    chuteCapImg.src = currentCapUrl;
+    chuteCapsule.classList.remove("no-photo");
+  } else {
+    currentCapUrl = null;
+    chuteCapsule.style.setProperty("--cap-color", currentPrize.color);
+    chuteCapsule.classList.add("no-photo");
+  }
+
+  chuteCapsule.classList.remove("is-ready");
+  chuteOverlay.classList.add("active");
+
+  /* Caduta rapida (~460ms) dentro la vaschetta, ma cliccabile fin da subito */
+  const dropAnim = chuteCapsule.animate([
+    { transform: "translate(-50%, -145%) scale(0.62) rotate(-35deg)", opacity: 0 },
+    { transform: "translate(-50%, -44%) scale(1.05, 0.93) rotate(12deg)", opacity: 1, offset: 0.65 },
+    { transform: "translate(-50%, -56%) scale(0.97, 1.03) rotate(-4deg)", opacity: 1, offset: 0.84 },
+    { transform: "translate(-50%, -50%) scale(1, 1) rotate(0deg)", opacity: 1 }
+  ], { duration: 460, easing: "cubic-bezier(0.22, 0.85, 0.35, 1)", fill: "forwards" });
+
+  setTimeout(() => sfxBounce(), 270);
+
+  dropAnim.onfinish = () => {
+    dropAnim.cancel();
+    if (phase === "chuteReady") chuteCapsule.classList.add("is-ready");
+  };
+}
+
+function openCapsuleFromChute() {
+  if (phase !== "chuteReady") return;
+  chuteOverlay.classList.remove("active");
+  chuteCapsule.classList.remove("is-ready");
+  sfxClick();
+
+  if (currentCapUrl) {
+    capImgTop.src = currentCapUrl;
+    capImgBottom.src = currentCapUrl;
     capsuleWrap.classList.add("has-cap-photo");
   } else {
     capsuleWrap.classList.remove("has-cap-photo");
     capBottom.style.setProperty("--cap-color", currentPrize.color);
   }
 
-  const chute = document.getElementById(`chute-${idx}`).getBoundingClientRect();
   capTop.style.transform = "translate3d(0,0,0) rotate(0deg)";
   capTop.style.opacity = "1";
   capBottom.style.transform = "translate3d(0,0,0) rotate(0deg)";
@@ -3766,31 +3902,15 @@ function startCapsuleDrop(idx) {
   seamStress.style.opacity = "0";
   goldGlow.style.opacity = "0";
   squeezeFill.style.clipPath = "inset(0 100% 0 0)";
-  squeezeUI.style.opacity = "0";
+  capsuleWrap.style.transform = "translate3d(0,0,0) scale(1,1)";
 
+  /* Subito pronta da tenere premuta, zero tempi di attesa */
+  phase = "squeeze";
+  squeezeUI.style.opacity = "1";
   capsuleOverlay.classList.add("active");
-
-  const startX = chute.left + chute.width / 2 - window.innerWidth / 2;
-  const startY = chute.top + chute.height / 2 - window.innerHeight / 2;
-
-  const anim = capsuleWrap.animate([
-    { transform: `translate3d(${startX}px, ${startY}px, 0) scale(0.22) rotate(-25deg)`, opacity: 0.35 },
-    { transform: `translate3d(${startX * 0.52}px, ${startY + 34}px, 0) scale(0.56) rotate(170deg)`, opacity: 1, offset: 0.36 },
-    { transform: `translate3d(0px, 24px, 0) scale(1.06, 0.93) rotate(350deg)`, offset: 0.72 },
-    { transform: `translate3d(0px, -10px, 0) scale(0.97, 1.03) rotate(360deg)`, offset: 0.87 },
-    { transform: `translate3d(0px, 0px, 0) scale(1, 1) rotate(360deg)` }
-  ], { duration: 1950, easing: "cubic-bezier(0.22, 0.85, 0.35, 1)", fill: "forwards" });
-
-  setTimeout(() => sfxBounce(), 710);
-  setTimeout(() => sfxBounce(), 1410);
-
-  anim.onfinish = () => {
-    anim.cancel();
-    capsuleWrap.style.transform = "translate3d(0,0,0) scale(1,1)";
-    phase = "squeeze";
-    squeezeUI.style.opacity = "1";
-  };
 }
+
+chuteCapsule.addEventListener("click", openCapsuleFromChute);
 
 const stopHolding = () => { holding = false; };
 
@@ -4001,6 +4121,7 @@ async function bootApp() {
     "public/logo.png",
     "public/background.jpg",
     "public/macchinetta_2.png",
+    "public/sportello.jpg",
     "public/badge3.png",
     "public/nuvola.png",
     "public/sidebar.png",
