@@ -38,7 +38,6 @@
 
   img {
     -webkit-user-drag: none;
-    user-drag: none;
   }
 
   html, body {
@@ -752,13 +751,6 @@
   }
   .machine-stage.has-photo .knob-fallback { display: none; }
 
-  .chute-origin {
-    position: absolute;
-    top: 79.5%; left: 62.5%; width: 26.0%; height: 18.5%;
-    z-index: 5;
-    pointer-events: none;
-  }
-
   .machine-meta {
     position: absolute;
     top: 81.5%;
@@ -872,6 +864,11 @@
     transition: opacity 0.18s ease;
     filter: drop-shadow(0 5px 8px rgba(30, 48, 68, 0.28));
     pointer-events: none;
+  }
+  /* Compensa il formato 16:9 della GIF per allinearlo all'altezza dei PNG 1:1 */
+  .pet-dog.is-walk-gif .pet-dog-sprite.sprite-walk {
+    transform-origin: bottom center;
+    transform: scale(1.78);
   }
   .pet-dog[data-state="walk"] .sprite-walk,
   .pet-dog[data-state="sit"] .sprite-sit,
@@ -1770,7 +1767,7 @@
     transition: transform 0.14s ease;
   }
   .inv-tile:active { transform: scale(0.95); }
-  .inv-tile img { width: 86%; height: 86%; object-fit: contain; }
+  .inv-tile img { width: 86%; height: 86%; object-fit: contain; pointer-events: none; }
   .inv-tile-emoji { font-size: 36px; }
   .inv-qty { position: absolute; top: 5px; right: 5px; background: #1a1a1d; color: #fff; font-size: 11px; font-weight: 800; padding: 2px 7px; border-radius: 999px; }
   .inv-new-badge {
@@ -1858,7 +1855,7 @@
     aspect-ratio: 1 / 1;
     transform: translate(-50%, -50%);
     cursor: pointer;
-    touch-action: manipulation;
+    touch-action: none;
     border: none;
     background: transparent;
     padding: 0;
@@ -2035,7 +2032,7 @@
     justify-content: center;
     overflow: hidden;
   }
-  .prize-stage img { width: 90%; height: 90%; object-fit: contain; border-radius: 20px; }
+  .prize-stage img { width: 90%; height: 90%; object-fit: contain; border-radius: 20px; pointer-events: none; }
   .prize-fallback-emoji { font-size: 68px; }
 
   .reveal-sub { font-size: clamp(11px, 3.2vw, 13px); font-weight: 800; color: #1e364a; margin: 0 0 10px; }
@@ -2048,7 +2045,7 @@
     transition: transform 0.15s ease;
   }
   .btn-reveal-img:active { transform: scale(0.93); }
-  .btn-reveal-img img { height: 100%; width: auto; max-width: 100%; object-fit: contain; display: block; filter: drop-shadow(0 5px 12px rgba(0, 0, 0, 0.2)); }
+  .btn-reveal-img img { height: 100%; width: auto; max-width: 100%; object-fit: contain; display: block; pointer-events: none; filter: drop-shadow(0 5px 12px rgba(0, 0, 0, 0.2)); }
 
   /* --- Fix Topbar, Bottoni e Cagnolino su Mobile --- */
   @media (max-width: 640px) {
@@ -2492,6 +2489,7 @@ const SUPABASE_KEY = "sb_publishable_fh0uYqBqDFn4urQ-k6EtHQ_LAC3ZCaA";
 const sb = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
 
 let currentUser = null;
+let loadedCloudUserId = null;
 let authMode = "login";
 let guestBannerDismissed = false;
 let isRecoveryMode = false;
@@ -2929,6 +2927,8 @@ async function initPetDog() {
   const walkUrl = hasWalkGif ? "public/cane-cammina.gif" : (hasWalkPng ? "public/cane-cammina.png" : null);
   if (!walkUrl && !hasSit && !hasSleep) return;
 
+  petEl.classList.toggle("is-walk-gif", hasWalkGif);
+
   const walkSrc = walkUrl || (hasSit ? "public/cane-seduto.png" : "public/cane-dorme.png");
   const sitSrc = hasSit ? "public/cane-seduto.png" : walkSrc;
   const sleepSrc = hasSleep ? "public/cane-dorme.png" : sitSrc;
@@ -3134,8 +3134,11 @@ async function syncItemToCloud(item) {
   }
 }
 
-async function loadCloudData(user) {
+async function loadCloudData(user, force = false) {
   if (!sb || !user) return;
+  if (!force && loadedCloudUserId === user.id) return;
+  loadedCloudUserId = user.id;
+
   try {
     const { data: profile, error: profErr } = await sb
       .from("profiles")
@@ -3167,6 +3170,7 @@ async function loadCloudData(user) {
       updateInventoryUI();
     }
   } catch (err) {
+    loadedCloudUserId = null;
     console.error("Errore caricamento dati cloud:", err);
   }
 }
@@ -3447,7 +3451,7 @@ authForm.addEventListener("submit", async (e) => {
     } else if (result.data && result.data.user) {
       currentUser = result.data.user;
       guestBannerDismissed = false;
-      await loadCloudData(currentUser);
+      await loadCloudData(currentUser, true);
       updateAuthUI();
       authPassword.value = "";
       closeAuthModal();
@@ -3527,6 +3531,7 @@ document.getElementById("logoutBtn").onclick = async () => {
   if (!sb) return;
   await sb.auth.signOut();
   currentUser = null;
+  loadedCloudUserId = null;
   isRecoveryMode = false;
   guestBannerDismissed = false;
   credit = 0;
@@ -3561,6 +3566,7 @@ async function initAuth() {
       updateAuthUI();
     } else if (event === "SIGNED_OUT") {
       currentUser = null;
+      loadedCloudUserId = null;
       isRecoveryMode = false;
       guestBannerDismissed = false;
       credit = 0;
@@ -3577,6 +3583,7 @@ async function initAuth() {
     updateAuthUI();
   } else {
     currentUser = null;
+    loadedCloudUserId = null;
     credit = 0;
     inventory = [];
     updateAuthUI();
@@ -3678,6 +3685,17 @@ function closePosterModal() { posterModal.classList.remove("open"); }
 document.getElementById("closePosterModal").onclick = closePosterModal;
 posterModal.addEventListener("click", (e) => { if (e.target === posterModal) closePosterModal(); });
 
+/* Chiusura modali con tasto Esc su desktop */
+window.addEventListener("keydown", (e) => {
+  if (e.key !== "Escape") return;
+  if (posterModal.classList.contains("open")) closePosterModal();
+  else if (authModal.classList.contains("open")) closeAuthModal();
+  else if (wizardModal.classList.contains("open")) closeWizard();
+  else if (invBackdrop.classList.contains("open")) closeInventory();
+});
+
+const knobResetters = {};
+
 function renderCorridor() {
   corridor.innerHTML = "";
   dotsEl.innerHTML = "";
@@ -3705,7 +3723,6 @@ function renderCorridor() {
           <img class="knob-photo-crop" id="knobCrop-${idx}" alt="" />
           <div class="knob-fallback"></div>
         </div>
-        <div class="chute-origin" id="chute-${idx}"></div>
         <div class="machine-meta">
           <div class="machine-badge" id="badgeWrap-${idx}">
             <img src="public/badge3.png" alt="3€" class="machine-badge-img" onerror="this.parentElement.classList.add('no-badge-img');" />
@@ -3899,6 +3916,7 @@ function insertCoin(idx) {
   corridor.classList.add("locked");
   sfxCoin();
   dockHint.textContent = "Gira la manopola centrale di 360°!";
+  if (knobResetters[idx]) knobResetters[idx]();
   document.getElementById(`knob-${idx}`).classList.add("ready");
   document.getElementById(`eject-${idx}`).classList.add("ready");
   updateActiveUI();
@@ -3920,6 +3938,7 @@ function ejectCoin(idx) {
 
   phase = "idle";
   corridor.classList.remove("locked");
+  if (knobResetters[idx]) knobResetters[idx]();
   document.getElementById(`knob-${idx}`).classList.remove("ready");
   document.getElementById(`eject-${idx}`).classList.remove("ready");
   dockHint.textContent = "Moneta restituita nel borsellino!";
@@ -4004,6 +4023,13 @@ function bindMachineEvents(idx) {
   const knob = document.getElementById(`knob-${idx}`);
   let turning = false, startAngle = 0, currentDeg = 0, lastDetent = 0, knobCx = 0, knobCy = 0;
 
+  knobResetters[idx] = () => {
+    turning = false;
+    currentDeg = 0;
+    lastDetent = 0;
+    knob.style.transform = "rotate3d(0,0,1,0deg)";
+  };
+
   knob.addEventListener("pointerdown", (e) => {
     if (phase !== "coinInserted" || idx !== activeIndex || !currentUser) return;
     e.stopPropagation();
@@ -4039,6 +4065,7 @@ function autoTurnKnob(idx, knob) {
   const duration = 720, start = performance.now();
   let lastClickStep = 0;
   function frame(now) {
+    if (phase !== "coinInserted") return;
     const t = Math.min(1, (now - start) / duration);
     const eased = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
     const deg = eased * 360;
@@ -4075,10 +4102,13 @@ const squeezeFill = document.getElementById("squeezeFill");
 const squeezeUI = document.getElementById("squeezeUI");
 
 let currentCapUrl = null;
+let activeDropAnim = null;
+let bounceSoundTimer = null;
 let squeezeProgress = 0, holding = false, squeezeRaf = null, lastTime = 0, lastCreakStep = 0;
 
 function pickRandomPrize(machineIdx) {
   const pool = MACHINES[machineIdx].activePrizes;
+  if (!pool || pool.length === 0) return null;
   const last = lastPrizeByMachine[machineIdx];
   const candidates = pool.filter((_, i) => pool.length < 2 || i !== last);
   const chosen = candidates[Math.floor(Math.random() * candidates.length)];
@@ -4094,6 +4124,7 @@ function startCapsuleDrop(idx) {
 
   /* Estrae e salva subito il premio una sola volta: al sicuro anche in caso di refresh/crash */
   currentPrize = pickRandomPrize(idx);
+  if (!currentPrize) { phase = "idle"; corridor.classList.remove("locked"); return; }
   addToInventory(currentPrize);
 
   chuteCapsule.classList.remove("is-ready");
@@ -4103,17 +4134,22 @@ function startCapsuleDrop(idx) {
     if (phase !== "chuteReady") return;
     chuteOverlay.classList.add("active");
 
-    const dropAnim = chuteCapsule.animate([
+    if (activeDropAnim) { activeDropAnim.cancel(); activeDropAnim = null; }
+    clearTimeout(bounceSoundTimer);
+
+    activeDropAnim = chuteCapsule.animate([
       { transform: "translate(-50%, -145%) scale(0.62) rotate(-35deg)", opacity: 0 },
       { transform: "translate(-50%, -44%) scale(1.05, 0.93) rotate(12deg)", opacity: 1, offset: 0.65 },
       { transform: "translate(-50%, -56%) scale(0.97, 1.03) rotate(-4deg)", opacity: 1, offset: 0.84 },
       { transform: "translate(-50%, -50%) scale(1, 1) rotate(0deg)", opacity: 1 }
     ], { duration: 460, easing: "cubic-bezier(0.22, 0.85, 0.35, 1)", fill: "forwards" });
 
-    setTimeout(() => sfxBounce(), 270);
+    bounceSoundTimer = setTimeout(() => {
+      if (phase === "chuteReady") sfxBounce();
+    }, 270);
 
-    dropAnim.onfinish = () => {
-      dropAnim.cancel();
+    activeDropAnim.onfinish = () => {
+      if (activeDropAnim) { activeDropAnim.cancel(); activeDropAnim = null; }
       chuteCapsule.style.opacity = "1";
       if (phase === "chuteReady") chuteCapsule.classList.add("is-ready");
     };
@@ -4143,8 +4179,12 @@ function startCapsuleDrop(idx) {
 
 function openCapsuleFromChute() {
   if (phase !== "chuteReady") return;
+  if (activeDropAnim) { activeDropAnim.cancel(); activeDropAnim = null; }
+  clearTimeout(bounceSoundTimer);
+
   chuteOverlay.classList.remove("active");
   chuteCapsule.classList.remove("is-ready");
+  chuteCapsule.style.opacity = "1";
   sfxClick();
 
   if (currentCapUrl) {
@@ -4171,7 +4211,6 @@ function openCapsuleFromChute() {
   capsuleOverlay.classList.add("active");
 }
 
-chuteOverlay.addEventListener("contextmenu", (e) => e.preventDefault());
 chuteCapsule.addEventListener("pointerdown", (e) => {
   e.preventDefault();
   e.stopPropagation();
@@ -4188,7 +4227,6 @@ document.addEventListener("contextmenu", (e) => {
 const stopHolding = () => { holding = false; };
 
 capsuleWrap.addEventListener("touchstart", (e) => { if (phase === "squeeze") e.preventDefault(); }, { passive: false });
-capsuleOverlay.addEventListener("contextmenu", (e) => e.preventDefault());
 
 capsuleWrap.addEventListener("pointerdown", (e) => {
   if (phase !== "squeeze") return;
