@@ -2666,8 +2666,7 @@
           <div class="admin-box">
             <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
               <h3>Nuova Macchinetta</h3>
-              <button type="button" class="admin-btn sec" id="importDefaultsBtn">📥 Importa le 9 macchine attuali nel DB</button>
-            </div>
+              </div>
             <form id="adminMachineForm" style="display:flex;flex-direction:column;gap:8px;">
               <div class="admin-grid-2">
                 <input class="admin-input" id="admSlug" placeholder="Codice serie (es. m10)" required />
@@ -4921,46 +4920,6 @@ async function loadAdminPrizes() {
     adminPrizesList.appendChild(row);
   });
 }
-
-document.getElementById("importDefaultsBtn").onclick = async () => {
-  if (!confirm("Importare le 9 macchinette e le sorpresine attuali nel database Supabase?")) return;
-  setAdminMsg("Importazione in corso...");
-  try {
-    for (let i = 0; i < MACHINES.length; i++) {
-      const m = MACHINES[i];
-      const { data: insM, error: mErr } = await sb
-        .from("machines")
-        .upsert({
-          slug: m.prefix,
-          title: `Macchinetta ${i + 1}`,
-          price: m.price,
-          sort_order: i + 1,
-          is_active: true,
-          machine_photo_url: m.machinePhoto,
-          poster_photo_url: m.posterPhoto
-        }, { onConflict: "slug" })
-        .select()
-        .single();
-      if (mErr) throw mErr;
-
-      for (const p of (m.activePrizes || [])) {
-        await sb.from("prizes").upsert({
-          machine_id: insM.id,
-          prize_key: p.key,
-          name: `Sorpresa ${p.key}`,
-          photo_url: p.photo,
-          stock_qty: 10,
-          is_active: true
-        }, { onConflict: "prize_key" });
-      }
-    }
-    setAdminMsg("Importazione completata!");
-    await loadAdminMachines();
-    await loadCatalogFromDB();
-  } catch (err) {
-    setAdminMsg("Errore importazione: " + err.message, true);
-  }
-};
 
 document.getElementById("adminMachineForm").addEventListener("submit", async (e) => {
   e.preventDefault();
