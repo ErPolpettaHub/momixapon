@@ -5050,6 +5050,167 @@ bootApp = async function() {
   await _origBootApp();
 };
 
+/* --- Estrazione Sicura Lato Server con Stock Reale (Step 3) --- */
+function hasAvailableStock(idx) {
+  const m = MACHINES[idx];
+  if (!m || !dbCatalogActive) return true;
+  return (m.activePrizes || []).some((p) => (typeof p.stock === "number" ? p.stock > 0 : true));
+}
+
+insertCoin = function(idx) {
+  if (phase !== "idle" || idx !== activeIndex) return;
+  if (!currentUser) {
+    sfxError();
+    openAuthModal("Accedi o registrati per inserire il gettone e giocare!");
+    return;
+  }
+
+  if (!hasAvailableStock(idx)) {
+    sfxError();
+    dockHint.textContent = "Questa macchinetta è esaurita!";
+    return;
+  }
+
+  const price = MACHINES[idx].price;
+  if (credit < price) {
+    sfxError();
+    dockHint.textContent = "Credito insufficiente! Ricarica con +";
+    showWalletCloud(2600);
+    return;
+  }
+
+  /* Il credito vero verrà scalato dal server solo al giro completo della manopola */
+  phase = "coinInserted";
+  corridor.classList.add("locked");
+  sfxCoin();
+  dockHint.textContent = "Gira la manopola centrale di 360°!";
+  if (knobResetters[idx]) knobResetters[idx]();
+  document.getElementById(`knob-${idx}`).classList.add("ready");
+  document.getElementById(`eject-${idx}`).classList.add("ready");
+  updateActiveUI();
+};
+
+ejectCoin = function(idx) {
+  if (phase !== "coinInserted" || idx !== activeIndex || !currentUser) return;
+
+  sfxEject();
+  coinBtn.classList.remove("is-popping");
+  void coinBtn.offsetWidth;
+  coinBtn.classList.add("is-popping");
+
+  phase = "idle";
+  corridor.classList.remove("locked");
+  if (knobResetters[idx]) knobResetters[idx]();
+  document.getElementById(`knob-${idx}`).classList.remove("ready");
+  document.getElementById(`eject-${idx}`).classList.remove("ready");
+  dockHint.textContent = "Moneta restituita nel borsellino!";
+  setTimeout(() => {
+    if (phase === "idle") {
+      dockHint.textContent = currentUser ? "Estrai il gettone dal borsellino" : "Accedi per iniziare a giocare";
+    }
+  }, 1800);
+  updateActiveUI();
+};
+
+const _origStartCapsuleDrop = startCapsuleDrop;
+startCapsuleDrop = async function(idx) {
+  const m = MACHINES[idx];
+  if (!dbCatalogActive || !m || !m.dbId || !sb || !currentUser) {
+    return _origStartCapsuleDrop(idx);
+  }
+
+  phase = "spinning";
+  dockHint.textContent = "Estrazione in corso...";
+
+  try {
+    const { data, error } = await sb.rpc("spin_machine", { p_machine_id: m.dbId });
+    if (error || !data || !data.ok) {
+      throw new Error(error ? error.message : "Errore durante l'estrazione");
+    }
+
+    /* Aggiorna credito, stock locale e inventario con i dati certi dal server */
+    credit = data.new_credit;
+    updateCreditUI(true);
+    showWalletCloud(1800);
+
+    const won = data.prize;
+    const localPrize = (m.activePrizes || []).find((p) => p.key === won.key);
+    if (localPrize) localPrize.stock = won.stock;
+
+    currentPrize = {
+      key: won.key,
+      name: won.name,
+      photo: won.photo,
+      color: localPrize ? localPrize.color : CAPSULE_COLORS[0]
+    };
+
+    const now = Date.now();
+    let target = inventory.find((item) => item.key === currentPrize.key);
+    if (target) {
+      target.qty += 1;
+      target.lastWon = now;
+    } else {
+      inventory.unshift({ key: currentPrize.key, photo: currentPrize.photo, qty: 1, lastWon: now });
+    }
+    markSessionNew(currentPrize.key);
+    inventory.sort((a, b) => b.lastWon - a.lastWon);
+    updateInventoryUI();
+
+    /* Lancia l'animazione della pallina nello sportello */
+    phase = "chuteReady";
+    squeezeProgress = 0;
+    holding = false;
+    lastCreakStep = 0;
+    chuteCapsule.classList.remove("is-ready");
+    chuteCapsule.style.opacity = "0";
+
+    const launchDrop = () => {
+      if (phase !== "chuteReady") return;
+      chuteOverlay.classList.add("active");
+      if (activeDropAnim) { activeDropAnim.cancel(); activeDropAnim = null; }
+      clearTimeout(bounceSoundTimer);
+
+      activeDropAnim = chuteCapsule.animate([
+        { transform: "translate(-50%, -145%) scale(0.62) rotate(-35deg)", opacity: 0 },
+        { transform: "translate(-50%, -44%) scale(1.05, 0.93) rotate(12deg)", opacity: 1, offset: 0.65 },
+        { transform: "translate(-50%, -56%) scale(0.97, 1.03) rotate(-4deg)", opacity: 1, offset: 0.84 },
+        { transform: "translate(-50%, -50%) scale(1, 1) rotate(0deg)", opacity: 1 }
+      ], { duration: 460, easing: "cubic-bezier(0.22, 0.85, 0.35, 1)", fill: "forwards" });
+
+      bounceSoundTimer = setTimeout(() => {
+        if (phase === "chuteReady") sfxBounce();
+      }, 270);
+
+      activeDropAnim.onfinish = () => {
+        if (activeDropAnim) { activeDropAnim.cancel(); activeDropAnim = null; }
+        chuteCapsule.style.opacity = "1";
+        if (phase === "chuteReady") chuteCapsule.classList.add("is-ready");
+      };
+    };
+
+    if (availableCapsules.length > 0) {
+      currentCapUrl = availableCapsules[Math.floor(Math.random() * availableCapsules.length)];
+      chuteCapsule.classList.remove("no-photo");
+      capImgTop.src = currentCapUrl;
+      capImgBottom.src = currentCapUrl;
+      chuteCapImg.src = currentCapUrl;
+      if (chuteCapImg.decode) chuteCapImg.decode().catch(() => {}).finally(launchDrop);
+      else launchDrop();
+    } else {
+      currentCapUrl = null;
+      chuteCapsule.style.setProperty("--cap-color", currentPrize.color);
+      chuteCapsule.classList.add("no-photo");
+      launchDrop();
+    }
+  } catch (err) {
+    sfxError();
+    phase = "idle";
+    corridor.classList.remove("locked");
+    dockHint.textContent = err.message || "Errore estrazione";
+    updateActiveUI();
+  }
+};
+
 bootApp();
 </script>
 </body>
